@@ -1,5 +1,9 @@
 ### [뒤로가기](../TreeVocaNote.md)
 
+## 설명
+- 사용자 입력처리를 담당
+- CLI환경에서 사용할 수 있는 도움말 등의 기능
+
 ### 메소드
 * [DictionaryIOSystem](#iosystem)
 * [DictionaryHelp](#help)
@@ -15,13 +19,10 @@ using namespace std;
 
 // 사전 사용자 입출력 시스템
 void DictionaryIOSystem	(WordDictionary& wd);
-
 // 도움말 출력 
 void DictionaryHelp		();
-
 // 내용 추가
 void DictionaryAdd		(WordDictionary& wd);
-
 // 예제
 void DictionaryExample	(WordDictionary& wd);
 ```

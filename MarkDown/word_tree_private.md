@@ -4,11 +4,24 @@
 ### word_tree_control.cc
 ```cpp
 #include"word_tree.h"
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### find
+```cpp
 // 문자열이 저장될 수 있거나 해당 문자열의 위치를 반환
 // 반환값
 // 주소값	: 저장 가능 또는 동일한 문자열 위치
 // NULL		: 에러
+
+Node*	WordDictionary :: Find(
+		const string&	target,
+		int&	 		n	
+		)
+{
+	Node* temp;
+	return Find(target,n,temp);
+}
+
 Node*	WordDictionary :: Find(
 		const string&	target,
 		int&	 		n,
@@ -57,16 +70,10 @@ Node*	WordDictionary :: Find(
 	}
 	return temp;
 }
-
-Node*	WordDictionary :: Find(
-		const string&	target,
-		int&	 		n	
-		)
-{
-	Node* temp;
-	return Find(target,n,temp);
-}
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### insert
+```cpp
 bool WordDictionary :: Insert(
 	const string &	word,
 	const string &	mean)
@@ -96,9 +103,11 @@ bool WordDictionary :: Insert(
 	}while(false);
 	return ret;
 }
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### save
+```cpp
 // 문자열을 저장함
-
 bool	WordDictionary :: Save(
 	Node*			destination,
 	Node*			parent,
@@ -137,7 +146,10 @@ bool	WordDictionary :: Save(
 	}
 	return FAIL;
 }
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### makenode
+```cpp
 // 노드 리스트 생성
 Node*	WordDictionary :: MakeNodes(const string& target, const string& mean)
 {
@@ -162,7 +174,10 @@ Node*	WordDictionary :: MakeNodes(const string& target, const string& mean)
 	// target이 빈 문자열이라면 null 반환
 	return head.child;
 }
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### savemean
+```cpp
 bool	WordDictionary :: SaveMean(
 	Node*			destination,
 	const string&	mean,
@@ -184,7 +199,10 @@ bool	WordDictionary :: SaveMean(
 	return FAIL;
 }
 
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### addrightnode
+```cpp
 // 현재의 오른쪽에 노드리스트 붙이기
 void	WordDictionary :: AddRightNode(
 	Node* 			destination, 
@@ -215,9 +233,11 @@ void	WordDictionary :: AddRightNode(
 		temp->brother = destination->brother;
 		destination->brother = temp;
 	}
-
 }
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### addbelownode
+```cpp
 // 현재의 아래쪽에 노드리스트 붙이기
 void	WordDictionary :: AddBelowNode(
 	Node* 			destination, 
@@ -231,7 +251,10 @@ void	WordDictionary :: AddBelowNode(
 
 	destination->child = temp;
 }
-
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### deleteword
+```cpp
 // 단어 삭제 
 bool	WordDictionary :: DeleteWord(string target)
 {
@@ -257,6 +280,111 @@ bool	WordDictionary :: DeleteWord(string target)
 
 	return FAIL;
 }
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### deletemean
+```cpp
+// 대상이 갖고있는 뜻을 삭제함
+bool	WordDictionary :: DeleteMean(Node* target)
+{
+	if(NULL == target)	{ return FAIL; }
+	if(!target->isWord)	{ return FAIL; }
+	
+	target->isWord = false;
+	--countWord;
+	return SUCCESS;
+}
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### deleteable
+```cpp
+// 의미가 저장안된경우, 아이가 없는경우에만 삭제됨
+bool	WordDictionary :: Deleteable(Node* target)
+{
+	if(NULL == target)			{ return false; }
+	// if(NULL != target->brother)	{ return false; }
+	if(NULL != target->child)	{ return false; }
+	if(target->isWord)			{ return false; }
+
+	return true;
+}
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### deletenode
+```cpp
+// 노드 삭제	
+bool	WordDictionary :: DeleteNode(Node* target)
+{
+	// 삭제 불가능
+	if(!Deleteable(target)){ return FAIL; }
+
+	// 삭제 가능
+	delete target;
+	--countNode;
+
+	return SUCCESS;
+}
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### modifyword
+```cpp
+bool	WordDictionary :: ModifyWord(string oldWord, string newWord)
+{
+	Node* temp;
+	int n;
+	temp = Find(oldWord, n);
+	
+	// 같은 단어가 아니거나 단어가 아니라면 종료
+	if(n + 1 != oldWord.length() || !temp->isWord) {return FAIL;}
+
+	// 새로운 단어 생성
+	if(!Insert(newWord,temp->mean)) {return FAIL;}
+	// 기존 단어 삭제
+	if(!DeleteWord(oldWord)) 
+	{
+		DeleteWord(newWord);
+		return FAIL;
+	};
+	
+	return SUCCESS;
+}
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### modifymean
+```cpp
+bool	WordDictionary :: ModifyMean(string target, string mean)
+{
+	Node * temp;
+	int n;
+	temp = Find(target,n);
+
+	// 같은 단어가 아니거나 단어가 아니라면 종료
+	if(n + 1 != target.length() || !temp->isWord){return FAIL;}
+	// 의미만 바꿈
+	temp->mean = mean;
+
+	return SUCCESS;
+}
+```
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### clear
+```cpp
+void	WordDictionary :: Clear()
+{
+	if(NULL != head->brother)
+	{
+		countNode = 1;
+		countWord = 0;
+
+		DFSClear(head->brother);
+		head->brother = NULL;
+	}
+}
+```
+
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### dfsdelete
+```cpp
 // false	삭제 불가
 // true		삭제 가능
 bool	WordDictionary :: DFSDelete(
@@ -312,87 +440,11 @@ bool	WordDictionary :: DFSDelete(
 	// 아이 삭제	
 	return DeleteNode(temp);
 }
+```
 
-// 대상이 갖고있는 뜻을 삭제함
-bool	WordDictionary :: DeleteMean(Node* target)
-{
-	if(NULL == target)	{ return FAIL; }
-	if(!target->isWord)	{ return FAIL; }
-	
-	target->isWord = false;
-	--countWord;
-	return SUCCESS;
-}
-
-// 의미가 저장안된경우, 아이가 없는경우에만 삭제됨
-bool	WordDictionary :: Deleteable(Node* target)
-{
-	if(NULL == target)			{ return false; }
-	// if(NULL != target->brother)	{ return false; }
-	if(NULL != target->child)	{ return false; }
-	if(target->isWord)			{ return false; }
-
-	return true;
-}
-
-// 노드 삭제	
-bool	WordDictionary :: DeleteNode(Node* target)
-{
-	// 삭제 불가능
-	if(!Deleteable(target)){ return FAIL; }
-
-	// 삭제 가능
-	delete target;
-	--countNode;
-
-	return SUCCESS;
-}
-
-bool	WordDictionary :: ModifyWord(string oldWord, string newWord)
-{
-	Node* temp;
-	int n;
-	temp = Find(oldWord, n);
-	
-	// 같은 단어가 아니거나 단어가 아니라면 종료
-	if(n + 1 != oldWord.length() || !temp->isWord) {return FAIL;}
-
-	// 새로운 단어 생성
-	if(!Insert(newWord,temp->mean)) {return FAIL;}
-	// 기존 단어 삭제
-	if(!DeleteWord(oldWord)) 
-	{
-		DeleteWord(newWord);
-		return FAIL;
-	};
-	
-	return SUCCESS;
-}
-bool	WordDictionary :: ModifyMean(string target, string mean)
-{
-	Node * temp;
-	int n;
-	temp = Find(target,n);
-
-	// 같은 단어가 아니거나 단어가 아니라면 종료
-	if(n + 1 != target.length() || !temp->isWord){return FAIL;}
-	// 의미만 바꿈
-	temp->mean = mean;
-
-	return SUCCESS;
-}
-void	WordDictionary :: Clear()
-{
-	if(NULL != head->brother)
-	{
-		countNode = 1;
-		countWord = 0;
-
-		DFSClear(head->brother);
-		head->brother = NULL;
-	}
-}
-
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### dfsclear
+```cpp
 void 	WordDictionary :: DFSClear(Node* node)
 {
 	if(NULL != node->child)
@@ -406,3 +458,62 @@ void 	WordDictionary :: DFSClear(Node* node)
 	delete node;
 }
 ```
+
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### dfsprint
+```cpp
+void	WordDictionary :: DFSPrint(Node* now, string& stack)
+{
+	stack.push_back(now->letter);
+	// 현재 노드가 의미를 가지고 있다면
+	if(now->isWord)
+	{
+		cout << stack << "\t : ";
+		cout << now->mean << "\n";
+	}
+
+	if(NULL != now->child)
+	{
+		DFSPrint(now->child, stack);
+	}	
+
+	stack.pop_back();
+
+	if(NULL != now->brother)
+	{
+		DFSPrint(now->brother, stack);
+	}
+}
+```
+
+###### [뒤로가기](./word_tree.md#private-메소드)
+#### dfstree
+```cpp
+// 트리에서 사용할 DFS
+void	WordDictionary :: DFSTree(Node* now, int n)
+{
+	if(NULL == now) {return;}
+	cout << "→   " << now->letter ;
+	if(now->isWord){cout << "!";}
+	cout << "\t" ;
+
+	if(NULL != now->child)
+	{
+		DFSTree(now->child,n+1);
+	}
+	else
+	{
+		cout << "\n";
+	}
+	
+	if(NULL != now->brother)
+	{
+		cout << "\n";
+		for(int i  = 0 ; i < n ; i++){ cout << "\t"; }
+		DFSTree(now->brother,n);
+	}
+}
+```
+
+#### last
+###### [뒤로가기](./word_tree.md)

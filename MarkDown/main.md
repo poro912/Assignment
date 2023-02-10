@@ -1,5 +1,9 @@
 [뒤로가기](../TreeVocaNote.md)
 
+## 설명
+- 주요 함수를 순차적으로 실행시킴
+- 환경 설정
+
 ### main.h
 ```cpp
 #include<iostream>

@@ -6,7 +6,10 @@
 
 // 기본 생성자
 WordDictionary :: WordDictionary() : countWord(0), countNode(0) ,head(new Node){	}
-
+```
+###### [뒤로가기](./word_tree.md)
+#### Add
+```cpp
 // 단어 추가 
 bool	WordDictionary :: Add(string word, string mean)
 {
@@ -30,7 +33,10 @@ bool	WordDictionary :: Add(string word, string mean)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 	return ret;
 }
-
+```
+###### [뒤로가기](./word_tree.md)
+#### remove
+```cpp
 // 단어 삭제
 bool	WordDictionary :: Remove(string target)
 {
@@ -51,7 +57,10 @@ bool	WordDictionary :: Remove(string target)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 	return ret;
 }
-
+```
+###### [뒤로가기](./word_tree.md)
+#### printsingle
+```cpp
 // 뜻 출력
 void	WordDictionary :: Print(string target)
 {
@@ -78,7 +87,10 @@ void	WordDictionary :: Print(string target)
 	cout << "\nㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 	return;
 }
-
+```
+###### [뒤로가기](./word_tree.md)
+#### printall
+```cpp
 // 전체 출력
 void	WordDictionary :: Print()
 {
@@ -98,30 +110,10 @@ void	WordDictionary :: Print()
 	}
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
-
-void	WordDictionary :: DFSPrint(Node* now, string& stack)
-{
-	stack.push_back(now->letter);
-	// 현재 노드가 의미를 가지고 있다면
-	if(now->isWord)
-	{
-		cout << stack << "\t : ";
-		cout << now->mean << "\n";
-	}
-
-	if(NULL != now->child)
-	{
-		DFSPrint(now->child, stack);
-	}	
-
-	stack.pop_back();
-
-	if(NULL != now->brother)
-	{
-		DFSPrint(now->brother, stack);
-	}
-}
-
+```
+###### [뒤로가기](./word_tree.md)
+#### similarprint
+```cpp
 // 유사 단어 전부 출력
 void	WordDictionary :: SimilarPrint(string target)
 {
@@ -149,21 +141,10 @@ void	WordDictionary :: SimilarPrint(string target)
 	}
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
-
-// 해당 단어 존재 여부 확인
-bool	WordDictionary :: Search(string target)
-{
-	cout << __FUNCTION__ << " Execute" << "\n";
-	return false;
-}
-
-// 유사 단어 반환
-string	WordDictionary :: SimilarSearch(string target)
-{
-	cout << __FUNCTION__ << " Execute" << "\n";
-	return string("NULL");
-}
-
+```
+###### [뒤로가기](./word_tree.md)
+#### replaceword
+```cpp
 void 	WordDictionary :: ReplaceWord(string oldWord, string newWord)
 {
 		
@@ -178,7 +159,10 @@ void 	WordDictionary :: ReplaceWord(string oldWord, string newWord)
 	}
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
-
+```
+###### [뒤로가기](./word_tree.md)
+#### replacemean
+```cpp
 void 	WordDictionary :: ReplaceMean(string word, string mean)
 {
 
@@ -193,7 +177,10 @@ void 	WordDictionary :: ReplaceMean(string word, string mean)
 	}
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
-
+```
+###### [뒤로가기](./word_tree.md)
+#### tree
+```cpp
 // 트리 출력
 void	WordDictionary :: Tree()
 {
@@ -203,33 +190,12 @@ void	WordDictionary :: Tree()
 		DFSTree(head->brother, 0);
 	}
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
-
 }
-// 트리에서 사용할 DFS
-void	WordDictionary :: DFSTree(Node* now, int n)
-{
-	if(NULL == now) {return;}
-	cout << "→   " << now->letter ;
-	if(now->isWord){cout << "!";}
-	cout << "\t" ;
+```
 
-	if(NULL != now->child)
-	{
-		DFSTree(now->child,n+1);
-	}
-	else
-	{
-		cout << "\n";
-	}
-	
-	if(NULL != now->brother)
-	{
-		cout << "\n";
-		for(int i  = 0 ; i < n ; i++){ cout << "\t"; }
-		DFSTree(now->brother,n);
-	}
-}
-
+###### [뒤로가기](./word_tree.md)
+#### info
+```cpp
 // 현재 정보 출력
 void	WordDictionary :: Info()
 {
@@ -238,7 +204,10 @@ void	WordDictionary :: Info()
 	cout << "생성된 노드 수\t: " << countNode << "\n";
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
-
+```
+###### [뒤로가기](./word_tree.md)
+#### printallinfo
+```cpp
 void	WordDictionary :: PrintAll()
 {
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ전체정보ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
