@@ -31,9 +31,8 @@ void DictionaryExample(WordDictionary & wd)
     wd.Add(string("  hello  "),string("안녕하세요"));
 ```
 
-<img src = "../img/add1.png" width="700" >
-<img src = "../img/add2.png" width="700" ></br>
-
+<img src = "../img/add1.png" width="400" ><img src = "../img/add2.png" width="400" >
+</br>
 
 
 ``` cpp
@@ -50,14 +49,14 @@ void DictionaryExample(WordDictionary & wd)
 	wd.SimilarPrint("app");
 ```
 
-<img src = "../img/search.png" width="700" ></br>
+<img src = "../img/search.png" width="400" ></br>
 
 ``` cpp
     // Tree 형태 출력
 	wd.Tree();
 ```
 
-<img src = "../img/tree.png" width="700" ></br>
+<img src = "../img/tree.png" width="400" ></br>
 
 ``` cpp
     // 단어 삭제
@@ -72,8 +71,8 @@ void DictionaryExample(WordDictionary & wd)
 	wd.Remove(string("create"));
 ```
 
-<img src = "../img/delete1.png" width="700" ></br>
-<img src = "../img/delete2.png" width="700" ></br>
+<img src = "../img/delete1.png" width="400" ></br>
+<img src = "../img/delete2.png" width="400" ></br>
 
 ``` cpp
     // 현재 저장정보 출력
@@ -81,7 +80,7 @@ void DictionaryExample(WordDictionary & wd)
     // 모든 저장 정보 출력
 	wd.PrintAll();
 ```
-<img src = "../img/info.png" width="700" ></br>
+<img src = "../img/info.png" width="400" ></br>
 
 ``` cpp
     // 철자 및 의미 변경
@@ -94,13 +93,13 @@ void DictionaryExample(WordDictionary & wd)
 	wd.Print("wing");
 	wd.Print();
 ```
-<img src = "../img/replace.png" width="700" ></br>
+<img src = "../img/replace.png" width="400" ></br>
 
 ``` cpp
     // 전체 삭제
 	wd.Clear();
 	wd.PrintAll();
 ```
-<img src = "../img/clear.png" width="700" ></br>
+<img src = "../img/clear.png" width="400" ></br>
 
 
