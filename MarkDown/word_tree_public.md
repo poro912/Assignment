@@ -244,5 +244,5 @@ void	WordDictionary :: PrintAll()
 }
 ```
 
-### [위로가기](#word_tree.cc)
-### [뒤로가기](./word_tree.md)
+### [위로가기](#word_treecc)
+### [뒤로가기](./word_tree.md#public-메소드)

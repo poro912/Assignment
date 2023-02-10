@@ -511,5 +511,5 @@ void 	WordDictionary :: DFSClear(Node* node)
 }
 ```
 
-### [위로가기](#word_tree_control.cc)
-### [뒤로가기](./word_tree.md)
+### [위로가기](#word_tree_controlcc)
+### [뒤로가기](./word_tree.md#private-메소드)
