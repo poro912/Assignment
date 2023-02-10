@@ -8,7 +8,7 @@ Tree 자료형을 이용한 단어장 프로그램이다.</br>
 * 개발 환경 : Linux Ubunt 22.04.1
 * IDE : Vim, make, VScode
 
-# 구현 기능
+## 구현 기능
 * 생성
 	- 단어 추가
 * 삭제
@@ -26,7 +26,7 @@ Tree 자료형을 이용한 단어장 프로그램이다.</br>
 	- 사용자 입출력 처리 시스템
 	- 사용자 입력 필터링 시스템
 
-# 문제점
+## 문제점
 1. 정책 미흡
    1. 특수문자에 대한 정책 미수립
    2. 단어 사이의 띄어쓰기 정책 미수립
@@ -41,7 +41,7 @@ Tree 자료형을 이용한 단어장 프로그램이다.</br>
    2. string 계열 함수의 혼용
    3. 다양한 편의 기능 미사용
 
-# 파일구조 (UML)
+## 파일구조 (UML)
 * main.o
 * IOSystem.o
 * word_tree.o
@@ -50,35 +50,35 @@ Tree 자료형을 이용한 단어장 프로그램이다.</br>
 네개의 주요 오브젝트 파일을 링킹하여 컴파일 함</br>
 <img src = "./img/file_struct.png" width="700" ></br>
 
-# 사용 라이브러리
+## 사용 라이브러리
 * iostream
 * string  
 * cstring      
 * algorithm            
 * list      
 
-# [시현](./MarkDown/demonsteration.md)
+## [시현](./MarkDown/demonsteration.md)
 
-# 헤더파일 구성
-## [Main.h](./MarkDown/main.md)</br>
+## 헤더파일 구성
+### [Main.h](./MarkDown/main.md)</br>
 - 주요 함수를 순차적으로 실행시킴
 - 환경 설정
 
-## [word_tree.h](./MarkDown/word_tree.md)</br>
+### [word_tree.h](./MarkDown/word_tree.md)</br>
 - 사용자 입력처리를 담당
 - CLI환경에서 사용할 수 있는 도움말 등의 기능
 
-## [IOSystem.h](./MarkDown/IOSystem.md)</br>
+### [IOSystem.h](./MarkDown/IOSystem.md)</br>
 - 주요 함수들을 정의
 - 데이터 가공 및 실행결과 출력
 - word_tree.cc  : 출력을 담당하거나 사용자가 호출하게 되는 메소드 정의
 - word_tree.control : 내부 데이터에 영향을 주거나 특정 알고리즘이 필요한 메소드 정의
 
-## [strings.h](./MarkDown/strings.md)</br>
+### [strings.h](./MarkDown/strings.md)</br>
 - 입출력 시 문제가 될 수 있는 입력 데이터를 필터링 하기위한 함수 정의
 </br>
 
-# Makefile 
+## Makefile 
 
 ```
 OBJS = main.o word_tree.o word_tree_control.o IOSystem.o strings.o 
