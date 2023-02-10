@@ -86,7 +86,7 @@ class WordDictionary
 ## Private 메소드
 ### [Code](./word_tree_private.md)
 * [Find](./word_tree_private.md#find)
-* [Find](./word_tree_private.md#find2)
+* [Find](./word_tree_private.md#find)
     - 조건에 해당하는 노드 탐색
 * [Save](./word_tree_private.md#save)
 	- 데이터 삽입

@@ -6,9 +6,13 @@
 
 ### 메소드
 * [DictionaryIOSystem](#iosystem)
+	- IOSystem 가동
 * [DictionaryHelp](#help)
+	- 사용할 수 있는 명령어 리스트 출력
 * [DictionaryAdd](#add)
+	- Add 메소드 호출
 * [DictionaryExample](#example)
+	- 예시 함수 실행
 
 ### IOSystem.h
 ```cpp

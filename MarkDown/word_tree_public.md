@@ -7,7 +7,7 @@
 // 기본 생성자
 WordDictionary :: WordDictionary() : countWord(0), countNode(0) ,head(new Node){	}
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### Add
 ```cpp
 // 단어 추가 
@@ -34,7 +34,7 @@ bool	WordDictionary :: Add(string word, string mean)
 	return ret;
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### remove
 ```cpp
 // 단어 삭제
@@ -58,7 +58,7 @@ bool	WordDictionary :: Remove(string target)
 	return ret;
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### printsingle
 ```cpp
 // 뜻 출력
@@ -88,7 +88,7 @@ void	WordDictionary :: Print(string target)
 	return;
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### printall
 ```cpp
 // 전체 출력
@@ -111,7 +111,7 @@ void	WordDictionary :: Print()
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### similarprint
 ```cpp
 // 유사 단어 전부 출력
@@ -142,7 +142,7 @@ void	WordDictionary :: SimilarPrint(string target)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### replaceword
 ```cpp
 void 	WordDictionary :: ReplaceWord(string oldWord, string newWord)
@@ -160,7 +160,7 @@ void 	WordDictionary :: ReplaceWord(string oldWord, string newWord)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### replacemean
 ```cpp
 void 	WordDictionary :: ReplaceMean(string word, string mean)
@@ -178,7 +178,7 @@ void 	WordDictionary :: ReplaceMean(string word, string mean)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### tree
 ```cpp
 // 트리 출력
@@ -193,7 +193,7 @@ void	WordDictionary :: Tree()
 }
 ```
 
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### info
 ```cpp
 // 현재 정보 출력
@@ -205,7 +205,7 @@ void	WordDictionary :: Info()
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
-###### [뒤로가기](./word_tree.md)
+###### [뒤로가기](./word_tree.md#public-메소드)
 #### printallinfo
 ```cpp
 void	WordDictionary :: PrintAll()
