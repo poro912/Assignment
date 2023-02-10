@@ -7,6 +7,7 @@
 // 기본 생성자
 WordDictionary :: WordDictionary() : countWord(0), countNode(0) ,head(new Node){	}
 ```
+
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### Add
 ```cpp
@@ -34,6 +35,7 @@ bool	WordDictionary :: Add(string word, string mean)
 	return ret;
 }
 ```
+
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### remove
 ```cpp
@@ -57,7 +59,63 @@ bool	WordDictionary :: Remove(string target)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 	return ret;
 }
+
 ```
+
+###### [뒤로가기](./word_tree.md#public-메소드)
+#### clear
+```cpp
+void	WordDictionary :: Clear()
+{
+	if(NULL != head->brother)
+	{
+		countNode = 1;
+		countWord = 0;
+
+		DFSClear(head->brother);
+		head->brother = NULL;
+	}
+}
+```
+
+###### [뒤로가기](./word_tree.md#public-메소드)
+#### replaceword
+```cpp
+void 	WordDictionary :: ReplaceWord(string oldWord, string newWord)
+{
+		
+	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡ단어변경ㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
+	if(ModifyWord(oldWord,newWord))
+	{
+		cout << "변경성공\n";
+	}
+	else
+	{
+		cout << "변경실패\n";
+	}
+	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
+}
+```
+
+###### [뒤로가기](./word_tree.md#public-메소드)
+#### replacemean
+```cpp
+void 	WordDictionary :: ReplaceMean(string word, string mean)
+{
+
+	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡ의미변경ㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
+	if(ModifyMean(word,mean))
+	{
+		cout << "변경성공\n";
+	}
+	else
+	{
+		cout << "변경실패\n";
+	}
+	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
+}
+```
+
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### printsingle
 ```cpp
@@ -88,6 +146,7 @@ void	WordDictionary :: Print(string target)
 	return;
 }
 ```
+
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### printall
 ```cpp
@@ -111,6 +170,7 @@ void	WordDictionary :: Print()
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
+
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### similarprint
 ```cpp
@@ -142,42 +202,7 @@ void	WordDictionary :: SimilarPrint(string target)
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
-###### [뒤로가기](./word_tree.md#public-메소드)
-#### replaceword
-```cpp
-void 	WordDictionary :: ReplaceWord(string oldWord, string newWord)
-{
-		
-	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡ단어변경ㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
-	if(ModifyWord(oldWord,newWord))
-	{
-		cout << "변경성공\n";
-	}
-	else
-	{
-		cout << "변경실패\n";
-	}
-	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
-}
-```
-###### [뒤로가기](./word_tree.md#public-메소드)
-#### replacemean
-```cpp
-void 	WordDictionary :: ReplaceMean(string word, string mean)
-{
 
-	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡ의미변경ㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
-	if(ModifyMean(word,mean))
-	{
-		cout << "변경성공\n";
-	}
-	else
-	{
-		cout << "변경실패\n";
-	}
-	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
-}
-```
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### tree
 ```cpp
@@ -205,6 +230,7 @@ void	WordDictionary :: Info()
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
 }
 ```
+
 ###### [뒤로가기](./word_tree.md#public-메소드)
 #### printallinfo
 ```cpp
@@ -215,6 +241,8 @@ void	WordDictionary :: PrintAll()
 	Tree();
 	Print();
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n\n";
-
 }
 ```
+
+#### last
+###### [뒤로가기](./word_tree.md)
