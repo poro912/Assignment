@@ -41,7 +41,7 @@ Tree 자료형을 이용한 단어장 프로그램이다.</br>
    2. string 계열 함수의 혼용
    3. 다양한 편의 기능 미사용
 
-## 파일구조 (UML)
+## 파일구조 
 * main.o
 * IOSystem.o
 * word_tree.o
