@@ -47,17 +47,15 @@
 ![img](./img/mattermost2.png)
 
 ## etc
+### NAT		(Network Address Translation)
+    IP패킷에 있는 출발지 및 목적지의 IP주소와 포트를 바꿔 재기록하여 트래픽을 주고받게 하는 기술
 ### 포트포워딩	(Port Forwarding)
     패킷이 네트워크 게이트를 지날 때 IP주소와 포트번호 결합의 통신 요청을 다른곳으로 넘겨주는 주소 변환 방법
     외부IP:port -> 내부IP:port 로 매핑
-
-### NAT		(Network Address Translation)
-    IP패킷에 있는 출발지 및 목적지의 IP주소와 포트를 바꿔 재기록하여 트래픽을 주고받게 하는 기술
-### SNAT		(Secure NAT)
-	출발지 주소를 변경하는 NAT
 ### DNAT		(Destination NAT)
 	도착지 주소를 변경하는 NAT
-
+### SNAT		(Source NAT)
+	출발지 주소를 변경하는 NAT
 ``` bash
 # SNAT rule
 sudo iptables -t nat -A POSTROUTING -p tcp -s 172.17.0.2 --sport 8065 -d 192.168.56.1 -j SNAT --to-source 192.168.56.1
