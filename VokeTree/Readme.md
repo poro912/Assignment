@@ -43,6 +43,9 @@ Tree 자료형을 이용한 단어장 프로그램이다.</br>
 * list      
 
 ## [시현](./MarkDown/demonsteration.md)
+예제코드와 결과에 대한 사진
+</br>[Link](./MarkDown/demonsteration.md)
+</br></br>
 
 ## 헤더파일 구성
 ### [Main.h](./MarkDown/main.md)</br>
