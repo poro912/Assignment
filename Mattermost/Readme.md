@@ -31,11 +31,11 @@
     systemctl start mysql
     systemctl start mattermost.service
 
-### 시스템 부팅시 시작 설정 명령
+### 서비스 자동 실행 명령
     systemctl enable mysql
     systemctl enable mattermost.service
 
-### 시스템 테스트 명령어
+### 시스템 테스트 명령
     cd /opt/mattermost
     sudo -u mattermost ./bin/mattermost
     sudo systemctl status mattermost.service 
