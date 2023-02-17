@@ -1,4 +1,4 @@
-## [뒤로가기](../TreeVocaNote.md)
+## [뒤로가기](../Readme.md)
 
 ## 설명
 - 주요 함수들을 정의
@@ -237,7 +237,7 @@ class WordDictionary
 		// 단어 삭제
 		bool Remove		(string target);
 		// 전체 삭제
-		void Clear	();	
+		void Clear		();	
 		// 단어 변경
 		void ReplaceWord	(string oldWord, string newWord);
 		// 의미 변경
@@ -259,5 +259,5 @@ class WordDictionary
 ```
 
 ### [위로가기](#설명)
-### [뒤로가기](../TreeVocaNote.md)
+### [뒤로가기](../Readme.md)
 

@@ -1,4 +1,4 @@
-### [뒤로가기](../TreeVocaNote.md)
+### [뒤로가기](../Readme.md)
 
 ## 설명
 - 사용자 입력처리를 담당
@@ -158,4 +158,4 @@ void DictionaryExample(WordDictionary & wd)
 }
 ```
 ### [위로가기](#설명)
-### [뒤로가기](../TreeVocaNote.md)
+### [뒤로가기](../Readme.md)

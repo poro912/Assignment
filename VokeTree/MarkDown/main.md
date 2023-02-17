@@ -1,4 +1,4 @@
-[뒤로가기](../TreeVocaNote.md)
+[뒤로가기](../Readme.md)
 
 ## 설명
 - 주요 함수를 순차적으로 실행시킴
@@ -33,4 +33,4 @@ int main(void)
 
 ```
 ### [위로가기](#설명)
-### [뒤로가기](../TreeVocaNote.md)
+### [뒤로가기](../Readme.md)
