@@ -11,7 +11,7 @@
 [공식 가이드](https://docs.mattermost.com/guides/deployment.html#install-guides)
 1. 도커를 이용한 설치
     * 곧바로 사용 가능하다.
-    * Preview 버전만 제공된다.
+    * 배포된 다양한 버전의 도커이미지가 존재한다.
     >docker run --name mattermost-preview -d --publish 8065:8065 --add-host dockerhost:127.0.0.1 mattermost/mattermost-preview 
 
 2. Git을 이용한 방식
