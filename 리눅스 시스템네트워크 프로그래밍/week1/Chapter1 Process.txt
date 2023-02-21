@@ -1,0 +1,68 @@
+프로세스
+
+효율적인 상황, 비효율적인 상황
+특징
+주의점
+구조체
+함수종류와 차이점
+
+부가 사용 메소드
+
+멀티프로세스
+복수개의 CPU가 설치된 경우 뛰어난 응답성과 성능을 보여줄 가능성이 크다.
+프로세스간 데이터 통신이 빈번하며 데이터 통신 비용이 큰 경우엔 비효율적이다.
+
+fork-exec
+
+Fork
+pid_t fork(void);
+프로세스 복제 함수
+복제가 일어나는 순간 부모의 모든 정적 정보를 복제함
+	(힙 메모리, 정적 메모리, IPC 자원 ID, 열린 파일, 시스널 마스크 등)
+동시 실행
+
+pid_t
+0 자식프로세스에게 리턴
+-1 에러, 복제 실패
+양수 부모 프로세스에게 리턴 자식 프로세스의 pid
+
+Exec
+현재 실행 중인 프로세스를 새로운 프로세스로 교체
+실행 코드 교체
+기본적인 PID, PPID, 파일기술자 등 프로세스의 정보유지
+
+int execl	( const char *path, const char *arg, ... );
+int execlp	( const char *file, const char *arg, ... );
+int execle	( const char *path, const char *arg, ..., char * const envp[] );
+int execv	( const char *path, char *const argv[] );
+int execvp	( const char *file, char *const argv[] );
+int execve	( const char *path, char *const argv[], char * const envp[] );
+
+file	: 환경변수에서 경로를 확인한다.
+path	: 현재위치에서부터 경로를 확인한다.
+l	: List	가변 인자로 받음 (마지막 가변인자는 NULL)
+v	: Vector	배열을 인자로 받음
+e	: 환경변수 목록
+
+
+posix_spawn
+fork-exec보다 세밀한 조작을 지원한다.
+저수준 파일 처리, 세션과 프로세스 그룹, 시그널 처리, 스케줄링
+
+int posix_spawn(pid_t *
+
+
+posix_spawn_file_actions_t 구조체
+수행할 작업에 대한 정보를 포함하는 데이터 구조
+
+
+
+
+
+
+
+
+
+
+
+
