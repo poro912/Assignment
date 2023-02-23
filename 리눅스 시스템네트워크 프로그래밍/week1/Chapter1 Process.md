@@ -58,23 +58,20 @@
 
 ## posix_spawn
 ### int posix_spawn(
-	```
 		pid_t *restrict			pid, 
 		const char *restrict		path,
 		const posix_spawn_file_actions_t	*file_actions,
 		const posix_spawnattr_t *restrict 	attrp,
 		char *const			argv[restrict],
 		char *const			envp[restrict]);
-	```
+
 ### int posix_spawnp(
-	```
 		pid_t *restrict			pid, 
 		const char *restrict		file,
 		const posix_spawn_file_actions_t	*file_actions,
 		const posix_spawnattr_t *restrict	attrp,
 		char *const			argv[restrict],
 		char *const			envp[restrict]);
-	```
 **Parametters**
 - `pid_t *restrict pid` 		: 생성된 자식프로세스의 pid를 저장할 변수
 - `const char *restrict path`		: 실행할 파일, 주소로 경로를 확인
@@ -104,30 +101,56 @@
 </br> init 함수를 통해 무조건 초기화 후 사용해야 한다.
 </br> EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러
 
+**Common Parametters**
+- `posix_spawn_file_actions_t *file_actions`
+  - 속성을 변경할 객체의 주소
+- `int fildes`
+  - file descriptor 번호
+
+**Common Return Value**
+- `other`	: 에러번호
+- `0`		: 성공
+
+
+## posix_spawn_file_actions_init
 ### int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)
-**description**
+**Description**
 </br> posix_spawn_file_action_t 구조체를 초기화 한다.
 
+
+## posix_spawn_file_actions_destroy
 ### int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)
-**description**
+**Description**
 </br> posix_spawn_file_action_t 구조체를 삭제한다.
 
+
+## posix_spawn_file_actions_addopen
 ### int posix_spawn_file_actions_addopen(
-		posix_spawn_file_actions_t	*file_actions
+		posix_spawn_file_actions_t	*file_actions,
 		int			fildes,
 		const char *restrict	path,
 		int			oflag,
 		mode_t			mode)
-**description**
+**Description**
 </br> 자식 프로세스가 생성되면서 파일을 추가로 연다.
 
-### int posix_spawn_file_actions_addclose(posix_spawn_file_actions_t	*file_actions)
-**description**
+
+## posix_spawn_file_actions_addclose
+### int posix_spawn_file_actions_addclose(
+		posix_spawn_file_actions_t	*file_actions,
+		int 			fildes)
+**Description**
 </br> 자식 프로세스가 생성되면서 파일을 닫는다.
 
-### int posix_spawn_file_actions_adddup2(posix_spawn_file_actions_t	*file_actions)
-**description**
+
+## posix_spawn_file_actions_adddup2
+### int posix_spawn_file_actions_adddup2(
+		posix_spawn_file_actions_t	*file_actions,
+		int 			fildes,
+		int 			newfildes)
+**Description**
 </br> 자식 프로세스가 생성되면서 파일기술자를 복제한다.
+
 
 ## posix_spawnatter_t 구조체
 **Description**
