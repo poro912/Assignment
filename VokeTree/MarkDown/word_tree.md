@@ -237,23 +237,23 @@ class WordDictionary
 				int			n = 0);
 
 		// 전체 탐색
-		void DFSTree(	Node* now,int n);
+		void DFSTree(Node* now,int n);
 
 		// 전체 출력
-		void DFSPrint(	Node* now, string& stack);
+		void DFSPrint(Node* now, string& stack);
 
 		// 전체 삭제
-		void DFSClear(	Node * node);
+		void DFSClear(Node * node);
 
 	public :
 		// 생성자
 		WordDictionary();
 
 		// 단어 추가
-		bool Add(	string target, string mean);
+		bool Add(string target, string mean);
 
 		// 단어 삭제
-		bool Remove(	string target);
+		bool Remove(string target);
 
 		// 전체 삭제
 		void Clear();	
@@ -264,7 +264,7 @@ class WordDictionary
 		void ReplaceMean(string word, string mean);
 
 		// 해당 단어 출력
-		void Print(	string target);
+		void Print(string target);
 
 		// 전체 단어 출력
 		void Print();
