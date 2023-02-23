@@ -116,12 +116,12 @@
 
 
 ### int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)
-</br> posix_spawn_file_action_t 구조체를 초기화 한다.
-
+posix_spawn_file_action_t 구조체를 초기화 한다.
+</br> </br> 
 
 ### int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)
-</br> posix_spawn_file_action_t 구조체를 삭제한다.
-
+posix_spawn_file_action_t 구조체를 삭제한다.
+</br> </br> 
 
 ### int posix_spawn_file_actions_addopen(
 		posix_spawn_file_actions_t	*file_actions,
@@ -129,21 +129,21 @@
 		const char *restrict	path,
 		int			oflag,
 		mode_t			mode)
-</br> 자식 프로세스가 생성되면서 파일을 추가로 연다.
-
+자식 프로세스가 생성되면서 파일을 추가로 연다.
+</br> </br> 
 
 ### int posix_spawn_file_actions_addclose(
 		posix_spawn_file_actions_t	*file_actions,
 		int 			fildes)
-</br> 자식 프로세스가 생성되면서 파일을 닫는다.
-
+자식 프로세스가 생성되면서 파일을 닫는다.
+</br> </br> 
 
 ### int posix_spawn_file_actions_adddup2(
 		posix_spawn_file_actions_t	*file_actions,
 		int 			fildes,
 		int 			newfildes)
-</br> 자식 프로세스가 생성되면서 파일기술자를 복제한다.
-
+자식 프로세스가 생성되면서 파일기술자를 복제한다.
+</br> </br> 
 
 ## posix_spawnatter_t 구조체
 **Description**
@@ -172,23 +172,23 @@
 
 ### int posix_spawntter_init(posix_spawnatter_t *attr)
 posix_spawnatter_t 구조체를 초기화 한다.
-</br> 
+</br> </br> 
 
 ### int posix_spawntter_destroy(posix_spawnatter_t *attr)
 posix_spawnatter_t 구조체를 삭제한다.
-</br> 
+</br> </br> 
 
 ### int posix_spawntter_getflags(
 		const posix_spawnatter_t *restrict 	attr,
 		short *restrict		flags)
 posix_spawnatter_t 구조체에서 설정된 플래그 속성을 받는다.
-</br> 
+</br> </br> 
 
 ### int posix_spawntter_setflags(
 		posix_spawnatter_t 	*attr,
 		short			flags)
 posix_spawnatter_t 구조체에 플래그를 설정한다.
-</br> 
+</br> </br> 
 
 
 ## 프로세스 그룹 속성 조작
@@ -196,55 +196,55 @@ posix_spawnatter_t 구조체에 플래그를 설정한다.
 ### int posix_spawntter_getgroup(
 		const posix_spawntter_t *restrict 	attr,
 		pid_t *restrict 	pgroup)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_setgroup(
 		const posix_spawntter_t *restrict 	attr,
 		pid_t		 	pgroup)
-</br>
+</br> </br> 
 
 
 ## 시그널 속성 조작
 ### int posix_spawntter_getsigdefault(
 		const posix_spawntter_t *restrict 	attr,
 		sigset_t *restrict 	sigdefault)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_setsigdefault(
 		const posix_spawntter_t *restrict 	attr,
 		const sigset_t *restrict 		sigdefault)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_getsigmask(
 		const posix_spawntter_t *restrict 	attr,
 		sigset_t *restrict 	sigmask)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_setsigmask(
 		const posix_spawntter_t *restrict 	attr,
 		const sigset_t *restrict 		sigmask)
-</br>
+</br> </br> 
 
 ## 스케줄링 속성 조작
 ### int posix_spawntter_getschedpolicy(
 		const posix_spawntter_t *restrict 	attr,
 		int *restrict 		schedpolicy)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_setschedpolicy(
 		const posix_spawntter_t *restrict 	attr,
 		int 			schedpolicy)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_getschedparam(
 		const posix_spawntter_t *restrict 	attr,
 		struct sched_param *restrict 		schedparam)
-</br>
+</br> </br> 
 
 ### int posix_spawntter_setschedparam(
 		const posix_spawntter_t *restrict 	attr,
 		const struct sched_param *restrict 	schedparam)
-</br>
+</br> </br> 
 
 
 ## posix_spawnattr_t 함수
