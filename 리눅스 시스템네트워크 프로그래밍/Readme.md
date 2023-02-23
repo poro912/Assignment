@@ -15,9 +15,9 @@
 
 ## 2 Chapter
 기간 : 2023// ~ 2023//
-</br> 제목 : 
+</br> 제목 : 파일 처리
 </br> 주제 : 
-</br> [link](week2/)
+</br> [link](week2/Chapter2%20File.md)
 
 
 

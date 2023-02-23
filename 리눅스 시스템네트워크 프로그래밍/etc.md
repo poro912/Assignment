@@ -1,4 +1,11 @@
 ## Index
+### 이론
+* [restrict 키워드](#restrict-키워드)
+* [파일 디스크립터](#파일-디스크립터)
+* [ID](#id)
+* [시그널](#시그널)
+* [IPC](#ipc)
+### 메소드
 * [system](#system)
 * [exit](#exit)
 * [kill](#kill)
@@ -9,10 +16,13 @@
 * [wait](#wait)
 * [waitpid](#waitpid)
 * [errno](#errno)
-* [strerror](#strerror)
 * [perror](#perror)
-* []()
-* []()
+* [strerror](#strerror)
+* [dprintf](#dprintf)
+* [open](#open)
+* [fcntl](#fcntl)
+* [signal](#signal)
+* [sigaction](#sigaction)
 
 ## restrict 키워드
 C 문법이며 C++에서는 지원하지 않는다.
@@ -36,7 +46,7 @@ C 문법이며 C++에서는 지원하지 않는다.
 |RUID| Real User        | 프로세스를 시작한 실제 사용자 |
 |SUID| Saved set User   | ID 임시 저장, 원래사용자로 복귀 |
 |EUID| Effective User   | 유효 사용자 ID |
-|PGID| Process Group    | 하나 이상의 프로세스 |
+|PGID| Process Group    | 하나 이상의 프로세스 (0 : 그룹 리더)|
 |SID | Session          | 하나 이상의 프로세스 |
 ## 시그널 
 ``` 
@@ -57,6 +67,12 @@ C 문법이며 C++에서는 지원하지 않는다.
 59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2
 63) SIGRTMAX-1  64) SIGRTMAX
 ```
+
+## IPC
+IPC(Inter Process Communication)
+프로세스간 데이터를 주고 받는 행위 또는 그에 대한 방법이나 경로
+</br> Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Semaphore 방법이 존재한다.
+
 ## system
 ### int system( const char *str )
 **Parametters**
