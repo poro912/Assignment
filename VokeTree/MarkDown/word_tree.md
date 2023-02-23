@@ -22,11 +22,11 @@
 ```cpp
 typedef struct _NODE
 {
-	_NODE*	child;		// 하위 노드
-	_NODE*	brother;	// 동급 노드
-	char	letter;		// 문자
-	bool	isWord;		// isExpress
-	string	mean;		// definition
+	_NODE*		child;		// 하위 노드
+	_NODE*		brother;	// 동급 노드
+	char		letter;		// 문자
+	bool		isWord;		// isExpress
+	string		mean;		// definition
 	
 	// 생성자
 	_NODE()
@@ -169,92 +169,117 @@ class WordDictionary
 		Node* head;
 
 		// 문자열이 저장될 수 있는 위치를 확인
-		Node* Find		(const string &target, int& n);
-		Node*	Find	(
-				const string&	target,
+		Node* Find(	const string &target, int& n);
+		Node* Find(
+				const string&		target,
 				int&	 		n,
 				Node*& 			parent);
+
 		// 문자열을 저장
-		bool Save		(
+		bool Save(
 				Node * 			destination,
 				Node *			parent,
-				const string& 	target,
-				const string& 	mean,
+				const string& 		target,
+				const string& 		mean,
 				int& 			n);
+
 		// 단어 삽입
-		bool Insert		(
-				const string&	target,
-				const string&	mean);
+		bool Insert(
+				const string&		target,
+				const string&		mean);
+
 		// 노드리스트를 생성
-		Node* MakeNodes	(
-				const string& 	target, 
-				const string& 	mean);
+		Node* MakeNodes(
+				const string& 		target, 
+				const string& 		mean);
+
 		// 노드에 의미를 저장
-		bool SaveMean	(
+		bool SaveMean(
 				Node *			destination,
-				const string&	mean,
+				const string&		mean,
 				bool			replace = false);
+
 		// 형제 노드로 붙임
-		void AddRightNode	(
+		void AddRightNode(
 				Node * 			destination,
 				Node *			parent,
-				const string& 	target, 
-				const string& 	mena);
+				const string&		target, 
+				const string&		mena);
+
 		// 자식 노드로 붙임
-		void AddBelowNode	(
+		void AddBelowNode(
 				Node* 			destination, 
-				const string& 	target, 
-				const string& 	mean);
+				const string& 		target, 
+				const string& 		mean);
+				
 		// 노드 삭제 가능여부 반환
-		bool Deleteable	(Node* target);
+		bool Deleteable(Node* target);
+
 		// 노드 삭제
-		bool DeleteNode	(Node* target);
+		bool DeleteNode(Node* target);
+
 		// 의미 삭제
-		bool DeleteMean	(Node* target);
+		bool DeleteMean(Node* target);
+
 		// 단어 삭제
-		bool DeleteWord	(string target);
+		bool DeleteWord(string target);
+
 		// 단어 수정(삭제 후 생성)
-		bool ModifyWord	(string oldWord,string newWord);
+		bool ModifyWord(string oldWord,string newWord);
+
 		// 의미 수정
-		bool ModifyMean	(string target, string mean);
+		bool ModifyMean(string target, string mean);
+
 		// 대상 삭제
-		bool DFSDelete	(
+		bool DFSDelete(
 				Node* 			now,
-				const string& 	target,
-				int				n = 0);
+				const string& 		target,
+				int			n = 0);
+
 		// 전체 탐색
-		void DFSTree	(Node* now,int n);
+		void DFSTree(	Node* now,int n);
+
 		// 전체 출력
-		void DFSPrint	(Node* now, string& stack);
+		void DFSPrint(	Node* now, string& stack);
+
 		// 전체 삭제
-		void DFSClear	(Node * node);
+		void DFSClear(	Node * node);
 
 	public :
 		// 생성자
-		WordDictionary	();
+		WordDictionary();
+
 		// 단어 추가
-		bool Add		(string target, string mean);
+		bool Add(	string target, string mean);
+
 		// 단어 삭제
-		bool Remove		(string target);
+		bool Remove(	string target);
+
 		// 전체 삭제
-		void Clear		();	
+		void Clear();	
 		// 단어 변경
-		void ReplaceWord	(string oldWord, string newWord);
+		void ReplaceWord(string oldWord, string newWord);
+
 		// 의미 변경
-		void ReplaceMean	(string word, string mean);
+		void ReplaceMean(string word, string mean);
+
 		// 해당 단어 출력
-		void Print		(string target);
+		void Print(	string target);
+
 		// 전체 단어 출력
-		void Print		();
+		void Print();
+
 		// 유사단어 전체 출력
-		void SimilarPrint	(string target);
+		void SimilarPrint(string target);
+
 		// 트리 출력
-		void Tree		();
+		void Tree();
+
 		// 저장 정보 출력
-		void Info		();
+		void Info();
+
 		// 모든 정보 출력
-		void PrintAll	();
-			
+		void PrintAll();
 };
 ```
 

@@ -1,4 +1,4 @@
-# Index
+## Index
 * [system](#system)
 * [exit](#exit)
 * [kill](#kill)
@@ -13,6 +13,10 @@
 * [perror](#perror)
 * []()
 * []()
+
+## restrict 키워드
+C 문법이며 C++에서는 지원하지 않는다.
+해당 포인터를 참조하는 객체가 하나임을 보장한다는 제한자이다.
 
 ## 파일 디스크립터
 | no | name | POSIX | stream |
