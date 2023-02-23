@@ -99,56 +99,49 @@
 **Description**
 </br> posix_spawn함수 호출 시 열거나 닫을 파일을 제어하는 구조체
 </br> init 함수를 통해 무조건 초기화 후 사용해야 한다.
+</br> 사용을 완료한 경우 메모리를 해제해야 메모리 누수가 생기지 않는다.
 </br> EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러
 
 **Common Parametters**
 - `posix_spawn_file_actions_t *file_actions`
   - 속성을 변경할 객체의 주소
-- `int fildes`
-  - file descriptor 번호
+- `int fildes`	: file descriptor 번호
+- `int oflag`	: 파일 열기 옵션 비트
+- `mode_t mode`	: 파일 접근 권한 ex) 0644, 0777
+
 
 **Common Return Value**
 - `other`	: 에러번호
 - `0`		: 성공
 
 
-## posix_spawn_file_actions_init
 ### int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)
-**Description**
 </br> posix_spawn_file_action_t 구조체를 초기화 한다.
 
 
-## posix_spawn_file_actions_destroy
 ### int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)
-**Description**
 </br> posix_spawn_file_action_t 구조체를 삭제한다.
 
 
-## posix_spawn_file_actions_addopen
 ### int posix_spawn_file_actions_addopen(
 		posix_spawn_file_actions_t	*file_actions,
 		int			fildes,
 		const char *restrict	path,
 		int			oflag,
 		mode_t			mode)
-**Description**
 </br> 자식 프로세스가 생성되면서 파일을 추가로 연다.
 
 
-## posix_spawn_file_actions_addclose
 ### int posix_spawn_file_actions_addclose(
 		posix_spawn_file_actions_t	*file_actions,
 		int 			fildes)
-**Description**
 </br> 자식 프로세스가 생성되면서 파일을 닫는다.
 
 
-## posix_spawn_file_actions_adddup2
 ### int posix_spawn_file_actions_adddup2(
 		posix_spawn_file_actions_t	*file_actions,
 		int 			fildes,
 		int 			newfildes)
-**Description**
 </br> 자식 프로세스가 생성되면서 파일기술자를 복제한다.
 
 
@@ -157,6 +150,8 @@
 </br> posix_spawn함수 호출 시 다양 속성을 제어하는 구조체
 </br> init 함수를 통해 무조건 초기화 후 사용해야 한다.
 </br> EUID, 프로세스 그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러
+
+**Flags**
 | 플래그 | 설명 |
 | :---: | :--- |
 | POSIX_SPAWN_RESETIDS		| 자식 프로세스의 EUID를 부모 프로세스의 RUID로 설정한다. |
@@ -165,6 +160,88 @@
 | POSIX_SPAWN_SETSIGMASK	| 시그널 블록 마스크 속성을 활성화한다. |
 | POSIX_SPAWN_SETSCHEDPARAM	| 스케줄링 파라미터 속성을 활성화한다. |
 | POSIX_SPAWN_SETSCHEDULER	| 스케줄러 정책 속성을 활성화한다. |
+
+**Common Parameters**
+- `posix_spawnatter_t *attr`
+  - 속성을 변경할 객체의 주소
+- `short flags`	: 해당하는 플래그 조합
+
+**Common Return Value**
+- `other`	: 에러번호
+- `0`		: 성공
+
+### int posix_spawntter_init(posix_spawnatter_t *attr)
+</br> posix_spawnatter_t 구조체를 초기화 한다.
+
+### int posix_spawntter_destroy(posix_spawnatter_t *attr)
+</br> posix_spawnatter_t 구조체를 삭제한다.
+
+### int posix_spawntter_getflags(
+		const posix_spawnatter_t *restrict 	attr,
+		short *restrict		flags)
+</br> posix_spawnatter_t 구조체에서 설정된 플래그 속성을 받는다.
+
+### int posix_spawntter_setflags(
+		posix_spawnatter_t 	*attr,
+		short			flags)
+</br> posix_spawnatter_t 구조체에 플래그를 설정한다.
+
+
+## 프로세스 그룹 속성 조작
+
+### int posix_spawntter_getgroup(
+		const posix_spawntter_t *restrict 	attr,
+		pid_t *restrict 	pgroup)
+</br>
+
+### int posix_spawntter_setgroup(
+		const posix_spawntter_t *restrict 	attr,
+		pid_t		 	pgroup)
+</br>
+
+
+## 시그널 속성 조작
+### int posix_spawntter_getsigdefault(
+		const posix_spawntter_t *restrict 	attr,
+		sigset_t *restrict 	sigdefault)
+</br>
+
+### int posix_spawntter_setsigdefault(
+		const posix_spawntter_t *restrict 	attr,
+		const sigset_t *restrict 		sigdefault)
+</br>
+
+### int posix_spawntter_getsigmask(
+		const posix_spawntter_t *restrict 	attr,
+		sigset_t *restrict 	sigmask)
+</br>
+
+### int posix_spawntter_setsigmask(
+		const posix_spawntter_t *restrict 	attr,
+		const sigset_t *restrict 		sigmask)
+</br>
+
+## 스케줄링 속성 조작
+### int posix_spawntter_getschedpolicy(
+		const posix_spawntter_t *restrict 	attr,
+		int *restrict 		schedpolicy)
+</br>
+
+### int posix_spawntter_setschedpolicy(
+		const posix_spawntter_t *restrict 	attr,
+		int 			schedpolicy)
+</br>
+
+### int posix_spawntter_getschedparam(
+		const posix_spawntter_t *restrict 	attr,
+		struct sched_param *restrict 		schedparam)
+</br>
+
+### int posix_spawntter_setschedparam(
+		const posix_spawntter_t *restrict 	attr,
+		const struct sched_param *restrict 	schedparam)
+</br>
+
 
 ## posix_spawnattr_t 함수
 ### 

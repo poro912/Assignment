@@ -265,10 +265,10 @@ C 문법이며 C++에서는 지원하지 않는다.
 </br> 일반적인 출력문장에 저수준의 출력 문장을 추가한형태
 
 ## open
-### int open (const char *FILENAME, int FLAGS[, mode_t MODE])
+### int open (const char *filename, int FLAGS[, mode_t mode])
 **Parametters**
-- `const char *FILENAME`	: 대상 파일 이름
-- `int FLAGS`	: 파일 열기 옵션 비트 or '|' 연산자로 연결 가능
+- `const char *filename`	: 대상 파일 이름
+- `int flags`	: 파일 열기 옵션 비트 or '|' 연산자로 연결 가능
   - | 옵션 | 설명 |
 	| :---: | :--- |
 	| O_RDONLY	| 읽기 전용 |
@@ -282,7 +282,7 @@ C 문법이며 C++에서는 지원하지 않는다.
 	| O_NONBLOCK	| 읽을 내용이 없으면 바로 복귀 |
 	| O_SYNC	| 쓰기가 완료될 때까지 대기 |
 
-- `mode_t MODE`	: 파일 접근 권한 ex) 0644, 0777
+- `mode_t mode`	: 파일 접근 권한 ex) 0644, 0777
 
 **Return Value**
 - `other`	: 파일디스크립터 값
