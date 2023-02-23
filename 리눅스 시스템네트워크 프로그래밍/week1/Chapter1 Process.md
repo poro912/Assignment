@@ -171,20 +171,24 @@
 - `0`		: 성공
 
 ### int posix_spawntter_init(posix_spawnatter_t *attr)
-</br> posix_spawnatter_t 구조체를 초기화 한다.
+posix_spawnatter_t 구조체를 초기화 한다.
+</br> 
 
 ### int posix_spawntter_destroy(posix_spawnatter_t *attr)
-</br> posix_spawnatter_t 구조체를 삭제한다.
+posix_spawnatter_t 구조체를 삭제한다.
+</br> 
 
 ### int posix_spawntter_getflags(
 		const posix_spawnatter_t *restrict 	attr,
 		short *restrict		flags)
-</br> posix_spawnatter_t 구조체에서 설정된 플래그 속성을 받는다.
+posix_spawnatter_t 구조체에서 설정된 플래그 속성을 받는다.
+</br> 
 
 ### int posix_spawntter_setflags(
 		posix_spawnatter_t 	*attr,
 		short			flags)
-</br> posix_spawnatter_t 구조체에 플래그를 설정한다.
+posix_spawnatter_t 구조체에 플래그를 설정한다.
+</br> 
 
 
 ## 프로세스 그룹 속성 조작
