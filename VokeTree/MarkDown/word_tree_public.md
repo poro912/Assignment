@@ -13,8 +13,8 @@ WordDictionary :: WordDictionary() : countWord(0), countNode(0) ,head(new Node){
 ```cpp
 // 단어 추가 
 bool	WordDictionary :: Add(
-	string			word,
-	string			mean)
+		string			word,
+		string			mean)
 {
 	bool ret = FAIL;
 	StringProcess(word);
@@ -84,8 +84,8 @@ void	WordDictionary :: Clear()
 #### replaceword
 ```cpp
 void 	WordDictionary :: ReplaceWord(
-	string			oldWord,
-	string			newWord)
+		string			oldWord,
+		string			newWord)
 {
 		
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡ단어변경ㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";
@@ -105,8 +105,8 @@ void 	WordDictionary :: ReplaceWord(
 #### replacemean
 ```cpp
 void 	WordDictionary :: ReplaceMean(
-	string			word,
-	string			mean)
+		string			word,
+		string			mean)
 {
 
 	cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡ의미변경ㅡㅡㅡㅡㅡㅡㅡㅡㅡ\n";

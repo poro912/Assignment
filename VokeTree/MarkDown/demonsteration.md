@@ -5,10 +5,10 @@
 ``` cpp
 void DictionaryExample(WordDictionary & wd)
 {
-    // 전체 단어 목록 출력
+	// 전체 단어 목록 출력
 	wd.Print();
 
-    // 단어 추가
+	// 단어 추가
 	wd.Add(string("  hello  "),string("안녕하세요"));
 
 	wd.Add(string("App"),	string("application의 준말"));
@@ -26,9 +26,9 @@ void DictionaryExample(WordDictionary & wd)
 	wd.Add(string("wint"),	string("날개"));
 
 	wd.Add(string("How   Are   You"),string("1.안녕하십니까?\n2.처음 뵙겠습니다."));
-    
-    // 중복 단어 추가
-    wd.Add(string("  hello  "),string("안녕하세요"));
+	
+	// 중복 단어 추가
+	wd.Add(string("  hello  "),string("안녕하세요"));
 ```
 
 <img src = "../img/add1.png" width="400" ><img src = "../img/add2.png" width="400" >
@@ -36,38 +36,38 @@ void DictionaryExample(WordDictionary & wd)
 
 
 ``` cpp
-    // hello 단어 출력
+	// hello 단어 출력
 	wd.Print(string("hello"));
 
-    // 전체 단어 출력
+	// 전체 단어 출력
 	wd.Print();
 
-    // a로 시작하는 단어 전체 출력
+	// a로 시작하는 단어 전체 출력
 	wd.SimilarPrint("a");
 
-    // app로 시작하는 단어 전체 출력
+	// app로 시작하는 단어 전체 출력
 	wd.SimilarPrint("app");
 ```
 
 <img src = "../img/search.png" width="400" ></br>
 
 ``` cpp
-    // Tree 형태 출력
+	// Tree 형태 출력
 	wd.Tree();
 ```
 
 <img src = "../img/tree.png" width="800" ></br>
 
 ``` cpp
-    // 단어 삭제
+	// 단어 삭제
 	wd.Remove(string("hello"));
-    // 없는 단어 삭제
+	// 없는 단어 삭제
 	wd.Remove(string("hello"));	
-    // 추가 노드가 있는 상태에서의 삭제
+	// 추가 노드가 있는 상태에서의 삭제
 	wd.Remove(string("app"));
 	wd.Tree();
 
-    // 형제 노드가 있는 상태에서의 삭제
+	// 형제 노드가 있는 상태에서의 삭제
 	wd.Remove(string("create"));
 ```
 
@@ -75,15 +75,15 @@ void DictionaryExample(WordDictionary & wd)
 <img src = "../img/delete2.png" width="800" ></br>
 
 ``` cpp
-    // 현재 저장정보 출력
+	// 현재 저장정보 출력
 	wd.Info();
-    // 모든 저장 정보 출력
+	// 모든 저장 정보 출력
 	wd.PrintAll();
 ```
 <img src = "../img/info.png" width="800" ></br>
 
 ``` cpp
-    // 철자 및 의미 변경
+	// 철자 및 의미 변경
 	wd.Print("wint");
 	wd.ReplaceWord("wint","wing");
 	wd.Tree();
@@ -96,7 +96,7 @@ void DictionaryExample(WordDictionary & wd)
 <img src = "../img/replace.png" width="800" ></br>
 
 ``` cpp
-    // 전체 삭제
+	// 전체 삭제
 	wd.Clear();
 	wd.PrintAll();
 ```

@@ -28,17 +28,17 @@
 </br> 정적 정보 : 힙 메모리, 정적 메모리, IPC 자원 ID, 열린 파일 , 시그널 마스크 등
 
 ## exec
-### int execl(const char *path, const char *arg, ... );
+### int execl (const char *path, const char *arg, ... );
 ### int execlp(const char *file, const char *arg, ... );
 ### int execle(const char *path, const char *arg, ..., char *const envp[]);
-### int execv(const char *path, char *const argv[]);
+### int execv (const char *path, char *const argv[]);
 ### int execvp(const char *file, char *const argv[]);
 ### int execve(const char *path, char *const argv[], char *const envp[]);
 **Parametters**
 - `const char *path`    : 실행할 파일, 주소로 경로를 확인
 - `const char *file`	: 실행할 파일, 환경변수에서 경로 검색(파일 이름만 주면 환경변수에서 확인)
   - 접미사 `p : path enviroment`
-- `const char *arg`		: 인자를 가변인자로 받음 (마지막은 NULL이 들어가야함)
+- `const char *arg`	: 인자를 가변인자로 받음 (마지막은 NULL이 들어가야함)
   - 접미사 `l : list` 
 - `chat const *argv[]`	: 인자를 배열로 받음 (마지막은 NULL이 들어가야함)
   - 접미사 `v : vector` 
@@ -60,16 +60,23 @@
 
 ## posix_spawn
 ### int posix_spawn(
-  ```
-    pid_t *restrict			pid, 
-    const char *restrict		path,
-    const posix_spawn_file_actions_t	*file_actions,
-    const posix_spawnattr_t		*restrict attrp,
-    char *const				argv[restrict], 
-    char *const				envp[restrict]);
-  ```
-  
-### int posix_spawnp
+	```
+		pid_t *restrict			pid, 
+		const char *restrict		path,
+		const posix_spawn_file_actions_t	*file_actions,
+		const posix_spawnattr_t		*restrict attrp,
+		char *const			argv[restrict],
+		char *const			envp[restrict]);
+	```
+### int posix_spawnp(
+	```
+		pid_t *restrict			pid, 
+		const char *restrict		file,
+		const posix_spawn_file_actions_t	*file_actions,
+		const posix_spawnattr_t		*restrict attrp,
+		char *const			argv[restrict],
+		char *const			envp[restrict]);
+	```
 **Parametters**
 - 
 
