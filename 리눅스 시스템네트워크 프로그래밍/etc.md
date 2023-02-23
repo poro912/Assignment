@@ -21,16 +21,16 @@ C 문법이며 C++에서는 지원하지 않는다.
 ## 파일 디스크립터
 | no | name | POSIX | stream |
 | :---: | :---: | :---: | :---: | 
-| 0 | standard input | STDIN_FILENO | stdin |
-| 1 | standard output | STDOUT_FILENO| stdout |
-| 2 | standard error | STDERR_FILENO| stderr|
+| 0 | standard input	| STDIN_FILENO | stdin|
+| 1 | standard output	| STDOUT_FILENO| stdout|
+| 2 | standard error	| STDERR_FILENO| stderr|
 
 ## ID
 사용자, 권한등을 식별하기위해 OS에서 지정하는 번호
 | ID | mean | 설명 |
 |:---:|:---:|:---|
-|UID | User				| 사용자 |
-|GID | Group			| 사용자 그룹 |
+|UID | User		| 사용자 |
+|GID | Group		| 사용자 그룹 |
 |PID | Process          | 프로세스 |
 |PPID| Parent Process   | 부모의 프로세스 |
 |RUID| Real User        | 프로세스를 시작한 실제 사용자 |
@@ -67,7 +67,7 @@ C 문법이며 C++에서는 지원하지 않는다.
 - `other`	: 프로그램 종료 후 반환받은 값
 - `127`	: 자식프로세스에서 셸 실행 불가
 - `0`	: 셸 사용 불가
-- `-1`	: 명령 실패 (fork 불가)
+- `-1`	: 명령 실패 (fork 불가, errno 설정됨)
 
 **Description**
 </br> 전달받은 문자열을 셸에서 실행한다.
@@ -162,16 +162,17 @@ C 문법이며 C++에서는 지원하지 않는다.
 ### pid_t wait(int *statloc)
 **Parametters**
 - `int *statloc`	: 자식의 실행 결과를 매크로를 통해 알 수 있음 (정상종료 / 비정상종료)
-	- `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
-	- `WEXITSTATUS(statloc)`: 정상종료 시 반환값을 반환
-	- `WIFSIGNALED(statloc)`: 신호로 인한 종료라면 참 반환
-	- `WTERMSIG(statloc)`	: 종료하게한 신호의 번호를 반환
-	- `WIFSTOPPED(statloc)`	: 정지되어있다면 참 반환
-	- `WSTOPSIG(statloc)`	: 정지하게한 신호의 번호를 반환
+  - 메크로 목록
+  - `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
+  - `WEXITSTATUS(statloc)`: 정상종료 시 반환값을 반환
+  - `WIFSIGNALED(statloc)`: 신호로 인한 종료라면 참 반환
+  - `WTERMSIG(statloc)`	: 종료하게한 신호의 번호를 반환
+  - `WIFSTOPPED(statloc)`	: 정지되어있다면 참 반환
+  - `WSTOPSIG(statloc)`	: 정지하게한 신호의 번호를 반환
 
 **Return Value**
 - `other`	: 프로세스 ID
-- `-1` : 오류 (ECHILD 자식 없음, EINTR 시스템 콜 인터럽트)
+- `-1` : 에러 (ECHILD 자식 없음, EINTR 시스템 콜 인터럽트)
 
 **Description**
 </br> 자식프로세스의 종료시 까지 대기
@@ -185,28 +186,28 @@ C 문법이며 C++에서는 지원하지 않는다.
 ### pid_t waitpid(pid_t pid, int *statloc, int options);
 **Parametters**
 - `pid_t pid`	: 대기할 자식 프로세스
-	- `양수`	: 지정한 프로세스
-	- `0`		: 같은 그룹의 프로세스
-	- `-1`		: 임의의 자식 프로세스
-	- `음수`	: 절대값 프로세스가 속한 그룹 프로세스
+  - `양수`	: 지정한 프로세스
+  - `0`		: 같은 그룹의 프로세스
+  - `-1`		: 임의의 자식 프로세스
+  - `음수`	: 절대값 프로세스가 속한 그룹 프로세스
 - `int *statloc`	: 자식의 실행 결과를 매크로를 통해 알 수 있음 (정상종료 / 비정상종료)
-	- `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
-	- `WEXITSTATUS(statloc)`: 정상종료 시 반환값을 반환
-	- `WIFSIGNALED(statloc)`: 신호로 인한 종료라면 참 반환
-	- `WTERMSIG(statloc)`	: 종료하게한 신호의 번호를 반환
-	- `WIFSTOPPED(statloc)`	: 정지되어있다면 참 반환
-	- `WSTOPSIG(statloc)`	: 정지하게한 신호의 번호를 반환
+  - `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
+  - `WEXITSTATUS(statloc)`: 정상종료 시 반환값을 반환
+  - `WIFSIGNALED(statloc)`: 신호로 인한 종료라면 참 반환
+  - `WTERMSIG(statloc)`	: 종료하게한 신호의 번호를 반환
+  - `WIFSTOPPED(statloc)`	: 정지되어있다면 참 반환
+  - `WSTOPSIG(statloc)`	: 정지하게한 신호의 번호를 반환
 
 - `int options`	: 실행 시 사용할 옵션
-	- `WCONTINUED`	: 중단되었다가 재개된 자식 프로세스의 상태를 받음
-	- `WNOHANG`		: 호출자는 차단되지 않고 반환값으로 0을 받음
-	- `WUNTRACED`	: 중단된 자식 프로세스의 상태를 받음
-	- `0`	: Wait함수와 동일하게 실행됨
+  - `WCONTINUED`	: 중단되었다가 재개된 자식 프로세스의 상태를 받음
+  - `WNOHANG`		: 호출자는 차단되지 않고 반환값으로 0을 받음
+  - `WUNTRACED`	: 중단된 자식 프로세스의 상태를 받음
+  - `0`	: Wait함수와 동일하게 실행됨
 
 **Return Value**
 - `other`	: 프로세스 ID
 - `0`	: 이용할 수 있는 자식이 없
-- `-1`	: 오류 (ECHILD 자식 없음, EINTR 시스템 콜 인터럽트)
+- `-1`	: 에러 (ECHILD 자식 없음, EINTR 시스템 콜 인터럽트)
 
 **Description**
 </br> 자식 프로세스를 기다린다.
@@ -223,11 +224,11 @@ C 문법이며 C++에서는 지원하지 않는다.
 ## strerror
 ### char *strerror(int errnum)
 **Parametters**
-- `int errnum`	: 오류번호
+- `int errnum`	: 에러번호
 
 **Return Value**
-- 오류 메시지
-- 오류번호에 해당하는 메시지를 리턴한다.
+- 에러 메시지
+- 에러번호에 해당하는 메시지를 리턴한다.
 - `NULL`	: 해당하는 메시지 없음
 - `"Unknown error nnn"`	: 해당하는 메시지 없음
  
@@ -241,14 +242,14 @@ C 문법이며 C++에서는 지원하지 않는다.
 - `const char* str` : 에러 문자열 이전에 출력할 문자열
 
 **Description**
-</br> 전역변수 errno의 값을 해석하여 해당하는 오류메시지를 표준 오류 출력 스트림에 출력한다.
+</br> 전역변수 errno의 값을 해석하여 해당하는 에러메시지를 표준 에러 출력 스트림에 출력한다.
 
 
 ## strerror_r
 ### int strerror_r(int errnum, char *strerrbuf, size_t buflen)
 **Parametters**
-- `int errnum`	: 오류 변호 
-- `char *strerrbuf`	: 오류메시지를 저장할 버퍼
+- `int errnum`	: 에러 변호 
+- `char *strerrbuf`	: 에러메시지를 저장할 버퍼
 - `size_t buflen`	: 버퍼의 길이
 
 **Return Value**
@@ -256,7 +257,7 @@ C 문법이며 C++에서는 지원하지 않는다.
 - `-1`	: 실패
 
 **Description**
-</br> 시스템 오류 메시지를 문자열로 반환
+</br> 시스템 에러 메시지를 문자열로 반환
 
 ## dprintf
 ### int dprintf( int fd, const char *format, ...)
@@ -270,16 +271,16 @@ C 문법이며 C++에서는 지원하지 않는다.
 - `int FLAGS`	: 파일 열기 옵션 비트 or '|' 연산자로 연결 가능
   - | 옵션 | 설명 |
 	| :---: | :--- |
-	| O_RDONLY | 읽기 전용 |
-	| O_WRONLY | 쓰기 전용 |
-	| O_RDWR | 읽기 쓰기 |
-	| O_CREAT | 해당 파일이 없으면 생성 |
-	| O_EXCL | 이미 파일이 있으면 열지 않음, O_CREAT와 함께 사용 |
-	| O_TRUNC | 기존 파일 내용을 모두 삭제 |
-	| O_APPEND | open 후에 쓰기 포인터가 파일 끝에 위치 |
-	| O_NOCITTY | 터미널 프로그램의 제어 터미널로 할당하지 않음 |
-	| O_NONBLOCK | 읽을 내용이 없으면 바로 복귀 |
-	| O_SYNC | 쓰기가 완료될 때까지 대기 |
+	| O_RDONLY	| 읽기 전용 |
+	| O_WRONLY	| 쓰기 전용 |
+	| O_RDWR	| 읽기 쓰기 |
+	| O_CREAT	| 해당 파일이 없으면 생성 |
+	| O_EXCL	| 이미 파일이 있으면 열지 않음, O_CREAT와 함께 사용 |
+	| O_TRUNC	| 기존 파일 내용을 모두 삭제 |
+	| O_APPEND	| open 후에 쓰기 포인터가 파일 끝에 위치 |
+	| O_NOCITTY	| 터미널 프로그램의 제어 터미널로 할당하지 않음 |
+	| O_NONBLOCK	| 읽을 내용이 없으면 바로 복귀 |
+	| O_SYNC	| 쓰기가 완료될 때까지 대기 |
 
 - `mode_t MODE`	: 파일 접근 권한 ex) 0644, 0777
 
@@ -294,13 +295,24 @@ C 문법이며 C++에서는 지원하지 않는다.
 ### int fcntl(int fd, int cmd, ... )
 **Parametters**
 - `int fd`	: 대상 파일 디스크립터
-- `int cmd`	: 
+- `int cmd`	: 실행할 명령
+  - F_SETFD
+  - FD_CLOEXEC
+  - F_DUPFD : 파일 디스크립터 복사
+F_GETFD : 파일 디스크립터와 연관된 플래그 읽기
+F_SETFD : 파일 디스크립터에 플래그 설정
+F_GETFL : 열린 파일에 대한 플래그 읽기
+F_SETFL : 열린 파일에 대한 플래그 설정
+F_GETLK : 파일 잠금 확인
+F_SETLK : 파일 잠금 및 해제
+F_GETOWN : 프로세스 또는 프로세스 그룹 아이디 읽기
+F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 **Return Value**
 - `-1`	: 실패
 
 **Description**
-</br> 이미 열린 파일을 제어하기위해 사용
+</br> 열린 파일에 대해 제어함
 
 
 ## signal

@@ -36,7 +36,7 @@
 ### int execve(const char *path, char *const argv[], char *const envp[]);
 **Parametters**
 - `const char *path`    : 실행할 파일, 주소로 경로를 확인
-- `const char *file`	: 실행할 파일, 환경변수에서 경로 검색(파일 이름만 주면 환경변수에서 확인)
+- `const char *file`	: 실행할 파일, 환경변수에서 경로 탐색(파일 이름만 주면 환경변수에서 확인)
   - 접미사 `p : path enviroment`
 - `const char *arg`	: 인자를 가변인자로 받음 (마지막은 NULL이 들어가야함)
   - 접미사 `l : list` 
@@ -45,7 +45,6 @@
 - `char *const envp[]`	: 환경변수 목록
   - 접미사 `e : envitonmental path` 
   
-
 **Return Value**
 - 실행 성공 시 반환값 없음
 - `-1`	: 실패
@@ -55,7 +54,6 @@
 </br> 현재 실행중인 프로세스를 새로운 프로세스로 교체한다.
 </br> 입력한 인자를 바탕으로 프로그램을 실행 한다.
 </br> 기본적인 PID, PPID, 파일 디스크립터 등 프로세스의 정보는 유지된다.
-</br> 컴파일 시 FD_CLOEXEC 플래그를 통해 파일 디스크립터를 닫으며 실행할 수 있다.
 
 
 ## posix_spawn
@@ -64,7 +62,7 @@
 		pid_t *restrict			pid, 
 		const char *restrict		path,
 		const posix_spawn_file_actions_t	*file_actions,
-		const posix_spawnattr_t		*restrict attrp,
+		const posix_spawnattr_t *restrict 	attrp,
 		char *const			argv[restrict],
 		char *const			envp[restrict]);
 	```
@@ -73,33 +71,80 @@
 		pid_t *restrict			pid, 
 		const char *restrict		file,
 		const posix_spawn_file_actions_t	*file_actions,
-		const posix_spawnattr_t		*restrict attrp,
+		const posix_spawnattr_t *restrict	attrp,
 		char *const			argv[restrict],
 		char *const			envp[restrict]);
 	```
 **Parametters**
-- 
+- `pid_t *restrict pid` 		: 생성된 자식프로세스의 pid를 저장할 변수
+- `const char *restrict path`		: 실행할 파일, 주소로 경로를 확인
+- `const char *restrict file`		: 실행할 파일, 환경변수에서 경로 탐색
+  - 접미사 `p : path enviroment`
+- `const posix_spawn_file_actions_t *file_actions` : 열거나 닫을 파일을 제어하는 구조체
+  - NULL : 파일 디스크립터를 전부 넘겨준다.
+- `const posix_spawnattr_t attrp`	: 프로세스 그룹, 시그널 마스크, 스케줄링 정보 속성을 제어하는 구조체
+- `char *const argv[restrict]`		: 인자를 배열로 받음 (마지막은 NULL이 들어가야함)
+- `char *const envp[restrict]`		: 환경 변수 목록 (마지막은 NULL이 들어가야함)
 
 **Return Value**
-- 
+- `other`	: 에러 코드
+- `127`	: 자식프로세스에서 셸 실행 불가
+- `0`	: 셸 사용 불가
+- `-1`	: 명령 실패 (fork 불가)
 
 **Description**
-</br> fork-exec 구조의 오버헤드 방지 및 향상된 기능을 제공하는 함수
+</br> fork-exec 구조의 오버헤드를 방지하고 향상된 기능을 제공하는 함수
 </br> 저수준 파일 처리, 세션과 프로세스 그룹, 시그널 처리, 스케줄링에 대한 처리가 포함되어있다.
+</br> file_actions, attrp 인수를 이용하여 부모프로세스의 자원을 선택적으로 복제할 수 있다.
+
 
 ## posix_spawn_file_action_t 구조체
-### declring_function
-**Parametters**
-- 
-
-**Return Value**
-- 
-
 **Description**
-</br>
+</br> posix_spawn함수 호출 시 열거나 닫을 파일을 제어하는 구조체
+</br> init 함수를 통해 무조건 초기화 후 사용해야 한다.
+</br> EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러
+
+### int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)
+**description**
+</br> posix_spawn_file_action_t 구조체를 초기화 한다.
+
+### int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)
+**description**
+</br> posix_spawn_file_action_t 구조체를 삭제한다.
+
+### int posix_spawn_file_actions_addopen(
+		posix_spawn_file_actions_t	*file_actions
+		int			fildes,
+		const char *restrict	path,
+		int			oflag,
+		mode_t			mode)
+**description**
+</br> 자식 프로세스가 생성되면서 파일을 추가로 연다.
+
+### int posix_spawn_file_actions_addclose(posix_spawn_file_actions_t	*file_actions)
+**description**
+</br> 자식 프로세스가 생성되면서 파일을 닫는다.
+
+### int posix_spawn_file_actions_adddup2(posix_spawn_file_actions_t	*file_actions)
+**description**
+</br> 자식 프로세스가 생성되면서 파일기술자를 복제한다.
 
 ## posix_spawnatter_t 구조체
-### declring_function
+**Description**
+</br> posix_spawn함수 호출 시 다양 속성을 제어하는 구조체
+</br> init 함수를 통해 무조건 초기화 후 사용해야 한다.
+</br> EUID, 프로세스 그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러
+| 플래그 | 설명 |
+| :---: | :--- |
+| POSIX_SPAWN_RESETIDS		| 자식 프로세스의 EUID를 부모 프로세스의 RUID로 설정한다. |
+| POSIX_SPAWN_SETPGROUP		| 프로세스 그룹 관련 속성을 활성화한다. |
+| POSIX_SPAWN_SETSIGDEF		| 기본 시그널 작동 속성을 활성화한다. |
+| POSIX_SPAWN_SETSIGMASK	| 시그널 블록 마스크 속성을 활성화한다. |
+| POSIX_SPAWN_SETSCHEDPARAM	| 스케줄링 파라미터 속성을 활성화한다. |
+| POSIX_SPAWN_SETSCHEDULER	| 스케줄러 정책 속성을 활성화한다. |
+
+## posix_spawnattr_t 함수
+### 
 **Parametters**
 - 
 
