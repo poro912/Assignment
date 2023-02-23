@@ -15,8 +15,7 @@
 
 Node*	WordDictionary :: Find(
 		const string&	target,
-		int&	 		n	
-		)
+		int&	 	n)
 {
 	Node* temp;
 	return Find(target,n,temp);
@@ -24,9 +23,8 @@ Node*	WordDictionary :: Find(
 
 Node*	WordDictionary :: Find(
 		const string&	target,
-		int&	 		n,
-		Node*& 			parent
-		)
+		int&	 	n,
+		Node*& 		parent)
 {
 	Node* temp = head;
 	parent = NULL;
@@ -79,8 +77,8 @@ Node*	WordDictionary :: Find(
 bool	WordDictionary :: Save(
 	Node*			destination,
 	Node*			parent,
-	const string&	word,	
-	const string&	mean,	
+	const string&		word,	
+	const string&		mean,	
 	int&			n)
 {
 	// 모든 글자노드가 존재 한다면
@@ -120,8 +118,8 @@ bool	WordDictionary :: Save(
 #### insert
 ```cpp
 bool WordDictionary :: Insert(
-	const string &	word,
-	const string &	mean)
+	const string &		word,
+	const string &		mean)
 {
 	Node* destination;
 	Node* parent;
@@ -154,7 +152,9 @@ bool WordDictionary :: Insert(
 #### makenode
 ```cpp
 // 노드 리스트 생성
-Node*	WordDictionary :: MakeNodes(const string& target, const string& mean)
+Node*	WordDictionary :: MakeNodes(
+	const string&		target, 
+	const string&		mean)
 {
 	Node head;
 	Node* now = NULL;
@@ -184,7 +184,7 @@ Node*	WordDictionary :: MakeNodes(const string& target, const string& mean)
 ```cpp
 bool	WordDictionary :: SaveMean(
 	Node*			destination,
-	const string&	mean,
+	const string&		mean,
 	bool			replace)
 {
 	// 뜻이 저장되어있지 않다면
@@ -211,8 +211,8 @@ bool	WordDictionary :: SaveMean(
 void	WordDictionary :: AddRightNode(
 	Node* 			destination, 
 	Node*			parent,
-	const string& 	target, 
-	const string& 	mean)
+	const string& 		target, 
+	const string& 		mean)
 {
 	//cout << "오른쪽에 노드 연결\n";
 	Node* temp;
@@ -246,8 +246,8 @@ void	WordDictionary :: AddRightNode(
 // 현재의 아래쪽에 노드리스트 붙이기
 void	WordDictionary :: AddBelowNode(
 	Node* 			destination, 
-	const string& 	target, 
-	const string& 	mean)
+	const string& 		target, 
+	const string& 		mean)
 {
 	
 	//cout << "아래쪽에 노드 연결\n";
@@ -338,7 +338,9 @@ bool	WordDictionary :: DeleteWord(string target)
 ###### [뒤로가기](./word_tree.md#private-메소드)
 #### modifyword
 ```cpp
-bool	WordDictionary :: ModifyWord(string oldWord, string newWord)
+bool	WordDictionary :: ModifyWord(
+	string 			oldWord,
+	string			newWord)
 {
 	Node* temp;
 	int n;
@@ -363,7 +365,9 @@ bool	WordDictionary :: ModifyWord(string oldWord, string newWord)
 ###### [뒤로가기](./word_tree.md#private-메소드)
 #### modifymean
 ```cpp
-bool	WordDictionary :: ModifyMean(string target, string mean)
+bool	WordDictionary :: ModifyMean(
+	string			target,
+	string			mean)
 {
 	Node * temp;
 	int n;
@@ -384,9 +388,9 @@ bool	WordDictionary :: ModifyMean(string target, string mean)
 // false	삭제 불가
 // true		삭제 가능
 bool	WordDictionary :: DFSDelete(
-		Node*			now,
-		const string& 	target,
-		int 			n)
+	Node*			now,
+	const string& 		target,
+	int 			n)
 {
 	Node* temp;
 	
@@ -470,7 +474,9 @@ void	WordDictionary :: DFSTree(Node* now, int n)
 ###### [뒤로가기](./word_tree.md#private-메소드)
 #### dfsprint
 ```cpp
-void	WordDictionary :: DFSPrint(Node* now, string& stack)
+void	WordDictionary :: DFSPrint(
+	Node*			now,
+	string&			stack)
 {
 	stack.push_back(now->letter);
 	// 현재 노드가 의미를 가지고 있다면
