@@ -25,14 +25,18 @@
 * [signal](#signal)
 * [sigaction](#sigaction)
 
+
 ## restrict 키워드
 C 문법이며 C++에서는 지원하지 않는다.
 해당 포인터를 참조하는 객체가 하나임을 보장한다는 제한자이다.
+
 
 ## man명령어
 man (Manual)
 특정 명령이나 자원들의 메뉴얼을 출력해주는 명령어이다.  
 총 9개의 영역으로 이뤄진다.  
+
+
 ### man [section num] 찾고싶은 명령어  
 | Section | description |
 | :---: | :--- |
@@ -65,6 +69,7 @@ man (Manual)
 | 1 | standard output	| STDOUT_FILENO| stdout|
 | 2 | standard error	| STDERR_FILENO| stderr|
 
+
 ## ID
 사용자, 권한등을 식별하기위해 OS에서 지정하는 번호
 | ID | mean | 설명 |
@@ -77,7 +82,9 @@ man (Manual)
 |SUID| Saved set User   | ID 임시 저장, 원래사용자로 복귀 |
 |EUID| Effective User   | 유효 사용자 ID |
 |PGID| Process Group    | 하나 이상의 프로세스 (0 : 그룹 리더)|
-|SID | Session          | 하나 이상의 프로세스 |
+|SID | Session          | 하나 이상의 프로세스 |  
+
+
 ## 시그널 
 ``` 
  1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL
@@ -100,8 +107,8 @@ man (Manual)
 
 ## IPC
 IPC(Inter Process Communication)
-프로세스간 데이터를 주고 받는 행위 또는 그에 대한 방법이나 경로
-</br> Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Semaphore 방법이 존재한다.
+프로세스간 데이터를 주고 받는 행위 또는 그에 대한 방법이나 경로  
+Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Semaphore 방법이 존재한다.
 
 ## system
 ### int system( const char *str )
@@ -115,9 +122,9 @@ IPC(Inter Process Communication)
 - `0`	: 셸 사용 불가
 - `-1`	: 명령 실패 (fork 불가, errno 설정됨)
 
-**Description**
-</br> 전달받은 문자열을 셸에서 실행한다.
-</br> 부모프로세스는 실행이 정지되며, 시그널이 블로킹된다.
+**Description**  
+전달받은 문자열을 셸에서 실행한다.  
+부모프로세스는 실행이 정지되며, 시그널이 블로킹된다.
 
 
 ## exit
@@ -127,9 +134,9 @@ IPC(Inter Process Communication)
 	- `EXIT_SUCCESS`	: 0 정상 종료
 	- `EXIT_FAILURE`	: 1 비정상 종료
 
-**Description**
-</br> 프로그램을 종료한다.
-</br> 종료시 버퍼를 모두 삭제하고 파일디스크립터를 모두 닫는다.
+**Description**  
+프로그램을 종료한다.  
+종료시 버퍼를 모두 삭제하고 파일디스크립터를 모두 닫는다.
 
 
 ## kill
@@ -152,11 +159,12 @@ IPC(Inter Process Communication)
 
 **Return Value**
 - 시그널 전송 결과값 반환
+- `other` : 실패 (확인 필요)
 - `0`	: 성공
 - `-1`	: 실패
 
-**Description**
-</br> 대상 프로세스에 종료 시그널 전송
+**Description**  
+대상 프로세스에 종료 시그널 전송
 
 
 ## sleep
@@ -168,8 +176,8 @@ IPC(Inter Process Communication)
 - `orthr` : 대기 중단으로 인해 남은 대기시간
 - `0`	: 대기 완료
 
-**Description**
-</br> 지정된 시간 또는 신호가 도착할 때까지 Sleep 상태가 된다.
+**Description**  
+지정된 시간 또는 신호가 도착할 때까지 Sleep 상태가 된다.
 
 
 ## pause
@@ -178,8 +186,8 @@ IPC(Inter Process Communication)
 **Return Value**
 - `-1`	: 항상 -1 반환
 
-**Description**
-</br> 시그널 수신 때 까지 프로세스 대기
+**Description**  
+시그널 수신 때 까지 프로세스 대기
 
 
 ## getpid
@@ -188,9 +196,9 @@ IPC(Inter Process Communication)
 **Return Value**
 - 현재 프로세스의 ID
 
-**Description**
-</br> 현재프로세스의 ID값을 얻는 함수
-</br>항상 실행된다.
+**Description**  
+현재프로세스의 ID값을 얻는 함수  
+항상 실행된다.
 
 
 ## getppid
@@ -199,9 +207,9 @@ IPC(Inter Process Communication)
 **Return Value**
 - 부모 프로세스의 ID
 
-**Description**
-</br> 부모프로세스의 ID값을 얻는 함수
-</br>항상 실행된다.
+**Description**  
+부모프로세스의 ID값을 얻는 함수  
+항상 실행된다.
 
 
 ## wait
@@ -220,12 +228,12 @@ IPC(Inter Process Communication)
 - `other`	: 프로세스 ID
 - `-1` : 에러 (ECHILD 자식 없음, EINTR 시스템 콜 인터럽트)
 
-**Description**
-</br> 자식프로세스의 종료시 까지 대기
-</br> 시그널을 받는경우
-</br> 자식프로세스가 이미 종료된 상태인 경우
-</br> 자식프로세스가 없는 경우
-</br> 위의 네가지 경우 반환되어 함수가 종료된다.
+**Description**  
+ 자식프로세스의 종료시 까지 대기  
+ 시그널을 받는경우  
+ 자식프로세스가 이미 종료된 상태인 경우  
+ 자식프로세스가 없는 경우  
+ 위의 네가지 경우 반환되어 함수가 종료된다.  
 
 
 ## waitpid
@@ -255,16 +263,17 @@ IPC(Inter Process Communication)
 - `0`	: 이용할 수 있는 자식이 없
 - `-1`	: 에러 (ECHILD 자식 없음, EINTR 시스템 콜 인터럽트)
 
-**Description**
-</br> 자식 프로세스를 기다린다.
-</br> 옵션에따라 차단을 방지하거나 자세한 설정이 가능하다.
+**Description**  
+자식 프로세스를 기다린다.  
+옵션에따라 차단을 방지하거나 자세한 설정이 가능하다.  
 
 
 ## errno
-**Description**
-</br> 에러 발생시 발생 에러코드를 저장하는 전역변수
-</br> thread마다 따로리되어 멀티스레드에 안전하다.
-</br> 0 이라면 정상 실행됨을 의미한다.
+**Description**  
+에러 발생시 발생 에러코드를 저장하는 전역변수  
+thread마다 따로 관리되어 멀티스레드에 안전하다.  
+0 이라면 정상 실행됨을 의미한다.  
+요즘에는 전역 변수가 아닌 따로 관리한다. (정확한 정보 필요)
 
 
 ## strerror
@@ -278,8 +287,8 @@ IPC(Inter Process Communication)
 - `NULL`	: 해당하는 메시지 없음
 - `"Unknown error nnn"`	: 해당하는 메시지 없음
  
-**Description**
-</br> 해당하는 errnum의 문자열을 반환한다.
+**Description**  
+해당하는 errnum의 문자열을 반환한다.
 
 
 ## perror
@@ -287,8 +296,8 @@ IPC(Inter Process Communication)
 **Parametters**
 - `const char* str` : 에러 문자열 이전에 출력할 문자열
 
-**Description**
-</br> 전역변수 errno의 값을 해석하여 해당하는 에러메시지를 표준 에러 출력 스트림에 출력한다.
+**Description**  
+전역변수 errno의 값을 해석하여 해당하는 에러메시지를 표준 에러 출력 스트림에 출력한다.
 
 
 ## strerror_r
@@ -302,13 +311,13 @@ IPC(Inter Process Communication)
 - `0`	: 성공
 - `-1`	: 실패
 
-**Description**
-</br> 시스템 에러 메시지를 문자열로 반환
+**Description**  
+시스템 에러 메시지를 문자열로 반환
 
 ## dprintf
 ### int dprintf( int fd, const char *format, ...)
-**Description**
-</br> 일반적인 출력문장에 저수준의 출력 문장을 추가한형태
+**Description**  
+일반적인 출력문장에 저수준의 출력 문장을 추가한형태
 
 ## open
 ### int open (const char *filename, int FLAGS[, mode_t mode])
@@ -334,8 +343,8 @@ IPC(Inter Process Communication)
 - `other`	: 파일디스크립터 값
 - `-1`	: 실패
 
-**Description**
-</br> 파일 열기 함수
+**Description**  
+파일 열기 함수
 
 ## fcntl
 ### int fcntl(int fd, int cmd, ... )
@@ -357,8 +366,8 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 **Return Value**
 - `-1`	: 실패
 
-**Description**
-</br> 열린 파일에 대해 제어함
+**Description**  
+열린 파일에 대해 제어함
 
 
 ## signal
