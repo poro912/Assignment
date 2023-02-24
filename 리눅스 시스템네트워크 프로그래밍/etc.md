@@ -33,7 +33,7 @@ C 문법이며 C++에서는 지원하지 않는다.
 man (Manual)
 특정 명령이나 자원들의 메뉴얼을 출력해주는 명령어이다.  
 총 9개의 영역으로 이뤄진다.  
-### man [num] 찾고싶은 명령어  
+### man [section num] 찾고싶은 명령어  
 | Section | description |
 | :---: | :--- |
 | 1 | 명령어(shell commands)"나 '실행 가능한 프로그램('Executable programs)|
