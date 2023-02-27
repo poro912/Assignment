@@ -1,4 +1,5 @@
-## Index
+<h2> Index</h2>
+
 ### 이론
 * [restrict 키워드](#restrict-키워드)
 * [man](#man명령어)
@@ -6,7 +7,7 @@
 * [ID](#id)
 * [시그널](#시그널)
 * [IPC](#ipc)
-### 메소드
+### API
 * [system](#system)
 * [exit](#exit)
 * [kill](#kill)
@@ -109,6 +110,8 @@ man (Manual)
 IPC(Inter Process Communication)
 프로세스간 데이터를 주고 받는 행위 또는 그에 대한 방법이나 경로  
 Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Semaphore 방법이 존재한다.
+
+
 
 ## system
 ### int system( const char *str )
