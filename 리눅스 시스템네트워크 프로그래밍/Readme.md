@@ -17,10 +17,17 @@
 
 
 ## 2 Chapter
-기간 : 2023// ~ 2023//
+기간 : 2023/02/27 ~ 2023/03/03
 </br> 제목 : 파일 처리
 </br> 주제 : 
 </br> [link](week2/Chapter2%20File.md)
+
+
+## 3 Chapter
+기간 : 2023/02/27 ~ 2023/03/03
+</br> 제목 : 텍스트 처리
+</br> 주제 : 
+</br> [link](week2/Chapter3%20TextProcess.md)
 
 
 ##  Chapter
@@ -28,3 +35,34 @@
 </br> 제목 : 
 </br> 주제 : 
 </br> [link](week/)
+
+
+##  Chapter
+기간 : 2023// ~ 2023//
+</br> 제목 : 
+</br> 주제 : 
+</br> [link](week/)
+
+
+##  Chapter
+기간 : 2023// ~ 2023//
+</br> 제목 : 
+</br> 주제 : 
+</br> [link](week/)
+
+
+
+
+
+
+
+## h2  
+### h3  
+**Parametters**  
+- 
+
+**Return Value**  
+- 
+
+**Description**  
+</br>  
