@@ -17,11 +17,16 @@
 - [동기화된 I/O](#동기화된-io)
 	- [레이턴시 (latency)](#레이턴시-latency)
 	- [수동 동기화](#수동-동기화)
+	- [fsync](#fsync)
+- [**Parametters**](#parametters)
+- [**Return Value**](#return-value)
+	- [fdatasync](#fdatasync)
+- [**Parametters**](#parametters-1)
+- [**Return Value**](#return-value-1)
 	- [자동 동기화](#자동-동기화)
 	- [넌 블로킹](#넌-블로킹)
 	- [비동기적 I/O](#비동기적-io)
-- [posix\_fadvise](#posix_fadvise)
-	- [posix\_fadvise](#posix_fadvise-1)
+	- [posix\_fadvise](#posix_fadvise)
 - [FILE 구조체](#file-구조체)
 	- [setvbuf](#setvbuf)
 	- [XDR](#xdr)
@@ -29,20 +34,14 @@
 - [바이너리 데이터 입출력](#바이너리-데이터-입출력)
 - [LFS](#lfs)
 	- [fwrite](#fwrite)
-- [**Parametters**](#parametters)
-- [**Return Value**](#return-value)
+- [**Parametters**](#parametters-2)
+- [**Return Value**](#return-value-2)
 	- [fread](#fread)
-- [**Parametters**](#parametters-1)
-- [**Return Value**](#return-value-1)
+- [**Parametters**](#parametters-3)
+- [**Return Value**](#return-value-3)
 	- [fdopen](#fdopen)
 	- [fclose](#fclose)
 	- [fflush](#fflush)
-- [etc](#etc)
-	- [dup](#dup)
-	- [snprintf](#snprintf)
-	- [lseek](#lseek)
-	- [close](#close)
-	- [flush](#flush)
 
 
 
@@ -56,7 +55,7 @@
 
 ## 분류별 함수 목록
 ### 저수준 함수  
-<img src="img/%EC%A0%80%EC%88%98%EC%A4%80_1.jpg" width=500></img>
+<img src="img/%EC%A0%80%EC%88%98%EC%A4%80_1.jpg" width=500></img></br>
 <img src="img/%EC%A0%80%EC%88%98%EC%A4%80_2.jpg" width=500></img>
 
 ### 고수준 함수  
@@ -118,8 +117,8 @@
    
 
 ## 동기화된 I/O  
-I/O 처리는 상대적으로 비동기적으로 처리한다.  
-몇몇 경우 즉각적으로 내용이 반영되야 하는 경우에 동기화를 사용한다.
+보통 I/O 처리는 비동기적으로 처리된다.  
+즉각적으로 내용이 반영되어야 하는 몇몇 경우에 동기화를 사용한다.
 
 ### 레이턴시 (latency)  
 자극과 반응 사이의 시간  
@@ -127,6 +126,23 @@ I/O 처리는 상대적으로 비동기적으로 처리한다.
 
 ### 수동 동기화  
 동기화 시점에 fsync, fdatasync 함수를 호출한다.  
+### fsync  
+**Parametters**  
+- 
+
+**Return Value**  
+- 
+
+**Description**  
+
+### fdatasync  
+**Parametters**  
+- 
+
+**Return Value**  
+- 
+
+**Description**  
 
 ### 자동 동기화  
 [open 함수](../etc.md#open)로 파일을 열 때 옵션 플래그를 설정한다.  
@@ -143,8 +159,7 @@ I/O 처리는 상대적으로 비동기적으로 처리한다.
 ### 비동기적 I/O  
 - 10장 리얼타임 확장  
 
-
-## posix_fadvise  
+ 
 ### posix_fadvise  
 	int posix_fadvise(
 		int		fd, 
@@ -164,25 +179,23 @@ I/O 처리는 상대적으로 비동기적으로 처리한다.
 | POSIX_FADV_SEQUENTIAL	| 순차적으로 접근한다. |
 | POSIX_FADV_RANDOM	| 지정된 데이터에 임의 순서로 접근한다. |
 | POSIX_FADV_NOREUSE	| 데이터에 한번만 접근한다. |
-| POSIX_FADV_WILLNEED	| 지정한 곧 접근한다. |
-| POSIX_FADV_DONTNEED	| 지정한 데이터에 접근하지 않는다. |  
+| POSIX_FADV_WILLNEED	| 지정한 곧 접근한다.</br>지정 영역을 페이지 캐시로 읽어들이는 논블록 동작을 개시한다.|
+| POSIX_FADV_DONTNEED	| 지정한 데이터에 접근하지 않는다.</br>지정 영역과 연계된 캐싱 페이지를 해제 시도한다. |  
 
-POSIX_FADV_WILLNEED	: 지정 영역을 페이지 캐시로 읽어들이는 논블록 동작을 개시한다.  
-POSIX_FADV_DONTNEED	: 지정 영역과 연계된 캐싱 페이지를 해제 시도한다.  
 
 **Return Value**  
 - `other`	: 에러번호
 - `0`	: 성공
 
 **Description**  
-fd와 연결된 파일의 데이터와 애플리케이션의 예상 동작에 대해 미리 선언(조언)한다.  
+fd와 연결된 파일의 데이터 처리와 애플리케이션의 예상 동작에 대해 조언 한다.  
 len이 0이라면 offset 부터 모든 데이터를 지정한다.  
 5장 IPC - mmap
 
 
 ## FILE 구조체  
-파일의 정보를 담을수 있는 자료형
-현재 파일의 위치, 버퍼의 사이즈 등 다양한 정보를 저장한다.
+파일의 정보를 담을수 있는 자료형  
+파일의 위치, 버퍼의 사이즈 등 다양한 정보를 저장한다.  
 파일 스트림	: FILE 구조체를 통해 얻어지는 파일 입출력 매개물  
 
 ### setvbuf  
@@ -200,7 +213,7 @@ len이 0이라면 offset 부터 모든 데이터를 지정한다.
   	| :---: 	| :--- |
 	| _IONBF	| 사용된 버퍼가 없음 |
 	| _IOFBF 	| buf를 버퍼로 사용하고 size를 버퍼 크기로 사용 |
-	| _IOLBF	| 행 버퍼링 사용 |
+	| _IOLBF	| 행 버퍼링 사용</br>행 버퍼링	: 줄바꿈, 버퍼 가득참, 입력 요청 시 버퍼를 비움 |
   - 행 버퍼링	: 줄바꿈, 버퍼 가득참, 입력 요청 시 버퍼를 비움
 - `size_t size`		: 버퍼의 크기
 
@@ -210,8 +223,8 @@ len이 0이라면 offset 부터 모든 데이터를 지정한다.
 - `0`	: 성공
 
 **Description**  
-버퍼링 방식과 버퍼의 크기를 설정한다.
-buf 인자가 NULL 이라면 함수에 요청된 크기만큼 메모리를 할당하며 스트림 버퍼로 사용한다.
+버퍼링 방식과 버퍼의 크기를 설정한다.  
+buf 인자가 NULL 이라면 함수에 요청된 크기만큼 메모리를 할당하며 스트림 버퍼로 사용한다.  
 
 ### XDR
 XDR(External Data Representation)  
@@ -278,21 +291,5 @@ LFS(Large File Summit/Support)	: 대용량 파일 지원
 ### fclose
 ### fflush
 
-## etc
-### dup  
-``` 함수 ```  
-
-**Parametters**  
-- a
-
-**Return Value**  
-- a
-
-**Description**  
-
-### snprintf
-### lseek
-### close
-### flush
 
 
