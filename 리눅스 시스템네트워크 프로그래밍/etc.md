@@ -51,9 +51,11 @@
 - [3장](#3장)
 	- [API](#api-2)
 		- [memchr](#memchr)
+	- [**Return Value**](#return-value-2)
 		- [strchr](#strchr)
+	- [**Return Value**](#return-value-3)
 		- [strtok](#strtok)
-		- [function\_name](#function_name)
+	- [**Return Value**](#return-value-4)
 
 # 1장  
 ## 이론  
@@ -653,8 +655,56 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 # 3장  
 ## API
 ### memchr
+	void *memchr(
+		const void 		*buf,
+		int			c,
+		size_t			count
+	)
+**Parametters**
+- `const void *buf`	: 
+- `int c`		: 
+- `size_t count`	: 
+
+**Return Value**
+- 
+**Description**
+
 ### strchr
+	char *strchr(
+		const char 		*string,
+		int			c
+	)
+**Parametters**
+- `const char *string`	: 
+- `int c`		: 
+
+**Return Value**
+- 
+**Description**
+
 ### strtok
+	char *strtok(
+		char *string1,
+		const char *string2
+	)
+**Parametters**
+- `char *string1`	: 
+- `const char *string2`	: 
+
+**Return Value**
+- 
+**Description**
+
+<!-- 
+### function_name
+	a
+**Parametters**
+- 
+
+**Return Value**
+- 
+
+**Description**
 
 
 ### function_name
@@ -668,7 +718,8 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 **Description**
 
 
-<!-- 
+
+
 ## trash
 
 ```cpp
