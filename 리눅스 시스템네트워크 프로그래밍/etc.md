@@ -34,7 +34,9 @@
 	- [**Parametters**](#parametters-1)
 	- [**Return Value**](#return-value-1)
 - [2장](#2장)
-	- [File mode](#file-mode)
+	- [이론](#이론-1)
+		- [메타데이터](#메타데이터)
+		- [File mode](#file-mode)
 	- [API](#api-1)
 		- [fopen](#fopen)
 		- [fclose](#fclose)
@@ -47,6 +49,10 @@
 		- [dup2](#dup2)
 		- [lseek](#lseek)
 - [3장](#3장)
+	- [API](#api-2)
+		- [memchr](#memchr)
+		- [strchr](#strchr)
+		- [strtok](#strtok)
 		- [function\_name](#function_name)
 
 # 1장  
@@ -67,9 +73,6 @@ POSIX	: portable operating system interface
 이식 가능 운영체제 인터페이스  
 서로다른 UNIX OS의 공통 API를 정리하여 이식성이 높은 프로그램을 개발하기 위한 인터페이스 규격  
 시스템 콜, 프로세스 환경, 파일과 디렉터리, 시스템 데이터베이스 tar 압축 포맷 등 다양한 분야가 있다.  
-
-
-
 
 ```man [section num] 찾고싶은 명령어  ```
 | Section | description |
@@ -147,7 +150,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ## API  
 ### system
-	int system( const char *str )
+	int system(const char *str)
 **Parametters**
 - `const char *str` : 셸에서 실행할 명령
 
@@ -164,7 +167,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### exit
-	void exit( int status )
+	void exit(int status)
 **Parametters**
 - `int status`	: 함수 종료 시 전달할 값
 	- `EXIT_SUCCESS`	: 0 정상 종료
@@ -254,8 +257,8 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 - `int *statloc`	: 자식의 실행 결과를 매크로를 통해 알 수 있음 (정상종료 / 비정상종료)
   - 메크로 목록
   - `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
-  - `WEXITSTATUS(statloc)`: 정상종료 시 반환값을 반환
-  - `WIFSIGNALED(statloc)`: 신호로 인한 종료라면 참 반환
+  - `WEXITSTATUS(statloc)`	: 정상종료 시 반환값을 반환
+  - `WIFSIGNALED(statloc)`	: 신호로 인한 종료라면 참 반환
   - `WTERMSIG(statloc)`	: 종료하게한 신호의 번호를 반환
   - `WIFSTOPPED(statloc)`	: 정지되어있다면 참 반환
   - `WSTOPSIG(statloc)`	: 정지하게한 신호의 번호를 반환
@@ -286,15 +289,15 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
   - `음수`	: 절대값 프로세스가 속한 그룹 프로세스
 - `int *statloc`	: 자식의 실행 결과를 매크로를 통해 알 수 있음 (정상종료 / 비정상종료)
   - `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
-  - `WEXITSTATUS(statloc)`: 정상종료 시 반환값을 반환
-  - `WIFSIGNALED(statloc)`: 신호로 인한 종료라면 참 반환
+  - `WEXITSTATUS(statloc)`	: 정상종료 시 반환값을 반환
+  - `WIFSIGNALED(statloc)`	: 신호로 인한 종료라면 참 반환
   - `WTERMSIG(statloc)`	: 종료하게한 신호의 번호를 반환
   - `WIFSTOPPED(statloc)`	: 정지되어있다면 참 반환
   - `WSTOPSIG(statloc)`	: 정지하게한 신호의 번호를 반환
 
 - `int options`	: 실행 시 사용할 옵션
   - `WCONTINUED`	: 중단되었다가 재개된 자식 프로세스의 상태를 받음
-  - `WNOHANG`		: 호출자는 차단되지 않고 반환값으로 0을 받음
+  - `WNOHANG`	: 호출자는 차단되지 않고 반환값으로 0을 받음
   - `WUNTRACED`	: 중단된 자식 프로세스의 상태를 받음
   - `0`	: Wait함수와 동일하게 실행됨
 
@@ -432,7 +435,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 
 ### signal
-```declring_function```  
+```declring_function```    
 **Parametters**
 - 
 
@@ -453,8 +456,15 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 
 # 2장  
-## File mode
+## 이론
+### 메타데이터
+데이터에 대한 데이터  
+많은 양의 데이터를 수집, 저장 및 분석할 수 있도록 일관된 방식으로 구조화된, 다른 데이터를 설명하는 데이터  
+대량의 정보 가운데서 찾고 있는 정보를 효율적으로 찾아내서 이용하기위해 일정한 규칙에 따라 부여되는 데이터  
+예) 사진의 촬영시간, 노출, 플래시 사용 여부, 해상도, 위치 등  
 
+
+### File mode  
 > **Warning**  
  w, w+, wb, wb+, w+b 모드는 기존 파일을 영구 삭제합니다.  
 
@@ -469,9 +479,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 |  t	| 텍스트모드 |
 |  b	| 바이너리모드 |
 
-
 ## API  
-
 ### fopen
 	FILE *fopen(
 		const char		*filename,
@@ -629,7 +637,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 - `off_t offset`	: 기준점으로부터 이동할 거리
 - `int whence`		: 기준점
 	| 기준점| 의미 |
-	| :--:	| :--: |
+	| :--:	| :-- |
 	| SEEK_SET | (0)파일의 맨 앞 |
 	| SEEK_CUR | (1)현재 SEEK 포인터 |
 	| SEEK_END | (2)파일의 맨 끝 | 
@@ -642,7 +650,11 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 파일 디스크립터의 커서를 조정한다.  
 현재 파일크기를 넘어 조정할 수 있다. (이 때 남은 부분은 NULL로 채워진다.)  
 
-# 3장
+# 3장  
+## API
+### memchr
+### strchr
+### strtok
 
 
 ### function_name
