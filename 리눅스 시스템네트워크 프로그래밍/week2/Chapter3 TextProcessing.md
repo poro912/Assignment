@@ -3,14 +3,14 @@
  
 - [서론](#서론)
 - [정규 표현식](#정규-표현식)
+	- [함수 목록](#함수-목록)
 	- [regcomp](#regcomp)
 	- [regmatch\_t](#regmatch_t)
 	- [regexec](#regexec)
-- [**Parametters**](#parametters)
 	- [regerror](#regerror)
-- [**Parametters**](#parametters-1)
+- [**Parametters**](#parametters)
 	- [regfree](#regfree)
-- [**Parametters**](#parametters-2)
+- [**Parametters**](#parametters-1)
 - [문자열 관련 함수](#문자열-관련-함수)
 
 
@@ -29,7 +29,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 [정규 표현식-위키백과](https://ko.wikipedia.org/wiki/%EC%A0%95%EA%B7%9C_%ED%91%9C%ED%98%84%EC%8B%9D)
 
 
-
+### 함수 목록
 |함수	|기능|
 |:--:	|:--|
 |regcomp	| 정규 표현식 패턴 문자열 패턴 버퍼로 컴파일 |
@@ -68,12 +68,14 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		regoff_t rm_so;
 		regoff_t rm_eo;
 	} regmatch_t;
+
 **Member**  
 - `regoff_t rm_so`	: 매칭에 성공한 시작 오프셋
 - `regoff_t rm_eo`	: 매칭에 성공한 끝 오프셋
+
 **Description**  
-매칭된 문자열의 오프셋 위치를 저장하기위한 구조체
-두개의 정수형으로 이루어져있다.
+매칭된 문자열의 오프셋 위치를 저장하기위한 구조체  
+두개의 정수형으로 이루어져있다.  
 
 ### regexec  
 	int regexec(
@@ -84,7 +86,13 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		int				eflags
 	)
 **Parametters** 
-- 
+- `const regx_t *restrict	preg`	: 
+- `const char *restrict	string`	: 
+- `size_t	nmatch`	: 
+- `regmatch_t 	pmatch[restrict]`	: 
+- `int	eflags`	: 
+
+
 **Return Value**  
 -   ㅁ
 
