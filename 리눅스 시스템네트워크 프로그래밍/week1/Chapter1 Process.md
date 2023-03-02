@@ -99,7 +99,8 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 		const posix_spawn_file_actions_t	*file_actions,
 		const posix_spawnattr_t *restrict 	attrp,
 		char *const			argv[restrict],
-		char *const			envp[restrict]);
+		char *const			envp[restrict]
+	)
 
 ### posix_spawnp
 	int posix_spawnp(
@@ -108,7 +109,8 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 		const posix_spawn_file_actions_t	*file_actions,
 		const posix_spawnattr_t *restrict	attrp,
 		char *const			argv[restrict],
-		char *const			envp[restrict]);
+		char *const			envp[restrict]
+	)
 **Parametters**
 - `pid_t *restrict pid` 		: 생성된 자식프로세스의 pid를 저장할 변수
 - `const char *restrict path`		: 실행할 파일, 주소로 경로를 확인
@@ -153,12 +155,12 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 
 
 ### posix_spawn_file_actions_init
-	int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)
+	int posix_spawn_file_actions_init(posix_spawn_file_actions_t		*file_actions)
 posix_spawn_file_action_t 구조체를 초기화 한다.  
 </br> 
 
 ### posix_spawn_file_actions_destroy
-	int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)
+	int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t		*file_actions)
 posix_spawn_file_action_t 구조체를 삭제한다.  
 </br>
 
@@ -168,14 +170,16 @@ posix_spawn_file_action_t 구조체를 삭제한다.
 		int			fildes,
 		const char *restrict	path,
 		int			oflag,
-		mode_t			mode)
+		mode_t			mode
+	)
 자식 프로세스가 생성되면서 파일을 추가로 연다.  
 </br>
 
 ### posix_spawn_file_actions_addclose
 	int posix_spawn_file_actions_addclose(
 		posix_spawn_file_actions_t		*file_actions,
-		int 			fildes)
+		int 			fildes
+	)
 자식 프로세스가 생성되면서 파일을 닫는다.  
 </br>
 
@@ -183,7 +187,8 @@ posix_spawn_file_action_t 구조체를 삭제한다.
 	int posix_spawn_file_actions_adddup2(
 		posix_spawn_file_actions_t		*file_actions,
 		int 			fildes,
-		int 			newfildes)
+		int 			newfildes
+	)
 자식 프로세스가 생성되면서 파일기술자를 복제한다.  
 </br>
 
@@ -225,14 +230,16 @@ posix_spawnatter_t 구조체를 삭제한다.
 ### posix_spawnattr_getflags
 	int posix_spawnattr_getflags(
 		const posix_spawnatter_t *restrict 	attr,
-		short *restrict		flags)
+		short *restrict		flags
+	)
 posix_spawnatter_t 구조체에서 설정된 플래그 속성을 받는다.  
 </br>
 
 ### posix_spawnattr_setflags
 	int posix_spawnattr_setflags(
 		posix_spawnatter_t 	*attr,
-		short			flags)
+		short			flags
+	)
 posix_spawnatter_t 구조체에 플래그를 설정한다.  
 </br>
 
@@ -241,14 +248,16 @@ posix_spawnatter_t 구조체에 플래그를 설정한다.
 ### posix_spawnattr_getgroup
 	int posix_spawnattr_getgroup(
 		const posix_spawnattr_t *restrict 	attr,
-		pid_t *restrict 	pgroup)
+		pid_t *restrict 	pgroup
+	)
 생성될 자식프로세스의 PGID를 받는다.  
 </br>
 
 ### posix_spawnattr_setgroup
 	int posix_spawnattr_setgroup(
 		const posix_spawnattr_t *restrict 	attr,
-		pid_t		 	pgroup)
+		pid_t		 	pgroup
+	)
 생성될 자식프로세스의 PGID를 변경한다.  
 </br>
 
@@ -257,28 +266,32 @@ posix_spawnatter_t 구조체에 플래그를 설정한다.
 ### posix_spawnattr_getsigdefault
 	int posix_spawnattr_getsigdefault(
 		const posix_spawnattr_t *restrict 	attr,
-		sigset_t *restrict 	sigdefault)
+		sigset_t *restrict 	sigdefault
+	)
 생성될 자식프로세스의 sigdefault 값을 얻는다.  
 </br>
 
 ### posix_spawnattr_setsigdefault
 	int posix_spawnattr_setsigdefault(
 		const posix_spawnattr_t *restrict 	attr,
-		const sigset_t *restrict 		sigdefault)
+		const sigset_t *restrict 		sigdefault
+	)
 생성될 자식프로세스의 sigdefault 값을 변경한다.  
 </br>
 
 ### posix_spawnattr_getsigmask
 	int posix_spawnattr_getsigmask(
 		const posix_spawnattr_t *restrict 	attr,
-		sigset_t *restrict 	sigmask)
+		sigset_t *restrict 	sigmask
+	)
 생성될 자식프로세스의 시그널 마스크 값을 얻는다.  
 </br>
 
 ### posix_spawnattr_setsigmask
 	int posix_spawnattr_setsigmask(
 		const posix_spawnattr_t *restrict 	attr,
-		const sigset_t *restrict 		sigmask)
+		const sigset_t *restrict 		sigmask
+	)
 생성될 자식프로세스의 시그널 마스크 값을 변경한다.  
 </br>
 
@@ -286,27 +299,31 @@ posix_spawnatter_t 구조체에 플래그를 설정한다.
 ### posix_spawnattr_getschedpolicy
 	int posix_spawnattr_getschedpolicy(
 		const posix_spawnattr_t *restrict 	attr,
-		int *restrict 		schedpolicy)
+		int *restrict 		schedpolicy
+	)
 생성될 자식프로세스의 스케줄링 정책을 얻는다.  
 </br>
 
 ### posix_spawnattr_setschedpolicy
 	int posix_spawnattr_setschedpolicy(
 		const posix_spawnattr_t *restrict 	attr,
-		int 			schedpolicy)
+		int 			schedpolicy
+	)
 생성될 자식프로세스의 스케줄링 정책을 변경한다.  
 </br>
 
 ### posix_spawnattr_getschedparam
 	int posix_spawnattr_getschedparam(
 		const posix_spawnattr_t *restrict 	attr,
-		struct sched_param *restrict 		schedparam)
+		struct sched_param *restrict 		schedparam
+	)
 생성될 자식프로세스의 스케줄 파라메터를 얻는다.  
 </br>
 
 ### posix_spawnattr_setschedparam
 	int posix_spawnattr_setschedparam(
 		const posix_spawnattr_t *restrict 	attr,
-		const struct sched_param *restrict 	schedparam)
+		const struct sched_param *restrict 	schedparam
+	)
 생성될 자식프로세스의 스케줄 파라메터를 변경한다.  
 </br>
