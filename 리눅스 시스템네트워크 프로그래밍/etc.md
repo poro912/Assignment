@@ -25,20 +25,29 @@
 		- [strerror\_r](#strerror_r)
 		- [dprintf](#dprintf)
 		- [open](#open)
+		- [close](#close)
 		- [fcntl](#fcntl)
 		- [signal](#signal)
+	- [**Parametters**](#parametters)
+	- [**Return Value**](#return-value)
 		- [sigaction](#sigaction)
+	- [**Parametters**](#parametters-1)
+	- [**Return Value**](#return-value-1)
 - [2장](#2장)
 	- [File mode](#file-mode)
 	- [API](#api-1)
+		- [fopen](#fopen)
+		- [fclose](#fclose)
+		- [fdopen](#fdopen)
+		- [fdclose](#fdclose)
+		- [fread](#fread)
+		- [fwrite](#fwrite)
+		- [fflush](#fflush)
 		- [dup](#dup)
-		- [dup](#dup-1)
-		- [snprintf](#snprintf)
-		- [lseek```declring_function```](#lseekdeclring_function)
-		- [close](#close)
-		- [flush](#flush)
+		- [dup2](#dup2)
+		- [lseek](#lseek)
+- [3장](#3장)
 		- [function\_name](#function_name)
-		- [declring\_function](#declring_function)
 
 # 1장  
 ## 이론  
@@ -138,7 +147,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ## API  
 ### system
-```int system( const char *str )```  
+	int system( const char *str )
 **Parametters**
 - `const char *str` : 셸에서 실행할 명령
 
@@ -155,7 +164,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### exit
-```void exit( int status )```  
+	void exit( int status )
 **Parametters**
 - `int status`	: 함수 종료 시 전달할 값
 	- `EXIT_SUCCESS`	: 0 정상 종료
@@ -167,7 +176,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### kill
-```int kill(pid_t pid, int sig)```  
+	int kill(pid_t pid, int sig)
 **Parametters**
 - `pid_t pid`	: 전송 대상 프로세스
 	- `양수`	: 지정한 프로세스
@@ -177,11 +186,11 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 - `int sig`		: 종료 시그널 번호
 	```
 		 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL
-		 5) SIGTRAP      6) SIGABRT      7) SIGBUS       8) SIGFPE
-		 9) SIGKILL     10) SIGUSR1     11) SIGSEGV     12) SIGUSR2
-		13) SIGPIPE     14) SIGALRM     15) SIGTERM     17) SIGCHLD
-		18) SIGCONT     19) SIGSTOP     20) SIGTSTP     21) SIGTTIN
-		22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
+		 2) SIGTRAP      6) SIGABRT      7) SIGBUS       8) SIGFPE
+		 3) SIGKILL     10) SIGUSR1     11) SIGSEGV     12) SIGUSR2
+		1)  SIGPIPE     14) SIGALRM     15) SIGTERM     17) SIGCHLD
+		2)  SIGCONT     19) SIGSTOP     20) SIGTSTP     21) SIGTTIN
+		3)  SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
 	```
 
 **Return Value**
@@ -195,7 +204,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### sleep
-```unsigned int sleep(unsigned int seconds)```  
+	unsigned int sleep(unsigned int seconds)
 **Parametters**
 - `unsigned inst seconds`	: 대기 시간
 
@@ -208,7 +217,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### pause
-```int pause(void)```  
+	int pause(void)
 
 **Return Value**
 - `-1`	: 항상 -1 반환
@@ -218,7 +227,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### getpid
-```pid_t getpid(void)```
+	pid_t getpid(void)
 
 **Return Value**
 - 현재 프로세스의 ID
@@ -229,7 +238,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### getppid
-```pid_t getppid(void)```  
+	pid_t getppid(void)
 
 **Return Value**
 - 부모 프로세스의 ID
@@ -240,7 +249,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### wait
-```pid_t wait(int *statloc)```  
+	pid_t wait(int *statloc)
 **Parametters**
 - `int *statloc`	: 자식의 실행 결과를 매크로를 통해 알 수 있음 (정상종료 / 비정상종료)
   - 메크로 목록
@@ -264,7 +273,11 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 
 ### waitpid
-```pid_t waitpid(pid_t pid, int *statloc, int options)```  
+	pid_t waitpid(
+		pid_t			pid,
+		int			*statloc,
+		int			options
+	)
 **Parametters**
 - `pid_t pid`	: 대기할 자식 프로세스
   - `양수`	: 지정한 프로세스
@@ -304,7 +317,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 
 ### strerror
-```char *strerror(int errnum)```  
+	char *strerror(int errnum)
 **Parametters**
 - `int errnum`	: 에러번호
 
@@ -319,7 +332,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 
 ### perror
-```void perror(const char* str)```  
+	void perror(const char* str)
 **Parametters**
 - `const char* str` : 에러 문자열 이전에 출력할 문자열
 
@@ -328,7 +341,11 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 
 ### strerror_r
-```int strerror_r(int errnum, char *strerrbuf, size_t buflen)```  
+	int strerror_r(
+		int			errnum, 
+		char			*strerrbuf,
+		size_t			buflen
+	)
 **Parametters**
 - `int errnum`	: 에러 변호 
 - `char *strerrbuf`	: 에러메시지를 저장할 버퍼
@@ -342,7 +359,10 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 시스템 에러 메시지를 문자열로 반환
 
 ### dprintf
-```int dprintf( int fd, const char *format, ...)```  
+	int dprintf(
+		int			fd,
+		const char		*format,
+		...)  
 **Description**  
 일반적인 출력문장에 저수준의 출력 문장을 추가한형태
 
@@ -375,8 +395,20 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 **Description**  
 파일 열기 함수
 
+### close
+	int close(int fd)
+**Parametters**  
+- `int fd`	: 닫을 파일 디스크립터
+
+**Return Value**  
+- `0`	: 성공
+- `-1`	: 에러
+
+**Description**  
+파일 디스크립터를 기반으로 파일을 닫는다.
+
 ### fcntl
-```int fcntl(int fd, int cmd, ... )```  
+	int fcntl(int fd, int cmd, ... )  
 **Parametters**
 - `int fd`	: 대상 파일 디스크립터
 - `int cmd`	: 실행할 명령
@@ -402,20 +434,20 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 ### signal
 ```declring_function```  
 **Parametters**
-- .
+- 
 
 **Return Value**
-- .
+- 
 
 **Description**
 
 ### sigaction
 ```declring_function```  
 **Parametters**
-- .
+- 
 
 **Return Value**
-- .
+- 
 
 **Description**
 
@@ -424,7 +456,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 ## File mode
 
 > **Warning**  
- w, w+, wb, wb+, w+b 모드를 주의하여 사용하십시오. 기존 파일을 영구 삭제합니다.  
+ w, w+, wb, wb+, w+b 모드는 기존 파일을 영구 삭제합니다.  
 
 | 모드	| 설명 |
 | :--	| :-- |
@@ -439,68 +471,182 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 
 ## API  
+
+### fopen
+	FILE *fopen(
+		const char		*filename,
+		const char		*mode
+	)
+**Parametters**  
+- `const char *filename`	: 파일 이름
+- `const char *mode`	: 파일 열기 옵션
+  
+**Return Value**  
+- `NULL`	: 실패
+- `other`	: 파일 포인터
+
+**Description**  
+파일 이름을 기반으로 파일을 FILE 포인터로 연다.
+
+
+### fclose
+	int fclose(FILE *stream)
+**Parametters**  
+- `FILE *stream`	: 닫을 파일 스트림
+
+**Return Value**   
+- `0`	: 닫기 성공
+- `EOF`	: 에러
+
+**Description**  
+파일을 닫는다.  
+닫기 전 스트림과 연관된 버퍼를 모두 닫는다.  
+2진 스트림이 닫히면 파일의 마지막까지 null문자로 채워진다.  
+
+### fdopen
+	FILE *fdopen(
+		int			handle,
+		char			*type
+	)
+**Parametters**  
+- `int handle`	: 파일 디스크립터
+- `char *type`	: 파일 열기 옵션
+  
+**Return Value**  
+- `NULL`	: 실패
+- `other`	: 파일 포인터
+
+**Description**  
+파일 디스크립터를 기반으로 이미 열린 파일을 FILE 포인터로 연다.  
+열기에 실패한 경우 close()를 이용해 handle를 닫아야 한다.  
+
+### fdclose
+	int fclose(
+		FILE			*stream,
+		int			*fdp
+	)
+**Parametters**  
+- `FILE *stream`	: 닫을 파일 스트림
+- `int *fdp`		: 반환받은 파일 기술
+
+**Return Value**   
+- `0`	: 닫기 성공
+- `EOF`	: 에러
+
+**Description**  
+파일 기술자를 제외하고 파일을 닫는다.  
+스트림에 연결된 파일기술자가 없는 경우 fdp는 -1로 설정된다.  
+
+### fread
+	size_t fread(
+		void			*buffer,
+		size_t			size,
+		size_t			count,
+		FILE			*stream
+	)
+
+**Parametters**  
+- `const void *buffer`	: 읽어온 데이터를 저장할 버퍼 주소
+- `size_t size`		: 데이터 하나의 크기
+- `size_t count`	: 읽어올 데이터 개수
+- `FILE *stream`	: 데이터를 읽어올 스트림
+
+**Return Value**  
+- 읽기에 성공한 데이터의 수
+- return 값과 count 값이 다르다면 에러
+
+**Description** 
+streadm의 데이터를 buffer 에 (size * count) byte 만큼 읽어온다.  
+ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.  
+
+### fwrite  
+	size_t fwrite (
+		const void		*buffer,
+		size_t			size,
+		size_t			count,
+		FILE			*stream
+	)
+**Parametters**  
+- `const void *buffer`	: 저장할 데이터의 주소
+- `size_t size`		: 데이터 하나의 크기
+- `size_t count`	: 저장할 데이터 개수
+- `FILE *stream`	: 데이터를 쓸 파일 포인터
+
+**Return Value**  
+- 파일에 실제로 저장된 데이터의 수
+- return 값과 count 값이 다르다면 에러
+
+**Description**  
+buffer의 데이터를 stream 에 (size * count) byte 만큼 씁니다.  
+
+### fflush
+	int fflush(FILE *stream)
+**Parametters**  
+- `FILE *stream`	: 대상 파일스트림
+
+**Return Value**  
+- `0`	: 성공
+- `EOF`	: 에러
+
+**Description**  
+stream과 연관된 버퍼를 비웁니다.  
+stream이 입력을 위해 열려있는 경우 ungetc 함수 효과를 취소합니다.  
+
 ### dup  
-```declring_function```  
+	int dup(int fd)
 **Parametters**  
-- .  
+- `int fd`	: 복제할 파일 기술자
 
 **Return Value**  
-- .  
+- `other`	: 파일기술자
+- `-1`	: 에러
 
 **Description**  
+파일 기술자를 복제하여 반환한다.
 
-### dup  
-```declring_function```    
+### dup2  
+	int dup2(int fd,int fd2)   
 **Parametters**  
-- .  
+-  `int fd`	: 복제할 파일 기술자
+-  `int fd2`	: 대상이 될 파일 기술자 번호
 
 **Return Value**  
-- .  
+- `other`	: 파일기술자
+- `-1`	: 에러
 
 **Description**  
+새 파일 기술자의 값을 fd2로 지정한다.  
+fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.  
 
-### snprintf
-```declring_function```    
+### lseek
+	off_t lseek(
+		int			fd,
+		off_t			offset,
+		int			whence
+	)  
 **Parametters**  
-- .  
+- `int fd`	: 조정할 파일 디스크립터
+- `off_t offset`	: 기준점으로부터 이동할 거리
+- `int whence`		: 기준점
+	| 기준점| 의미 |
+	| :--:	| :--: |
+	| SEEK_SET | (0)파일의 맨 앞 |
+	| SEEK_CUR | (1)현재 SEEK 포인터 |
+	| SEEK_END | (2)파일의 맨 끝 | 
 
 **Return Value**  
-- .  
+- `other`	: 변환한 offset
+- `-1`	: 에러
 
 **Description**  
+파일 디스크립터의 커서를 조정한다.  
+현재 파일크기를 넘어 조정할 수 있다. (이 때 남은 부분은 NULL로 채워진다.)  
 
-### lseek```declring_function```    
-**Parametters**  
-- .  
-
-**Return Value**  
-- .  
-
-**Description**  
-
-### close
-```declring_function```    
-**Parametters**  
-- .  
-
-**Return Value**  
-- .  
-
-**Description**  
-
-### flush
-```declring_function```    
-**Parametters**  
-- .  
-
-**Return Value**  
-- .  
-
-**Description**  
+# 3장
 
 
 ### function_name
-### declring_function
+	a
 **Parametters**
 - .
 

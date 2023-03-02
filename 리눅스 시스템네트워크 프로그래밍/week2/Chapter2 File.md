@@ -1,5 +1,4 @@
 <h1> 파일 처리</h1>
-
 <h2> Index </h2>
 
 - [서론](#서론)
@@ -26,25 +25,21 @@
 	- [posix\_fadvise](#posix_fadvise)
 - [FILE 구조체](#file-구조체)
 	- [setvbuf](#setvbuf)
-	- [XDR](#xdr)
-	- [패딩](#패딩)
+- [XDR](#xdr)
+- [패딩](#패딩)
 - [바이너리 데이터 입출력](#바이너리-데이터-입출력)
 - [LFS](#lfs)
-- [API](#api)
-	- [fdopen](#fdopen)
-	- [fclose](#fclose)
-	- [fwrite](#fwrite)
-	- [fread](#fread)
-	- [fflush](#fflush)
 
 
 
 
 ## 서론  
-파일 입출력은 크게 저수준과 고수준으로 나뉘며 각 방식의 차이점, 고려해야할 점 등을 서술하였다.  
+파일 입출력은 크게 저수준과 고수준으로 나뉘며 각 방식의 차이점, 고려해야할 점을 설명하였다.  
+동기화 방법, 타 플랫폼간 통신에서 발생할 수 있는 문제점, 해결방법도 함께 서술하였다.  
 파일도 자원이기 때문에 누수가 발생할 수 있으므로 적절히 닫아야 하며,  
 열고 닫는 행위에도 버퍼를 할당하므로 오버헤드를 발생 시킬 수 있다.  
 하나의 파일에 여러 채널을 열면 순서 역전 등 문제가 발생할 수 있다.  
+
 
 
 ## 분류별 함수 목록
@@ -158,8 +153,6 @@ I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거
 연산이 완료될 때까지 기다린다.  
 
 
-
-
 ### 자동 동기화  
 [open 함수](../etc.md#open)로 파일을 열 때 옵션 플래그를 설정한다.  
 | 옵션		| 설명 |
@@ -244,7 +237,7 @@ len이 0이라면 offset 부터 모든 데이터를 지정한다.
 버퍼링 방식과 버퍼의 크기를 설정한다.  
 buf 인자가 NULL 이라면 함수에 요청된 크기만큼 메모리를 할당하며 스트림 버퍼로 사용한다.  
 
-### XDR
+## XDR
 XDR(External Data Representation)  
 기계나 운영체제에 상관없이 일관된 데이터 표현 방식을 제공하는 프로토콜이다.  
 서로 다른 시스템 간 데이터를 교환할 때 발생할 수 있는 데이터 형식의 불일치나 바이트오더 등의 문제를 방지할 수 있다.  
@@ -252,7 +245,7 @@ XDR(External Data Representation)
 빅엔디안을 사용한다. (낮은 주소부터 저장)  
 유닛의 크기를 4바이트(32bit)로 권고한다.  
 
-### 패딩  
+## 패딩  
 구조체의 경우 경계를 맞추기 위해 패딩이 삽입되기도 한다.  
 멤버 변수의 순서에따라 패딩의 크기와 위치가 달라질 수 있다.  
 멀티 스레드나 시그널 프로그래밍에서 가짜 공유와 캐시미스를 줄일 수 있다.  
@@ -283,65 +276,3 @@ LFS(Large File Summit/Support)	: 대용량 파일 지원
   - 기존 함수의 수정 없이 컴파일 시 동일한 버전으로 변환된다.
     - #define _LARGEFILE_SOURCE
     - #define _FILE_OFFSET_BITS 64
-
-## API
-
-### fdopen
-	FILE *fdopen(
-		int			handle,
-		char			*type
-	)
-**Parametters**  
-- `int handle`	: 
-- `char *type`	: 
-  
-**Return Value**  
-- d
-
-**Description**  
-
-### fclose
-
-### fwrite  
-	size_t fwrite (
-		const void		*buffer,
-		size_t			size,
-		size_t			count,
-		FILE			*stream
-	)
-**Parametters**  
-- `const void *buffer`	: 저장할 데이터의 주소
-- `size_t size`		: 데이터 하나의 크기
-- `size_t count`	: 저장할 데이터 개수
-- `FILE *stream`	: 데이터를 쓸 파일 포인터
-
-**Return Value**  
-- 파일에 실제로 저장된 데이터의 수
-- return 값과 count 값이 다르다면 에러
-
-**Description**  
-buffer의 데이터를 stream 에 (size * count) byte 만큼 씁니다.
-
-### fread
-	size_t fread(
-		void			*buffer,
-		size_t			size,
-		size_t			count,
-		FILE			*stream
-	)
-
-**Parametters**  
-- `const void *buffer`	: 읽어온 데이터를 저장할 버퍼 주소
-- `size_t size`		: 데이터 하나의 크기
-- `size_t count`	: 읽어올 데이터 개수
-- `FILE *stream`	: 데이터를 읽어올 스트림
-
-**Return Value**  
-- 읽기에 성공한 데이터의 수
-- return 값과 count 값이 다르다면 에러
-
-**Description** 
-streadm의 데이터를 buffer 에 (size * count) byte 만큼 읽어온다.    
-ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.  
-
-### fflush
