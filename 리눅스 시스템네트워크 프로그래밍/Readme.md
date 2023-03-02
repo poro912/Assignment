@@ -26,7 +26,7 @@
 ## 3 Chapter
 기간 : 2023/02/27 ~ 2023/03/03
 </br> 제목 : 텍스트 처리
-</br> 주제 : 
+</br> 주제 : 텍스트 처리 정규 표현식
 </br> [link](week2/Chapter3%20TextProcessing.md)
 
 
