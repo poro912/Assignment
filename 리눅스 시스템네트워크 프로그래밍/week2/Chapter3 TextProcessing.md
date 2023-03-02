@@ -86,11 +86,11 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		int				eflags
 	)
 **Parametters** 
-- `const regx_t *restrict	preg`	: 
-- `const char *restrict	string`	: 
-- `size_t			nmatch`	: 
-- `regmatch_t 	pmatch[restrict]`	: 
-- `int			eflags`	: 
+- `const regx_t *restrict preg`	: 
+- `const char *restrict string`	: 
+- `size_t nmatch`		: 
+- `regmatch_t pmatch[restrict]`	: 
+- `int eflags`			: 
 
 
 **Return Value**  
