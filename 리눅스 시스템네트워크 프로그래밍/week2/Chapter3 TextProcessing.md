@@ -87,10 +87,10 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 	)
 **Parametters** 
 - `const regx_t *restrict	preg`	: 
-- `const char *restrict		string`	: 
+- `const char *restrict	string`	: 
 - `size_t			nmatch`	: 
 - `regmatch_t 	pmatch[restrict]`	: 
-- `int				eflags`	: 
+- `int			eflags`	: 
 
 
 **Return Value**  
