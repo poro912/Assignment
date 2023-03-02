@@ -313,7 +313,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ### errno
 **Description**  
-에러 발생시 발생 에러코드를 저장하는 전역변수  
+에러 발생시 발생 에러번호를 저장하는 전역변수  
 thread마다 따로 관리되어 멀티스레드에 안전하다.  
 0 이라면 정상 실행됨을 의미한다.  
 요즘에는 전역 변수가 아닌 따로 관리한다. (정확한 정보 필요)  

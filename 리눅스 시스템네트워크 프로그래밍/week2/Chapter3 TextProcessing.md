@@ -8,17 +8,15 @@
 	- [regmatch\_t](#regmatch_t)
 	- [regexec](#regexec)
 	- [regerror](#regerror)
-- [**Parametters**](#parametters)
 	- [regfree](#regfree)
-- [**Parametters**](#parametters-1)
 - [문자열 관련 함수](#문자열-관련-함수)
-
 
 
 ## 서론
 텍스트 처리함수는 입력 함수와 출력 형태를 결정하는 함수들로 이루어져 있다.  
 문자열을 한 바이트씩 읽어 처리하는 방법은 빠르지만, 형태가 변할 경우 재작성 하는 등의 문제가 발생할 수 있다.  
 이를 해결하기 위해 문자열 패턴을 분석하여 처리하는 정규 표현식을 소개하였다.  
+
 
 ## 정규 표현식
 특정한 규칙을 가진 문자열의 집합을 표현하는 데 사용하는 형식 언어  
@@ -27,7 +25,6 @@
 정규 표현식의 복잡도와 설계에 따라 컴퓨터 자원을 과도하게 소비할 수 있다.  
 BSD 방식, POSIX 방식, PCRE 방식 등이 있다.  
 [정규 표현식-위키백과](https://ko.wikipedia.org/wiki/%EC%A0%95%EA%B7%9C_%ED%91%9C%ED%98%84%EC%8B%9D)
-
 
 ### 함수 목록
 |함수	|기능|
@@ -47,7 +44,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 - `regex_t *restrict preg`	: 패턴 버퍼 저장 공간
 - `const char * restrict pattern`	: 정규식 표현 문자열
 - `int cflags`	: 옵션 ('|'로 연결 가능)
-	| flag		| 의미 |
+	| 옵션		| 의미 |
 	| :--:		| :-- |
 	| REG_EXTENDED	| POSIX 확장 정규 표현식 문법을 적용 |
 	| REG_ICASE	| 대소문자 구분을 무시 |
@@ -55,7 +52,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 	| REG_NEWLINE	| 줄 바꾸기 문자를 특수 줄의 끝 문자로 처리한다.</br>(생략시 줄바꿈 문자는 다른 문자처럼 처리) |  
  
 **Return Value**  
-- `other`	: 에러코드
+- `other`	: 에러번호
 - `0`	: 성공
 
 **Description**  
@@ -86,45 +83,53 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		int				eflags
 	)
 **Parametters** 
-- `const regx_t *restrict preg`	: 
-- `const char *restrict string`	: 
-- `size_t nmatch`		: 
-- `regmatch_t pmatch[restrict]`	: 
-- `int eflags`			: 
-
+- `const regx_t *restrict preg`	: 패턴 버퍼
+- `const char *restrict string`	: 검사할 문자열
+- `size_t nmatch`		: 매칭 테이블 개수
+- `regmatch_t pmatch[restrict]`	: 매칭 테이블 변수 배열
+- `int eflags`			: 옵션 플래그
+	| 옵션		| 의미 |
+	| :--:		| :-- |
+	| REG_NOTBOL	| 행 시작 일치 연산자가 항상 일치에 실패한다. |
+	| REG_NOTEOL	| 행 종료 일치 연산자가 항상 일치에 실패한다. |
 
 **Return Value**  
--   ㅁ
+- `other`	: 에러번호
+- `0`	: 성공
+- `REG_NOMATCH`	: 일치 항목 없음
 
-**Description**  
+**Description** 
+컴파일된 정규식 실 
+널로 끝나는 문자열을 컴파일된 정규식과 비교하여 일치하는 항목을 찾는다.
 
 ### regerror  
-	int regerror(
-		int errcode,
-		const regex_t *restrict preg,
-		char *restrict errbuf,
-		size_t errbuf_size
+	size_t regerror(
+		int 				errcode,
+		const regex_t *restrict 	preg,
+		char *restrict 			errbuf,
+		size_t 				errbuf_size
 	)
 **Parametters** 
-- 
+- `int errcode`				: 에러번호 (regcomp에서 반환된 값)
+- `const regex_t *restrict preg`	: 에러가 발생한 패턴 버퍼 포인터
+- `char *restrict errbuf`		: 에러 문자열을 저장할 버퍼
+- `size_t errbuf_size`			: 버퍼의 크기
 **Return Value**  
--   ㅁ
+- 오류 문자열을 저장하는데 필요한 버퍼의 크기
 
 **Description**  
+regcomp() 또는 regexec()에서 생긴 오류를 설명하는 문자열을 생성한다.
+최대 len 크기까지 buf에 복사된다.
 
 ### regfree  
-	int regerror(
-		int errcode,
-		const regex_t *restrict preg,
-		char *restrict errbuf,
-		size_t errbuf_size
-	)
+	void regfree(regex_t *preg)
 **Parametters** 
-- 
-**Return Value**  
--   ㅁ
+- `regex_t *preg`	: 메모리 해제할 패턴 저장공간
 
 **Description**  
+할당된 메모리를 해제한다.
+매칭에 사용된 패턴 버퍼는 계속 사용 가능하지만 메모리를 해제해야 누수를 막을 수 있다.
+
 
 ## 문자열 관련 함수 
 |함수	|기능|
