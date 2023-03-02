@@ -18,11 +18,8 @@
 	- [레이턴시 (latency)](#레이턴시-latency)
 	- [수동 동기화](#수동-동기화)
 	- [fsync](#fsync)
-- [**Parametters**](#parametters)
-- [**Return Value**](#return-value)
+	- [fsync](#fsync-1)
 	- [fdatasync](#fdatasync)
-- [**Parametters**](#parametters-1)
-- [**Return Value**](#return-value-1)
 	- [자동 동기화](#자동-동기화)
 	- [넌 블로킹](#넌-블로킹)
 	- [비동기적 I/O](#비동기적-io)
@@ -33,14 +30,11 @@
 	- [패딩](#패딩)
 - [바이너리 데이터 입출력](#바이너리-데이터-입출력)
 - [LFS](#lfs)
-	- [fwrite](#fwrite)
-- [**Parametters**](#parametters-2)
-- [**Return Value**](#return-value-2)
-	- [fread](#fread)
-- [**Parametters**](#parametters-3)
-- [**Return Value**](#return-value-3)
+- [API](#api)
 	- [fdopen](#fdopen)
 	- [fclose](#fclose)
+	- [fwrite](#fwrite)
+	- [fread](#fread)
 	- [fflush](#fflush)
 
 
@@ -117,8 +111,10 @@
    
 
 ## 동기화된 I/O  
-보통 I/O 처리는 비동기적으로 처리된다.  
-즉각적으로 내용이 반영되어야 하는 몇몇 경우에 동기화를 사용한다.
+I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거쳐 처리된다.  
+프로세스가 파일에 데이터를 기록하면, 커널은 해당 데이터를 하나의 버퍼에 복사한 후 내부적인 대기열에 등록하고, 적절한 시점에 디스크에 기록한다.  
+이렇게 되면 데이터는 버퍼에만 존재하고 아직 디스크에는 기록되지 않은 상태가 된다.  
+몇 가지 예외적인 상황에서는 즉각적인 내용 반영이 필요할 수 있는데, 이때 동기화를 사용한다.
 
 ### 레이턴시 (latency)  
 자극과 반응 사이의 시간  
@@ -127,22 +123,42 @@
 ### 수동 동기화  
 동기화 시점에 fsync, fdatasync 함수를 호출한다.  
 ### fsync  
+	void sync(void)
+**Description**  
+모든 버퍼를 디스크에 쓰도록 명령한다.  
+모든 버퍼의 내용과 메타데이터를 디스크와 동기화한다.  
+연산이 완료될 때까지 기다리지 않는다.  
+
+### fsync  
+	int fsync (int fd)
 **Parametters**  
-- 
+- ```int fd```	: 동기화할 파일디스크립터
 
 **Return Value**  
-- 
+- `0`	: 성공
+- `-1`	: 실패
 
 **Description**  
+해당 디스크립터의 버퍼를 디스크에 쓴다.  
+해당 fd의 내용과 메타데이터를 디스크와 동기화한다.  
+연산이 완료될 때까지 기다린다.  
 
 ### fdatasync  
+	int fdatasync (int fd)
 **Parametters**  
-- 
+- ```int fd```	: 동기화할 파일디스크립터
 
 **Return Value**  
-- 
+- `0`	: 성공
+- `-1`	: 실패
 
 **Description**  
+해당 디스크립터의 버퍼를 디스크에 쓴다.  
+해당 fd의 내용만 디스크와 동기화한다.  
+연산이 완료될 때까지 기다린다.  
+
+
+
 
 ### 자동 동기화  
 [open 함수](../etc.md#open)로 파일을 열 때 옵션 플래그를 설정한다.  
@@ -165,7 +181,8 @@
 		int		fd, 
 		off_t		offset, 
 		off_t		len, 
-		int		advice)
+		int		advice
+	)
 
 **Parametters**  
 - `int	fd`	: 파일 Descriptor
@@ -203,7 +220,8 @@ len이 0이라면 offset 부터 모든 데이터를 지정한다.
 		FILE 		*stream, 
 		char 		*buf, 
 		int 		type, 
-		size_t 		size)
+		size_t 		size
+	)
 
 **Parametters**  
 - `FILE *stream`	: 입출력 스트림
@@ -266,30 +284,64 @@ LFS(Large File Summit/Support)	: 대용량 파일 지원
     - #define _LARGEFILE_SOURCE
     - #define _FILE_OFFSET_BITS 64
 
-### fwrite  
-``` 함수 ```    
+## API
 
+### fdopen
+	FILE *fdopen(
+		int			handle,
+		char			*type
+	)
 **Parametters**  
-- 
-
+- `int handle`	: 
+- `char *type`	: 
+  
 **Return Value**  
-- 
+- d
 
 **Description**  
+
+### fclose
+
+### fwrite  
+	size_t fwrite (
+		const void		*buffer,
+		size_t			size,
+		size_t			count,
+		FILE			*stream
+	)
+**Parametters**  
+- `const void *buffer`	: 저장할 데이터의 주소
+- `size_t size`		: 데이터 하나의 크기
+- `size_t count`	: 저장할 데이터 개수
+- `FILE *stream`	: 데이터를 쓸 파일 포인터
+
+**Return Value**  
+- 파일에 실제로 저장된 데이터의 수
+- return 값과 count 값이 다르다면 에러
+
+**Description**  
+buffer의 데이터를 stream 에 (size * count) byte 만큼 씁니다.
 
 ### fread
-``` 함수 ```  
+	size_t fread(
+		void			*buffer,
+		size_t			size,
+		size_t			count,
+		FILE			*stream
+	)
 
 **Parametters**  
-- 
+- `const void *buffer`	: 읽어온 데이터를 저장할 버퍼 주소
+- `size_t size`		: 데이터 하나의 크기
+- `size_t count`	: 읽어올 데이터 개수
+- `FILE *stream`	: 데이터를 읽어올 스트림
 
 **Return Value**  
-- 
+- 읽기에 성공한 데이터의 수
+- return 값과 count 값이 다르다면 에러
 
-**Description**  
-### fdopen
-### fclose
+**Description** 
+streadm의 데이터를 buffer 에 (size * count) byte 만큼 읽어온다.    
+ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.  
+
 ### fflush
-
-
-
