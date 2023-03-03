@@ -98,9 +98,8 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 - `0`	: 성공
 - `REG_NOMATCH`	: 일치 항목 없음
 
-**Description** 
-컴파일된 정규식 실 
-널로 끝나는 문자열을 컴파일된 정규식과 비교하여 일치하는 항목을 찾는다.
+**Description**  
+컴파일된 정규식과 비교하여 일치하는 항목을 찾는다.  
 
 ### regerror  
 	size_t regerror(
@@ -119,7 +118,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 
 **Description**  
 regcomp() 또는 regexec()에서 생긴 오류를 설명하는 문자열을 생성한다.
-최대 len 크기까지 buf에 복사된다.
+최대 len 크기까지 buf에 복사된다.  
 
 ### regfree  
 	void regfree(regex_t *preg)
@@ -127,8 +126,8 @@ regcomp() 또는 regexec()에서 생긴 오류를 설명하는 문자열을 생�
 - `regex_t *preg`	: 메모리 해제할 패턴 저장공간
 
 **Description**  
-할당된 메모리를 해제한다.
-매칭에 사용된 패턴 버퍼는 계속 사용 가능하지만 메모리를 해제해야 누수를 막을 수 있다.
+할당된 메모리를 해제한다.  
+매칭에 사용된 패턴 버퍼는 계속 사용 가능하지만 메모리를 해제해야 누수를 막을 수 있다.  
 
 
 ## 문자열 관련 함수 

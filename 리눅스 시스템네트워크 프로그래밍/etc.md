@@ -513,12 +513,12 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 ### fdopen
 	FILE *fdopen(
-		int			handle,
-		char			*type
+		int			fd,
+		char			*mode
 	)
 **Parametters**  
-- `int handle`	: 파일 디스크립터
-- `char *type`	: 파일 열기 옵션
+- `int fd`	: 파일 디스크립터
+- `char *mode`	: 파일 열기 옵션
   
 **Return Value**  
 - `NULL`	: 실패
@@ -526,7 +526,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 **Description**  
 파일 디스크립터를 기반으로 열린 파일을 FILE 포인터로 연다.  
-열기에 실패한 경우 close()를 이용해 handle을 닫아야 한다.  
+열기에 실패한 경우 close()를 이용해 fd를 닫아야 한다.  
 
 ### fdclose
 	int fclose(
@@ -562,9 +562,9 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 **Return Value**  
 - 읽기에 성공한 데이터의 수
 
-**Description** 
+**Description**  
 streadm의 데이터를 buffer 에 (size * count) byte 만큼 읽어온다.  
-ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.
+ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.  
 return 값과 count 값이 다르다면 에러가 발생한 것  
 
 ### fwrite  
