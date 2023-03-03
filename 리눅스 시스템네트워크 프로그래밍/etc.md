@@ -708,15 +708,16 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 원본 문자열은 검색을 통해 값이 바뀌기 때문에 유의해야한다.  
 
 <!-- 
+## sub-title
 ### function_name
-	a
+	[function]
 **Parametters**
 - 
 
 **Return Value**
 - 
 
-**Description**
+**Description**  
 
 
 ### function_name
