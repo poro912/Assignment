@@ -51,11 +51,8 @@
 - [3장](#3장)
 	- [API](#api-2)
 		- [memchr](#memchr)
-	- [**Return Value**](#return-value-2)
 		- [strchr](#strchr)
-	- [**Return Value**](#return-value-3)
 		- [strtok](#strtok)
-	- [**Return Value**](#return-value-4)
 
 # 1장  
 ## 이론  
@@ -457,6 +454,8 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 **Description**
 
 
+
+
 # 2장  
 ## 이론
 ### 메타데이터
@@ -652,6 +651,8 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 파일 디스크립터의 커서를 조정한다.  
 현재 파일크기를 넘어 조정할 수 있다. (이 때 남은 부분은 NULL로 채워진다.)  
 
+
+
 # 3장  
 ## API
 ### memchr
@@ -661,13 +662,16 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		size_t			count
 	)
 **Parametters**
-- `const void *buf`	: 
-- `int c`		: 
-- `size_t count`	: 
+- `const void *buf`	: 탐색 대상 메모리 블럭의 주소
+- `int c`		: 찾을 값
+- `size_t count`	: buf의 크기
 
 **Return Value**
-- 
+- `other`	: 탐색결과 주소
+- `NULL`	: 탐색 값 없음
+
 **Description**
+메모리 블록에서 처음으로 일치하는 값을 찾아 주소를 반환한다.
 
 ### strchr
 	char *strchr(
@@ -675,25 +679,33 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		int			c
 	)
 **Parametters**
-- `const char *string`	: 
-- `int c`		: 
+- `const char *string`	: 탐색 대상 문자열
+- `int c`		: 찾을 값
 
 **Return Value**
-- 
+- `other`	: 탐색결과 주소
+- `NULL`	: 탐색 값 없음
+
 **Description**
+문자열에서 처음으로 일치하는 값을 찾아 주소를 반환한다.
 
 ### strtok
 	char *strtok(
-		char *string1,
-		const char *string2
+		char 			*string1,
+		const char 		*string2
 	)
 **Parametters**
-- `char *string1`	: 
-- `const char *string2`	: 
+- `char *string1`	: 대상 문자열
+- `const char *string2`	: 구분자 리스트
 
 **Return Value**
-- 
+- `other`	: 탐색결과 주소
+- `NULL`	: 탐색 값 없음
+
 **Description**
+구분자 리스트에 있는 값 중 하나가 string1에서 일치하면 구분자를 '\0'로 치환한다.  
+최초 일치하는 하나의 구분자만 변환하기때문에 NULL 반환시까지 반복 수행해야 한다.  
+원본 문자열은 검색을 통해 값이 바뀌기 때문에 유의해야한다.  
 
 <!-- 
 ### function_name
