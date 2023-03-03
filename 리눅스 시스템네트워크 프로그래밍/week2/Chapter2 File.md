@@ -16,8 +16,8 @@
 - [동기화된 I/O](#동기화된-io)
 	- [레이턴시 (latency)](#레이턴시-latency)
 	- [수동 동기화](#수동-동기화)
+	- [sync](#sync)
 	- [fsync](#fsync)
-	- [fsync](#fsync-1)
 	- [fdatasync](#fdatasync)
 	- [자동 동기화](#자동-동기화)
 	- [넌 블로킹](#넌-블로킹)
@@ -115,7 +115,7 @@ I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거
 ### 수동 동기화  
 동기화 시점에 fsync, fdatasync 함수를 호출한다.  
 
-### fsync  
+### sync  
 	void sync(void)
 **Description**  
 모든 버퍼를 디스크에 쓰도록 명령한다.  

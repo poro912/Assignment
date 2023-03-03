@@ -37,12 +37,12 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 ### regcomp  
 	int regcomp(
 		regex_t *restrict		preg
-		const char * restrict		pattern
+		const char *restrict		pattern
 		int				cflags
 	)
 **Parametters** 
 - `regex_t *restrict preg`	: 패턴 버퍼 저장 공간
-- `const char * restrict pattern`	: 정규식 표현 문자열
+- `const char *restrict pattern`	: 정규식 표현 문자열
 - `int cflags`	: 옵션 ('|'로 연결 가능)
 	| 옵션		| 의미 |
 	| :--:		| :-- |
@@ -62,8 +62,8 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 
 ### regmatch_t
 	typedef struct {
-		regoff_t rm_so;
-		regoff_t rm_eo;
+		regoff_t 			rm_so;
+		regoff_t 			rm_eo;
 	} regmatch_t;
 
 **Member**  

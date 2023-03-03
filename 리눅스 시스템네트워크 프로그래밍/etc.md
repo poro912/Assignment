@@ -3,8 +3,8 @@
 - [1장](#1장)
 	- [이론](#이론)
 		- [restrict 키워드](#restrict-키워드)
-		- [man명령어](#man명령어)
 		- [POSIX](#posix)
+		- [man명령어](#man명령어)
 		- [파일 디스크립터](#파일-디스크립터)
 		- [ID](#id)
 		- [시그널](#시그널)
@@ -60,18 +60,16 @@
 C 문법이며 C++에서는 지원하지 않는다.  
 해당 포인터를 참조하는 객체가 하나임을 보장한다는 제한자이다.  
 
-
-### man명령어
-man (Manual)  
-특정 명령이나 자원들의 메뉴얼을 출력해주는 명령어이다.  
-총 9개의 영역으로 이뤄진다.  
-
-
 ### POSIX 
 POSIX	: portable operating system interface  
 이식 가능 운영체제 인터페이스  
 서로다른 UNIX OS의 공통 API를 정리하여 이식성이 높은 프로그램을 개발하기 위한 인터페이스 규격  
 시스템 콜, 프로세스 환경, 파일과 디렉터리, 시스템 데이터베이스 tar 압축 포맷 등 다양한 분야가 있다.  
+
+### man명령어
+man (Manual)  
+특정 명령이나 자원들의 메뉴얼을 출력해주는 명령어이다.  
+총 9개의 영역으로 이뤄진다.  
 
 ```man [section num] 찾고싶은 명령어  ```
 | Section | description |
@@ -334,9 +332,9 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 
 ### perror
-	void perror(const char* str)
+	void perror(const char *str)
 **Parametters**
-- `const char* str` : 에러 문자열 이전에 출력할 문자열
+- `const char *str` : 에러 문자열 이전에 출력할 문자열
 
 **Description**  
 전역변수 errno의 값을 해석하여 해당하는 에러메시지를 표준 에러 출력 스트림에 출력한다.
@@ -495,8 +493,9 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 - `other`	: 파일 포인터
 
 **Description**  
-파일 이름을 기반으로 파일을 FILE 포인터로 연다.
-
+파일 이름을 기반으로 파일을 연다.  
+> **Warning**  
+ w, w+, wb, wb+, w+b 모드는 기존 파일을 영구 삭제합니다.  
 
 ### fclose
 	int fclose(FILE *stream)
@@ -526,8 +525,8 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 - `other`	: 파일 포인터
 
 **Description**  
-파일 디스크립터를 기반으로 이미 열린 파일을 FILE 포인터로 연다.  
-열기에 실패한 경우 close()를 이용해 handle를 닫아야 한다.  
+파일 디스크립터를 기반으로 열린 파일을 FILE 포인터로 연다.  
+열기에 실패한 경우 close()를 이용해 handle을 닫아야 한다.  
 
 ### fdclose
 	int fclose(
@@ -536,7 +535,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 	)
 **Parametters**  
 - `FILE *stream`	: 닫을 파일 스트림
-- `int *fdp`		: 반환받은 파일 기술
+- `int *fdp`		: 반환받은 파일 기술자
 
 **Return Value**   
 - `0`	: 닫기 성공
@@ -562,11 +561,11 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 **Return Value**  
 - 읽기에 성공한 데이터의 수
-- return 값과 count 값이 다르다면 에러
 
 **Description** 
 streadm의 데이터를 buffer 에 (size * count) byte 만큼 읽어온다.  
-ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.  
+ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인한다.
+return 값과 count 값이 다르다면 에러가 발생한 것  
 
 ### fwrite  
 	size_t fwrite (
@@ -583,10 +582,10 @@ ferror(), feof() 함수를 이용하여 읽기 오류와 파일의 끝을 확인
 
 **Return Value**  
 - 파일에 실제로 저장된 데이터의 수
-- return 값과 count 값이 다르다면 에러
 
 **Description**  
 buffer의 데이터를 stream 에 (size * count) byte 만큼 씁니다.  
+return 값과 count 값이 다르다면 에러
 
 ### fflush
 	int fflush(FILE *stream)
@@ -624,6 +623,7 @@ stream이 입력을 위해 열려있는 경우 ungetc 함수 효과를 취소합
 - `-1`	: 에러
 
 **Description**  
+파일 기술자를 복제하여 반환한다.
 새 파일 기술자의 값을 fd2로 지정한다.  
 fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.  
 
@@ -666,11 +666,11 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 - `int c`		: 찾을 값
 - `size_t count`	: buf의 크기
 
-**Return Value**
+**Return Value**  
 - `other`	: 탐색결과 주소
 - `NULL`	: 탐색 값 없음
 
-**Description**
+**Description**  
 메모리 블록에서 처음으로 일치하는 값을 찾아 주소를 반환한다.
 
 ### strchr
@@ -686,7 +686,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 - `other`	: 탐색결과 주소
 - `NULL`	: 탐색 값 없음
 
-**Description**
+**Description**  
 문자열에서 처음으로 일치하는 값을 찾아 주소를 반환한다.
 
 ### strtok
@@ -702,7 +702,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 - `other`	: 탐색결과 주소
 - `NULL`	: 탐색 값 없음
 
-**Description**
+**Description**  
 구분자 리스트에 있는 값 중 하나가 string1에서 일치하면 구분자를 '\0'로 치환한다.  
 최초 일치하는 하나의 구분자만 변환하기때문에 NULL 반환시까지 반복 수행해야 한다.  
 원본 문자열은 검색을 통해 값이 바뀌기 때문에 유의해야한다.  
