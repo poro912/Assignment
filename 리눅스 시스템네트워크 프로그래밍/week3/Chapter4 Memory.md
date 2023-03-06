@@ -106,7 +106,7 @@ float read_and_process(int n)
 **Description**  
 특정 위치의 메모리 페이지를 잠근다.  
 > **Warning**  
-addr 매개변수가 페이지의 크기 경계에 시작되야 한다. (sysconf(_SC_PAGESIZE)로 확인 가능)  
+addr 매개변수가 페이지의 크기 경계에 시작돼야 한다. (sysconf(_SC_PAGESIZE)로 확인 가능)  
 페이지 크기의 경계(페이지 크기의 배수) 가 아니라면 오류를 발생시킬 수 있다.
 
 
