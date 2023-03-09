@@ -4,7 +4,7 @@
 
 - [서론](#서론)
 - [mmap](#mmap)
-	- [장점](#장점)
+		- [장점](#장점)
 	- [더티페이지](#더티페이지)
 	- [file-backed 메모리](#file-backed-메모리)
 	- [shard mmap](#shard-mmap)
@@ -13,19 +13,18 @@
 	- [munmap](#munmap)
 	- [msync](#msync)
 	- [mprotect](#mprotect)
-- [**Parametters**](#parametters)
-- [**Return Value**](#return-value)
 	- [mremap](#mremap)
-- [**Parametters**](#parametters-1)
-- [**Return Value**](#return-value-1)
 	- [memory advice](#memory-advice)
+	- [posix\_madvise](#posix_madvise)
+- [Huge Page](#huge-page)
+- [SysV 와 POSIX 차이](#sysv-와-posix-차이)
 - [공유메모리](#공유메모리)
 - [세마포어](#세마포어)
 - [메시지큐](#메시지큐)
 - [sub-title](#sub-title)
 	- [function\_name](#function_name)
-- [**Parametters**](#parametters-2)
-- [**Return Value**](#return-value-2)
+- [**Parametters**](#parametters)
+- [**Return Value**](#return-value)
 
 
 ## 서론
@@ -38,14 +37,15 @@ IPC(Inter Process Communication)
 ## mmap
 mmap(memory mapped I/O)
 장치나 파일을 메모리와 대응시키는 기법  
-복수의 프로세스가 같은 파일에 대해 mmap을 호출하면 가상주소는 달라도 실제로 가리키는 물리적 주소는 동일하게 되어 공유의 효과를 가진다.  
+복수의 프로세스가 같은 파일에 대해 mmap을 호출하면 가상주소는 달라도 물리적 주소는 동일하여 공유 효과를 가진다.  
 rwx (read, write, execute) 프로텍션(권한)이 존재한다.  
 공유 방식에 따라 공유 메모리맵, 사설 메모리맵으로 나뉜다.  
 공유된 mmap을 사용할 때는 크리티컬 섹션 보호에 신경 써야 한다.  
 메모리 해제 전 msync로 동기화를 마치고 해제하는 것이 좋다.  
+대상 파일은 대응시킬 메모리의 크기보다 커야하며 만약 작은경우 ftruncate 함수를 사용해 늘린다.
+파일의 크기는 MMAP_SIZE 보다 커야한다.
 
-
-### 장점 
+#### 장점 
 스레드 안전을 만족한다.  
 대응된 메모리 맵은 포인터로 접근하므로 사용이 쉽다.  
 시스템 호출을 통하지 않고도 파일의 내용에 접근할 수 있다.  
@@ -176,41 +176,80 @@ mmap 세그먼트를 삭제하지는 않는다.
 - `-1`	: 에러	errno 설정
 
 **Description**  
-start부터 length 길이만큼 동기화 한다.
+start부터 length 길이만큼 동기화 한다.  
 
 
 ### mprotect
-	[function]
-**Parametters**
-- 
-
-**Return Value**
-- 
-
+	#include <sys/mman.h>
+	int mprotect(void		*addr
+		size_t			len
+		int			prot
+		int			pkey
+	)
 **Description**  
+프로세스의 메모리 페이지에 대한 액세스 보호를 변경한다.  
+페이지 경계에 정렬되어야 한다. (4096의 배수) 
 
 ### mremap
-	[function]
-**Parametters**
-- 
-
-**Return Value**
-- 
-
+	#include <sys/mman.h>
+	void *mremap(
+		void *old_address,
+		size_t old_size,
+		size_t new_size,
+		int flags
+	)
 **Description**  
+기존 메모리매핑의 길이를 변경합니다.  
+이 때 메모리의 위치는 이동될 수 있습니다.  
 
 
 ### memory advice
+참조: [posix_fadvise](../week2/Chapter2%20File.md#posix_fadvise)  
+BSD 표준과 POSIX 표준이 존재하며, 기능과 호환성면에서 차이가 있다.  
+프로그래머의 의도에 따라 메모리를 어떻게 사용할지 힌트를 주는기능  
+
+### posix_madvise  
+	int posix_fadvise(
+		void		*addr, 
+		off_t		len, 
+		int		advice
+	)
+**Parametters**  
+- `void *addr`	: 조언할 메모리의 시작주소
+- `off_t len`	: 조언할 메모리의 길이
+- `int advice`  
+	데이터 접근 조언
+	| 옵션	| 설명 |
+	| :---: | :--- |
+	| POSIX_MADV_NORMAL	| 열린 메모리에 아무 조언도 주지 않는다.|
+	| POSIX_MADV_SEQUENTIAL	| 순차적으로 접근한다. |
+	| POSIX_MADV_RANDOM	| 지정된 메모리에 임의 순서로 접근한다.</br>TLB의 효율을 높여준다.|	
+	| POSIX_MADV_WILLNEED	| 지정한 메모리에 곧 접근한다.</br>지정 영역을 페이지 캐시로 읽어들이는 논블록 동작을 개시한다.|
+	| POSIX_FADV_DONTNEED	| 지정한 데이터에 접근하지 않는다.</br>지정 영역과 연계된 캐싱 페이지를 해제 시도한다. |  
+
+
+## Huge Page
+리눅스상에서 대용량 파일을 사용하는 경우 hugeadm 명령을 사용하여 설정을 변경해야한다.  
+/proc/meminfo 파일의 HugePages_Total 속성을 참조하여 설정 여부를 알 수 있다.
+THP(Transparent Huge Page)
+묵시적으로 일정 크기가 넘어가는 대용량 메모리맵에 대해 자동으로 Huge page를 적용하는 기능
+
+## SysV 와 POSIX 차이
+ㅎ...
+
 
 ## 공유메모리
 
+
 ## 세마포어
+
 
 ## 메시지큐
 
 
 ## sub-title
 ### function_name
+	#include <>
 	[function]
 **Parametters**
 - 

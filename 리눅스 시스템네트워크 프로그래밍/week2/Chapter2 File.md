@@ -185,7 +185,7 @@ I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거
 | POSIX_FADV_SEQUENTIAL	| 순차적으로 접근한다. |
 | POSIX_FADV_RANDOM	| 지정된 데이터에 임의 순서로 접근한다. |
 | POSIX_FADV_NOREUSE	| 데이터에 한번만 접근한다. |
-| POSIX_FADV_WILLNEED	| 지정한 곧 접근한다.</br>지정 영역을 페이지 캐시로 읽어들이는 논블록 동작을 개시한다.|
+| POSIX_FADV_WILLNEED	| 지정한 데이터에 곧 접근한다.</br>지정 영역을 페이지 캐시로 읽어들이는 논블록 동작을 개시한다.|
 | POSIX_FADV_DONTNEED	| 지정한 데이터에 접근하지 않는다.</br>지정 영역과 연계된 캐싱 페이지를 해제 시도한다. |  
 
 **Return Value**  

@@ -62,6 +62,8 @@
 		- [스왑인](#스왑인)
 		- [스왑아웃](#스왑아웃)
 		- [file-backed 메모리](#file-backed-메모리)
+	- [API](#api-3)
+		- [ftruncate](#ftruncate)
 
 # 1장  
 ## 이론  
@@ -751,6 +753,28 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 읽기 전용 파일의 경우 이미 사본이 존재하기 때문에 페이지 아웃이 발생할 필요가 없다.  
 위와같이 이미 파일의 백업본이 물리장치에 존재하는 경우를 file-backed 메모리라 부른다.  
 실행파일, 동적라이브러리, 공용 데이터, 공용 이미지 파일 등이 이에 해당된다.  
+
+## API
+### ftruncate
+	#include <unistd.h>
+	#include <sys/types.h>
+	int ftruncate(
+		int			fd,
+		off_t 			length
+	)
+**Parametters**
+- `int fd`		: 크기를 변경할 파일 디스크립터
+- `off_t length`	: 변경할 길이
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno설정
+
+**Description**  
+파일의 크기를 조정한다.
+쓰기모드로 열린 fd의 파일 크기를 length 크기로 변경한다.  
+length가 파일 크기보다 작으면 length 만큼의 크기로 파일 뒤쪽을 자른다.  
+length가 파일 크기보다 크면 파일 크기를 변경하고 0x00으로 채운다.  
 
 <!-- 
 ## sub-title
