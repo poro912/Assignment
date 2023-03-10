@@ -68,7 +68,7 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 ### int execv (const char *path, char *const argv[]);
 ### int execvp(const char *file, char *const argv[]);
 ### int execve(const char *path, char *const argv[], char *const envp[]);
-**Parametters**
+**Parameters**
 - `const char *path`    : 실행할 파일, 주소로 경로를 확인
 - `const char *file`	: 실행할 파일, 환경변수에서 경로 탐색(파일 이름만 주면 환경변수에서 확인)
   - 접미사 `p : path enviroment`
@@ -111,7 +111,7 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 		char *const			argv[restrict],
 		char *const			envp[restrict]
 	)
-**Parametters**
+**Parameters**
 - `pid_t *restrict pid` 		: 생성된 자식프로세스의 pid를 저장할 변수
 - `const char *restrict path`		: 실행할 파일, 주소로 경로를 확인
 - `const char *restrict file`		: 실행할 파일, 환경변수에서 경로 탐색
@@ -141,7 +141,7 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
  EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러  
 
 
-**Common Parametters**
+**Common Parameters**
 - `posix_spawn_file_actions_t *file_actions`
   - 속성을 변경할 객체의 주소
 - `int fildes`	: file descriptor 번호

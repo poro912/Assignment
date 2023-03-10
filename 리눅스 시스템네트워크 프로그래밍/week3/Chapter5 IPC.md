@@ -4,7 +4,7 @@
 
 - [서론](#서론)
 - [mmap](#mmap)
-		- [장점](#장점)
+	- [장점](#장점)
 	- [더티페이지](#더티페이지)
 	- [file-backed 메모리](#file-backed-메모리)
 	- [shard mmap](#shard-mmap)
@@ -17,14 +17,27 @@
 	- [memory advice](#memory-advice)
 	- [posix\_madvise](#posix_madvise)
 - [Huge Page](#huge-page)
-- [SysV 와 POSIX 차이](#sysv-와-posix-차이)
+- [XSI IPC](#xsi-ipc)
+	- [XSI IPC key](#xsi-ipc-key)
+	- [제공 유틸리티](#제공-유틸리티)
+	- [ftok](#ftok)
 - [공유메모리](#공유메모리)
+- [XSI 공유 메모리](#xsi-공유-메모리)
+	- [shmget](#shmget)
+- [**Parameters**](#parameters)
+- [**Return Value**](#return-value)
+	- [shmat](#shmat)
+- [**Parameters**](#parameters-1)
+- [**Return Value**](#return-value-1)
+	- [shmdt](#shmdt)
+- [**Parameters**](#parameters-2)
+- [**Return Value**](#return-value-2)
+	- [shmctl](#shmctl)
+- [**Parameters**](#parameters-3)
+- [**Return Value**](#return-value-3)
+- [POSIX 공유메모리](#posix-공유메모리)
 - [세마포어](#세마포어)
 - [메시지큐](#메시지큐)
-- [sub-title](#sub-title)
-	- [function\_name](#function_name)
-- [**Parametters**](#parametters)
-- [**Return Value**](#return-value)
 
 
 ## 서론
@@ -42,10 +55,11 @@ rwx (read, write, execute) 프로텍션(권한)이 존재한다.
 공유 방식에 따라 공유 메모리맵, 사설 메모리맵으로 나뉜다.  
 공유된 mmap을 사용할 때는 크리티컬 섹션 보호에 신경 써야 한다.  
 메모리 해제 전 msync로 동기화를 마치고 해제하는 것이 좋다.  
-대상 파일은 대응시킬 메모리의 크기보다 커야하며 만약 작은경우 ftruncate 함수를 사용해 늘린다.
-파일의 크기는 MMAP_SIZE 보다 커야한다.
+대상 파일은 대응시킬 메모리의 크기보다 커야한다.  
+만약 작은경우 ftruncate 함수를 사용해 늘린다.  
+파일의 크기는 MMAP_SIZE 보다 커야한다.  
 
-#### 장점 
+### 장점 
 스레드 안전을 만족한다.  
 대응된 메모리 맵은 포인터로 접근하므로 사용이 쉽다.  
 시스템 호출을 통하지 않고도 파일의 내용에 접근할 수 있다.  
@@ -101,9 +115,13 @@ mlock, madvise 등을 이용해 스왑 아웃을 금지하여 성능을 향상�
 		int			fd,
 		off_t			offset
 	)
-**Parametters**
-- `void *start`		: 가상 주소 시작 번지 (0으로 설정 시 자동 할당)
-- `size_t length`	: 메모리의 크기 (mmap의 최소 length 보다 커야함)
+**Parameters**
+- `void *start`
+  - 가상 주소 시작 번지
+  - 0으로 설정 시 자동 할당
+- `size_t length`
+  - 메모리의 크기
+  - mmap의 최소 length 보다 커야함
 - `int prot`  
   	메모리 보호 권한 설정 플래그  
 	파일 기술자와 맞추거나 낮은 권한을 줄 것을 권장  
@@ -132,7 +150,7 @@ mlock, madvise 등을 이용해 스왑 아웃을 금지하여 성능을 향상�
 - `MAP_FAILED`	: 메모리 할당 실패, errno 지정
 
 **Description**  
-fd로 지정된 파일을 메모리 주소로 대응 시킨다.
+fd로 지정된 파일을 메모리 주소로 대응 시킨다.  
 
 
 ### munmap
@@ -141,7 +159,7 @@ fd로 지정된 파일을 메모리 주소로 대응 시킨다.
 		void			*start,
 		size_t			length
 	)
-**Parametters**
+**Parameters**
 - `void *start`		: 메모리 시작 주소
 - `size_t length`	: 해제할 길이
 
@@ -152,7 +170,7 @@ fd로 지정된 파일을 메모리 주소로 대응 시킨다.
 **Description**  
 현재 프로세스와 메모리의 연결을 끊는다.  
 mmap 세그먼트를 삭제하지는 않는다.  
-(시스템의 모든 프로세스에서 사용을 종료한 경우에만 퇴출된다.)  
+시스템의 모든 프로세스에서 사용을 종료한 경우에만 퇴출된다.  
 
 ### msync
 	#include <sys/mman.h>
@@ -161,7 +179,7 @@ mmap 세그먼트를 삭제하지는 않는다.
 		size_t			length,
 		int			flags
 	)
-**Parametters**
+**Parameters**
 - `void *start`		: 동기화할 메모리 시작 주소
 - `size_t length`	: 동기화할 길이
 - `int flags`  
@@ -188,15 +206,15 @@ start부터 length 길이만큼 동기화 한다.
 	)
 **Description**  
 프로세스의 메모리 페이지에 대한 액세스 보호를 변경한다.  
-페이지 경계에 정렬되어야 한다. (4096의 배수) 
+페이지 경계에 정렬되어야 한다. (4096의 배수)  
 
 ### mremap
 	#include <sys/mman.h>
 	void *mremap(
-		void *old_address,
-		size_t old_size,
-		size_t new_size,
-		int flags
+		void			*old_address,
+		size_t			old_size,
+		size_t			new_size,
+		int			flags
 	)
 **Description**  
 기존 메모리매핑의 길이를 변경합니다.  
@@ -210,11 +228,11 @@ BSD 표준과 POSIX 표준이 존재하며, 기능과 호환성면에서 차이�
 
 ### posix_madvise  
 	int posix_fadvise(
-		void		*addr, 
-		off_t		len, 
-		int		advice
+		void			*addr, 
+		off_t			len, 
+		int			advice
 	)
-**Parametters**  
+**Parameters**  
 - `void *addr`	: 조언할 메모리의 시작주소
 - `off_t len`	: 조언할 메모리의 길이
 - `int advice`  
@@ -230,16 +248,114 @@ BSD 표준과 POSIX 표준이 존재하며, 기능과 호환성면에서 차이�
 
 ## Huge Page
 리눅스상에서 대용량 파일을 사용하는 경우 hugeadm 명령을 사용하여 설정을 변경해야한다.  
-/proc/meminfo 파일의 HugePages_Total 속성을 참조하여 설정 여부를 알 수 있다.
-THP(Transparent Huge Page)
-묵시적으로 일정 크기가 넘어가는 대용량 메모리맵에 대해 자동으로 Huge page를 적용하는 기능
+/proc/meminfo 파일의 HugePages_Total 속성을 참조하여 설정 여부를 알 수 있다.  
+THP(Transparent Huge Page)  
+묵시적으로 일정 크기가 넘어가는 대용량 메모리맵에 대해 자동으로 Huge page를 적용하는 기능  
 
-## SysV 와 POSIX 차이
-ㅎ...
+
+## XSI IPC
+System V (System Five)에서 제공하는 IPC  
+유닉스로부터 유래되었다.  
+IPC key	: IPC 자원에 접근하기 위한 해시 키  
+IPC ID	: IPC key로 가져온 자원의 ID 값  
+XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로 이루어져있다.  
+자원 획득 함수 사용 시 생성을 진행하지만 이미 자원할당이 되어있다면 ID만을 알려준다.  
+(Ubuntu 22.04 버전에서도 사용중인것으로 확인 되었다.)  
+
+
+### XSI IPC key
+키를 사용하는 경우 외부에서 IPC 자원에 접근할 수 있다.  
+key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.  
+일반적으로 IPC key는 유일해야한다.  
+키를 구한 후 semget, shmget, msgget 등을 호출하여 XSI IPC ID를 얻어올 수 잇다.  
+임시로 사용되는 자원이라면 IPC_PRIVATE 매크로를 사용해 사설 IPC를 받아야 한다.  
+사설 IPC의 키값은 0이며 호출할 때마다 ID가 랜덤생성된다.  
+
+### 제공 유틸리티
+|유틸리티|설명|
+|:--:|:--|
+|ipcs	|IPC status</br>시스템의 XSI IPC 자원 리스트를 출력한다.|
+|ipcrm	|IPC revmoe</br>시스템의 XSI IPC 자원을 제거한다.|
+|lsipc	|list of IPC, XSI IPC 설정을 출력한다.|
+
+
+### ftok
+	#include <sys/types.h>
+	#include <sys/ipc.h>
+	key_t ftok(
+		const char			*pathname,
+		int				proj_id
+	)
+**Parameters**
+- `const char *pathname`	: 실제로 존재하고 접속 가능한 파일 또는 디렉터리
+- `int proj_id`			: 같은 path에 대해 구분하기 위한 값
+
+**Return Value**
+- `other`	: 성공
+- `-1`		: 에러, errno 설
+
+**Description**  
+System V IPC에서 사용할 key값을 생성하는 함수  
+path와 id값이 같다면 같은 key를 생성합니다.  
 
 
 ## 공유메모리
+함수 콜 없이 주소번지에 직접 접근한다.  
+입출력시 포인터 변수로 직접 접근하기 때문에 가장 빠른 성능을 보장한다.  
+프로그래머가 배타적 접근을 보장해야한다.  
+배타적 접근을 LOCK 매커니즘이라 하며 세마포어, 뮤텍스, rwlock, spinlock 등이 있다.  
+8장 스레드 프로그래밍  
+XSI계열과 POSIX계열로 설명하였다.  
 
+## XSI 공유 메모리
+### shmget
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+
+
+### shmat
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+
+
+### shmdt
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+
+
+### shmctl
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+
+## POSIX 공유메모리
 
 ## 세마포어
 
@@ -247,15 +363,19 @@ THP(Transparent Huge Page)
 ## 메시지큐
 
 
+
+
+<!--
 ## sub-title
 ### function_name
 	#include <>
 	[function]
-**Parametters**
+**Parameters**
 - 
 
 **Return Value**
 - 
 
 **Description**  
+-->
 

@@ -63,7 +63,7 @@
 ### function_name
 	#include <>
 	[function]
-**Parametters**
+**Parameters**
 - 
 
 **Return Value**
@@ -74,7 +74,7 @@
 
 ## h2  
 ### h3  
-**Parametters**  
+**Parameters**  
 -   
 
 **Return Value**  

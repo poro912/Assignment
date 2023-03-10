@@ -23,7 +23,6 @@ C언어는 메모리관리를 프로그래머에게 맡긴다.
 프로세스의 다양한 메모리와 적재위치 및 기능에 대해 설명하였으며 페이징 방지 방법을 서술하였다.  
 
 
-
 ## 프로세스 메모리
 |영역	|설명|
 |:--:	|:--|
@@ -97,7 +96,7 @@ float read_and_process(int n)
 		size_t			len
 	)
 
-**Parametters**
+**Parameters**
 - `const void *addr`	: 락을 설정할 주소
 - `size_t len`		: 길이
 
@@ -116,7 +115,7 @@ addr 매개변수가 페이지의 크기 경계에 시작돼야 한다.
 ### mlockall
 	#include <sys/mman.h>
 	int mlockall(int flags)
-**Parametters**
+**Parameters**
 - `int flags`	: 지정할 플래그 설정  
 	| 플래그	| 설명|
 	| :--:		| :-- |
@@ -142,7 +141,7 @@ addr 매개변수가 페이지의 크기 경계에 시작돼야 한다.
 		const void 		*addr,
 		size_t			len
 	)
-**Parametters**
+**Parameters**
 - `const void *addr`	: 락을 해제할 주소
 - `size_t len`		: 길이
 

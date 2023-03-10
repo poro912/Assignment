@@ -40,7 +40,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		const char *restrict		pattern
 		int				cflags
 	)
-**Parametters** 
+**Parameters** 
 - `regex_t *restrict preg`	: 패턴 버퍼 저장 공간
 - `const char *restrict pattern`	: 정규식 표현 문자열
 - `int cflags`	: 옵션 ('|'로 연결 가능)
@@ -82,7 +82,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		regmatch_t			pmatch[restrict],
 		int				eflags
 	)
-**Parametters** 
+**Parameters** 
 - `const regx_t *restrict preg`	: 패턴 버퍼
 - `const char *restrict string`	: 검사할 문자열
 - `size_t nmatch`		: 매칭 테이블 개수
@@ -108,7 +108,7 @@ BSD 방식, POSIX 방식, PCRE 방식 등이 있다.
 		char *restrict 			errbuf,
 		size_t 				errbuf_size
 	)
-**Parametters** 
+**Parameters** 
 - `int errcode`				: 에러번호 (regcomp에서 반환된 값)
 - `const regex_t *restrict preg`	: 에러가 발생한 패턴 버퍼 포인터
 - `char *restrict errbuf`		: 에러 문자열을 저장할 버퍼
@@ -122,7 +122,7 @@ regcomp() 또는 regexec()에서 생긴 오류를 설명하는 문자열을 생�
 
 ### regfree  
 	void regfree(regex_t *preg)
-**Parametters** 
+**Parameters** 
 - `regex_t *preg`	: 메모리 해제할 패턴 저장공간
 
 **Description**  

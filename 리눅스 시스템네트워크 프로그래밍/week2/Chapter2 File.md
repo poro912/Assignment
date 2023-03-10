@@ -124,7 +124,7 @@ I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거
 
 ### fsync  
 	int fsync(int fd)
-**Parametters**  
+**Parameters**  
 - ```int fd```	: 동기화할 파일디스크립터
 
 **Return Value**  
@@ -138,7 +138,7 @@ I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거
 
 ### fdatasync  
 	int fdatasync(int fd)
-**Parametters**  
+**Parameters**  
 - ```int fd```	: 동기화할 파일디스크립터
 
 **Return Value**  
@@ -173,7 +173,7 @@ I/O 연산은 일반적으로 커널의 버퍼 캐시나 페이지 캐시를 거
 		int		advice
 	)
 
-**Parametters**  
+**Parameters**  
 - `int	fd`	: 파일 Descriptor
 - `off_t	offset`	: 시작 번호
 - `off_t	len`		: 읽을 길이	(0이면 끝까지)
@@ -211,7 +211,7 @@ len이 0이라면 offset 부터 모든 데이터를 지정한다.
 		size_t 		size
 	)
 
-**Parametters**  
+**Parameters**  
 - `FILE	*stream`	: 입출력 스트림
 - `char	*buf`		: 사용할 버퍼
 - `int	type`		: 버퍼링 옵션 

@@ -28,10 +28,10 @@
 		- [close](#close)
 		- [fcntl](#fcntl)
 		- [signal](#signal)
-	- [**Parametters**](#parametters)
+	- [**Parameters**](#parameters)
 	- [**Return Value**](#return-value)
 		- [sigaction](#sigaction)
-	- [**Parametters**](#parametters-1)
+	- [**Parameters**](#parameters-1)
 	- [**Return Value**](#return-value-1)
 - [2장](#2장)
 	- [이론](#이론-1)
@@ -159,7 +159,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 ## API  
 ### system
 	int system(const char *str)
-**Parametters**
+**Parameters**
 - `const char *str` : 셸에서 실행할 명령
 
 **Return Value**
@@ -176,7 +176,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ### exit
 	void exit(int status)
-**Parametters**
+**Parameters**
 - `int status`	: 함수 종료 시 전달할 값
 	- `EXIT_SUCCESS`	: 0 정상 종료
 	- `EXIT_FAILURE`	: 1 비정상 종료
@@ -188,7 +188,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ### kill
 	int kill(pid_t pid, int sig)
-**Parametters**
+**Parameters**
 - `pid_t pid`	: 전송 대상 프로세스
 	- `양수`	: 지정한 프로세스
 	- `0`		: 같은 그룹의 프로세스
@@ -216,7 +216,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ### sleep
 	unsigned int sleep(unsigned int seconds)
-**Parametters**
+**Parameters**
 - `unsigned inst seconds`	: 대기 시간
 
 **Return Value**
@@ -261,7 +261,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 
 ### wait
 	pid_t wait(int *statloc)
-**Parametters**
+**Parameters**
 - `int *statloc`	: 자식의 실행 결과를 매크로를 통해 알 수 있음 (정상종료 / 비정상종료)
   - 메크로 목록
   - `WIFEXITED(statloc)`	: 정상적으로 종료되었다면 non-zero
@@ -289,7 +289,7 @@ Anonymous Pipe, Named Pipe, Message Queue, Shared Memory, Memory Map, Socket, Se
 		int			*statloc,
 		int			options
 	)
-**Parametters**
+**Parameters**
 - `pid_t pid`	: 대기할 자식 프로세스
   - `양수`	: 지정한 프로세스
   - `0`		: 같은 그룹의 프로세스
@@ -329,7 +329,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 ### strerror
 	char *strerror(int errnum)
-**Parametters**
+**Parameters**
 - `int errnum`	: 에러번호
 
 **Return Value**
@@ -344,7 +344,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 ### perror
 	void perror(const char *str)
-**Parametters**
+**Parameters**
 - `const char *str` : 에러 문자열 이전에 출력할 문자열
 
 **Description**  
@@ -357,7 +357,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 		char			*strerrbuf,
 		size_t			buflen
 	)
-**Parametters**
+**Parameters**
 - `int errnum`	: 에러 변호 
 - `char *strerrbuf`	: 에러메시지를 저장할 버퍼
 - `size_t buflen`	: 버퍼의 길이
@@ -379,7 +379,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 ### open
 ```int open (const char *filename, int FLAGS[, mode_t mode])```  
-**Parametters**
+**Parameters**
 - `const char *filename`	: 대상 파일 이름
 - `int flags`	: 파일 열기 옵션 비트 or '|' 연산자로 연결 가능
   - | 옵션 | 설명 |
@@ -408,7 +408,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 ### close
 	int close(int fd)
-**Parametters**  
+**Parameters**  
 - `int fd`	: 닫을 파일 디스크립터
 
 **Return Value**  
@@ -420,7 +420,7 @@ thread마다 따로 관리되어 멀티스레드에 안전하다.
 
 ### fcntl
 	int fcntl(int fd, int cmd, ... )  
-**Parametters**
+**Parameters**
 - `int fd`	: 대상 파일 디스크립터
 - `int cmd`	: 실행할 명령
   - F_SETFD
@@ -444,7 +444,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 ### signal
 ```declring_function```    
-**Parametters**
+**Parameters**
 - 
 
 **Return Value**
@@ -454,7 +454,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 ### sigaction
 ```declring_function```  
-**Parametters**
+**Parameters**
 - 
 
 **Return Value**
@@ -495,7 +495,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 		const char		*filename,
 		const char		*mode
 	)
-**Parametters**  
+**Parameters**  
 - `const char *filename`	: 파일 이름
 - `const char *mode`	: 파일 열기 옵션
   
@@ -510,7 +510,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 
 ### fclose
 	int fclose(FILE *stream)
-**Parametters**  
+**Parameters**  
 - `FILE *stream`	: 닫을 파일 스트림
 
 **Return Value**   
@@ -527,7 +527,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 		int			fd,
 		char			*mode
 	)
-**Parametters**  
+**Parameters**  
 - `int fd`	: 파일 디스크립터
 - `char *mode`	: 파일 열기 옵션
   
@@ -544,7 +544,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 		FILE			*stream,
 		int			*fdp
 	)
-**Parametters**  
+**Parameters**  
 - `FILE *stream`	: 닫을 파일 스트림
 - `int *fdp`		: 반환받은 파일 기술자
 
@@ -564,7 +564,7 @@ F_SETOWN : 프로세스 또는 프로세스 그룹 아이디 설정
 		FILE			*stream
 	)
 
-**Parametters**  
+**Parameters**  
 - `const void *buffer`	: 읽어온 데이터를 저장할 버퍼 주소
 - `size_t size`		: 데이터 하나의 크기
 - `size_t count`	: 읽어올 데이터 개수
@@ -585,7 +585,7 @@ return 값과 count 값이 다르다면 에러가 발생한 것
 		size_t			count,
 		FILE			*stream
 	)
-**Parametters**  
+**Parameters**  
 - `const void *buffer`	: 저장할 데이터의 주소
 - `size_t size`		: 데이터 하나의 크기
 - `size_t count`	: 저장할 데이터 개수
@@ -600,7 +600,7 @@ return 값과 count 값이 다르다면 에러
 
 ### fflush
 	int fflush(FILE *stream)
-**Parametters**  
+**Parameters**  
 - `FILE *stream`	: 대상 파일스트림
 
 **Return Value**  
@@ -613,7 +613,7 @@ stream이 입력을 위해 열려있는 경우 ungetc 함수 효과를 취소합
 
 ### dup  
 	int dup(int fd)
-**Parametters**  
+**Parameters**  
 - `int fd`	: 복제할 파일 기술자
 
 **Return Value**  
@@ -625,7 +625,7 @@ stream이 입력을 위해 열려있는 경우 ungetc 함수 효과를 취소합
 
 ### dup2  
 	int dup2(int fd,int fd2)   
-**Parametters**  
+**Parameters**  
 -  `int fd`	: 복제할 파일 기술자
 -  `int fd2`	: 대상이 될 파일 기술자 번호
 
@@ -644,7 +644,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		off_t			offset,
 		int			whence
 	)  
-**Parametters**  
+**Parameters**  
 - `int fd`	: 조정할 파일 디스크립터
 - `off_t offset`	: 기준점으로부터 이동할 거리
 - `int whence`		: 기준점
@@ -672,7 +672,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		int			c,
 		size_t			count
 	)
-**Parametters**
+**Parameters**
 - `const void *buf`	: 탐색 대상 메모리 블럭의 주소
 - `int c`		: 찾을 값
 - `size_t count`	: buf의 크기
@@ -689,7 +689,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		const char 		*string,
 		int			c
 	)
-**Parametters**
+**Parameters**
 - `const char *string`	: 탐색 대상 문자열
 - `int c`		: 찾을 값
 
@@ -705,7 +705,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		char 			*string1,
 		const char 		*string2
 	)
-**Parametters**
+**Parameters**
 - `char *string1`	: 대상 문자열
 - `const char *string2`	: 구분자 리스트
 
@@ -762,7 +762,7 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 		int			fd,
 		off_t 			length
 	)
-**Parametters**
+**Parameters**
 - `int fd`		: 크기를 변경할 파일 디스크립터
 - `off_t length`	: 변경할 길이
 
@@ -781,7 +781,7 @@ length가 파일 크기보다 크면 파일 크기를 변경하고 0x00으로 �
 ### function_name
 	#include <>
 	[function]
-**Parametters**
+**Parameters**
 - 
 
 **Return Value**
@@ -792,7 +792,7 @@ length가 파일 크기보다 크면 파일 크기를 변경하고 0x00으로 �
 
 ### function_name
 	a
-**Parametters**
+**Parameters**
 - .
 
 **Return Value**
