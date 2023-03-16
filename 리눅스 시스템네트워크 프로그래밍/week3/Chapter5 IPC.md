@@ -30,6 +30,15 @@
 	- [shmdt](#shmdt)
 	- [shmctl](#shmctl)
 - [POSIX 공유메모리](#posix-공유메모리)
+	- [shm\_open](#shm_open)
+- [**Return Value**](#return-value)
+	- [mmap](#mmap-2)
+	- [close](#close)
+- [**Parameters**](#parameters)
+- [**Return Value**](#return-value-1)
+	- [shm\_unlink](#shm_unlink)
+- [**Parameters**](#parameters-1)
+- [**Return Value**](#return-value-2)
 - [세마포어](#세마포어)
 - [메시지큐](#메시지큐)
 
@@ -410,7 +419,7 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 **Parameters**
 - `int shmid`	: 공유메모리 id
 - `int cmd`	: [제어 명령](#ipc-제어-명령)
-- `struct shmid_ds *buf`	: 공유메모리 정보를 구하기 위한 버퍼포인터
+- `struct shmid_ds *buf`	: 공유메모리 정보를 저장하기위한 구조체
 
 **Return Value**
 - `0`	: 성공
@@ -422,7 +431,58 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 
 ## POSIX 공유메모리
 
+### shm_open
+	#include <>
+	int shm_open(
+		const char *name,
+		int oflag,
+		mode_t mode
+	)
+**Parameters**
+- `const char *name`	: 
+- `int oflag`		: 
+- `mode_t mode`		: 
+
+**Return Value**
+- 
+
+**Description**  
+
+
+### [mmap](#mmap-1)
+mmap 함수를 통해서 공유메모리를 구현한다.
+
+### close
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+
+
+### shm_unlink
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+
+
+
+
+
+
+
 ## 세마포어
+
 
 
 ## 메시지큐
