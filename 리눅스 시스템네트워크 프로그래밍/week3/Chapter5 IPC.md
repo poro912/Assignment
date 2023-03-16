@@ -23,18 +23,12 @@
 	- [ftok](#ftok)
 - [공유메모리](#공유메모리)
 - [XSI 공유 메모리](#xsi-공유-메모리)
+	- [IPC Flag](#ipc-flag)
+	- [IPC 제어 명령](#ipc-제어-명령)
 	- [shmget](#shmget)
-- [**Parameters**](#parameters)
-- [**Return Value**](#return-value)
 	- [shmat](#shmat)
-- [**Parameters**](#parameters-1)
-- [**Return Value**](#return-value-1)
 	- [shmdt](#shmdt)
-- [**Parameters**](#parameters-2)
-- [**Return Value**](#return-value-2)
 	- [shmctl](#shmctl)
-- [**Parameters**](#parameters-3)
-- [**Return Value**](#return-value-3)
 - [POSIX 공유메모리](#posix-공유메모리)
 - [세마포어](#세마포어)
 - [메시지큐](#메시지큐)
@@ -247,29 +241,42 @@ BSD 표준과 POSIX 표준이 존재하며, 기능과 호환성면에서 차이�
 
 
 ## Huge Page
-리눅스상에서 대용량 파일을 사용하는 경우 hugeadm 명령을 사용하여 설정을 변경해야한다.  
+명시적으로 Huge Page를 사용하기 위해서는 커널 설정을 동반 해야한다.  
+리눅스에서는 hugeadm 명령을 사용하여 설정을 변경할 수 있다.  
 /proc/meminfo 파일의 HugePages_Total 속성을 참조하여 설정 여부를 알 수 있다.  
+만약 설정되어있지 않다면 SIGBUG시그널이 발생하여 프로세스가 종료될 수 있다.
+
 THP(Transparent Huge Page)  
 묵시적으로 일정 크기가 넘어가는 대용량 메모리맵에 대해 자동으로 Huge page를 적용하는 기능  
+/sys/kernel/mm/transparent_hugepage/enabled 에서 설정을 볼 수 있다.  
+소스 코드 수정 없이 Huge Page를 쓸 수 있게 해준다.
+THP 설정만으로 성능이 개선될 수 있다.
+
+| 속성	|설명|
+| :--:	|:--|
+| always	| THP 사용 |
+| madvise	| madvise 함수를 적용한 mmap에 대해서만 사용 |
+| never		| THP 사용안함 |
 
 
 ## XSI IPC
 System V (System Five)에서 제공하는 IPC  
-유닉스로부터 유래되었다.  
-IPC key	: IPC 자원에 접근하기 위한 해시 키  
+Key 획득 -> ID 획득 -> 자원 사용의 순서로 진행된다.  
+IPC key	: IPC 자원에 접근하기 위한 해시 키     
 IPC ID	: IPC key로 가져온 자원의 ID 값  
 XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로 이루어져있다.  
-자원 획득 함수 사용 시 생성을 진행하지만 이미 자원할당이 되어있다면 ID만을 알려준다.  
+자원 획득 함수 사용시 생성을 진행하지만 이미 자원할당이 되어있다면 ID만을 알려준다.  
 (Ubuntu 22.04 버전에서도 사용중인것으로 확인 되었다.)  
 
 
 ### XSI IPC key
-키를 사용하는 경우 외부에서 IPC 자원에 접근할 수 있다.  
-key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.  
 일반적으로 IPC key는 유일해야한다.  
+key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.  
+키를 사용하는 경우 외부에서 IPC 자원에 접근할 수 있다.  
 키를 구한 후 semget, shmget, msgget 등을 호출하여 XSI IPC ID를 얻어올 수 잇다.  
 임시로 사용되는 자원이라면 IPC_PRIVATE 매크로를 사용해 사설 IPC를 받아야 한다.  
 사설 IPC의 키값은 0이며 호출할 때마다 ID가 랜덤생성된다.  
+사설 IPC 또한 외부에서 접근 가능하다.  
 
 ### 제공 유틸리티
 |유틸리티|설명|
@@ -292,11 +299,11 @@ key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.
 
 **Return Value**
 - `other`	: 성공
-- `-1`		: 에러, errno 설
+- `-1`		: 에러, errno 설정
 
 **Description**  
-System V IPC에서 사용할 key값을 생성하는 함수  
-path와 id값이 같다면 같은 key를 생성합니다.  
+System V IPC에서 사용할 key를 생성하는 함수  
+매개변수값이 동일하다면 같은 key를 생성합니다.  
 
 
 ## 공유메모리
@@ -305,55 +312,113 @@ path와 id값이 같다면 같은 key를 생성합니다.
 프로그래머가 배타적 접근을 보장해야한다.  
 배타적 접근을 LOCK 매커니즘이라 하며 세마포어, 뮤텍스, rwlock, spinlock 등이 있다.  
 8장 스레드 프로그래밍  
-XSI계열과 POSIX계열로 설명하였다.  
 
 ## XSI 공유 메모리
+### IPC Flag
+IPC 자원을 얻을 때 사용하는 설정이다.  
+shmget, semget, msgget 메소드에서 동일하게 사용된다.  
+|옵션	|설명|
+|:--:	|:--|
+|IPC_CREATE	| 해당 자원이 존재하지 않으면 생성한다.|
+|IPC_EXCL	| 해당 자원이 존재한다면 에러(EEXIST)를 발생시킨다.|
+|SHM_HUGETLB	| SHM에 Huge page를 사용한다. (리눅스에서만 지원)|
+|접근권한	| 자원에 대한 접근 권한을 설정한다. ex)0660 |  
+
+### IPC 제어 명령
+IPC 자원에 대한 정보를 얻거나 수정할 때 사용하는 명령이다.  
+shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.  
+|명령|설명|
+|:--:|:--|
+|IPC_RMID	| IPC 자원을 제거한다.|
+|IPC_SET	| IPC 자원의 권한을 변경한다.|
+|IPC_STAT	| 현재 공유메모리 정보(생성자, 생성 시각, 접근 권한 등)를 읽어 buf에 저장한다.|
+|IPC_INFO	| 자원의 시스템 설정 값을 읽어온다.|
+|SHM_LOCK	| 공유메모리의 세그먼트를 잠근다.|
+|SHM_UNLOCK	| 공유메모리의 세그먼트를 잠금 해제한다.|  
+
 ### shmget
-	#include <>
-	[function]
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+	int shmget(
+		key_t				key,
+		int				size,
+		int				shmflg
+	)
 **Parameters**
-- 
+- `key_t	key`	: 키값
+- `int		size`	: 공유메모리의 크기
+- `int		shmflg`	: [옵션](#ipc-flag)
 
 **Return Value**
-- 
+- `other`	: id값
+- `-1`		: 에러, errno설정
 
 **Description**  
-
+공유 메모리의 IPC ID를 얻는다.(없는경우 생성)  
+공유 메모리의 크기가 너무 작은 경우 커널 설정에 따라 에러가 발생할 수 있다.  
 
 ### shmat
-	#include <>
-	[function]
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+	void* shmat(
+		int				shmid,
+		const void			*shmaddr,
+		int				shmflg
+	)
 **Parameters**
-- 
-
+- `int		shmid`		: id 값
+- `const void	*shmaddr`
+  - 매핑할 메모리 주소
+  - null : 매핑되지 않은곳에 자동으로 붙인다.
+- `int		shmflg`
+  	메모리 매핑 옵
+	|옵션	|설명|
+	|:--:	|:--|
+	| SHM_RND	| 페이지주소를 반내림하여 경계에 맞춘다.|
+	| SHM_RDONLY	| 읽기 전용으로 공유메모리에 연결한다.|
 **Return Value**
-- 
+- `other`	: 공유메모리 주소
+- `-1`		: 에러, errno설정
 
 **Description**  
+지정한 공유메모리와 연결한다.  
 
 
 ### shmdt
-	#include <>
-	[function]
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+	int shmdt(const void			*shmaddr)
 **Parameters**
-- 
+- `const void	*shmaddr`	: 공유메모리 주소
 
 **Return Value**
-- 
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
 
 **Description**  
+공유메모리와 연결을 해제한다.  
 
 
 ### shmctl
-	#include <>
-	[function]
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+	int shmctl(
+		int			shmid,
+		int			cmd,
+		struct shmid_ds		*buf
+	)
 **Parameters**
-- 
+- `int shmid`	: 공유메모리 id
+- `int cmd`	: [제어 명령](#ipc-제어-명령)
+- `struct shmid_ds *buf`	: 공유메모리 정보를 구하기 위한 버퍼포인터
 
 **Return Value**
-- 
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
 
 **Description**  
+공유 메모리를 조작(제거, 메타 데이터 획득)한다.  
+
 
 ## POSIX 공유메모리
 
