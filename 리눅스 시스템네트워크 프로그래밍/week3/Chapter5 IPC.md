@@ -281,8 +281,9 @@ THP 설정만으로 성능이 개선될 수 있다.
 ## XSI IPC
 System V (System Five)에서 제공하는 IPC  
 Key 획득 -> ID 획득 -> 자원 사용의 순서로 진행된다.  
-IPC key	: IPC 자원에 접근하기 위한 해시 키     
+IPC key	: IPC 자원에 접근하기 위한 해시 키  
 IPC ID	: IPC key로 가져온 자원의 ID 값  
+
 XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로 이루어져있다.  
 자원 획득 함수 사용시 생성을 진행하지만 이미 자원할당이 되어있다면 ID만을 알려준다.  
 (Ubuntu 22.04 버전에서도 사용중인것으로 확인 되었다.)  
@@ -292,7 +293,8 @@ XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로
 일반적으로 IPC key는 유일해야한다.  
 key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.  
 키를 사용하는 경우 외부에서 IPC 자원에 접근할 수 있다.  
-키를 구한 후 semget, shmget, msgget 등을 호출하여 XSI IPC ID를 얻어올 수 잇다.  
+키를 구한 후 semget, shmget, msgget 등을 호출하여 XSI IPC ID를 얻어올 수 있다.  
+
 임시로 사용되는 자원이라면 IPC_PRIVATE 매크로를 사용해 사설 IPC를 받아야 한다.  
 사설 IPC의 키값은 0이며 호출할 때마다 ID가 랜덤생성된다.  
 사설 IPC 또한 외부에서 접근 가능하다.  
