@@ -31,15 +31,25 @@
 	- [shmctl](#shmctl)
 - [POSIX 공유메모리](#posix-공유메모리)
 	- [shm\_open](#shm_open)
-- [**Return Value**](#return-value)
-	- [mmap](#mmap-2)
-	- [close](#close)
-- [**Parameters**](#parameters)
-- [**Return Value**](#return-value-1)
 	- [shm\_unlink](#shm_unlink)
-- [**Parameters**](#parameters-1)
-- [**Return Value**](#return-value-2)
 - [세마포어](#세마포어)
+	- [세마포어와 뮤텍스](#세마포어와-뮤텍스)
+	- [세마포어 vs 뮤텍스](#세마포어-vs-뮤텍스)
+- [XSI 세마포어](#xsi-세마포어)
+	- [주요 속성](#주요-속성)
+	- [semget](#semget)
+- [**Parameters**](#parameters)
+- [**Return Value**](#return-value)
+	- [semctl](#semctl)
+- [**Parameters**](#parameters-1)
+- [**Return Value**](#return-value-1)
+	- [semop](#semop)
+- [**Parameters**](#parameters-2)
+- [**Return Value**](#return-value-2)
+	- [semtimedop](#semtimedop)
+- [**Parameters**](#parameters-3)
+- [**Return Value**](#return-value-3)
+- [POSIX 세마포어](#posix-세마포어)
 - [메시지큐](#메시지큐)
 
 
@@ -412,9 +422,9 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 	#include <sys/ipc.h>
 	#include <sys/shm.h>
 	int shmctl(
-		int			shmid,
-		int			cmd,
-		struct shmid_ds		*buf
+		int				shmid,
+		int				cmd,
+		struct shmid_ds			*buf
 	)
 **Parameters**
 - `int shmid`	: 공유메모리 id
@@ -429,59 +439,148 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 공유 메모리를 조작(제거, 메타 데이터 획득)한다.  
 
 
-## POSIX 공유메모리
 
+## POSIX 공유메모리
 ### shm_open
-	#include <>
+	#include <sys/mman.h>
+	#include <sys/stat.h>
+	#include <fcntl.h>
 	int shm_open(
-		const char *name,
-		int oflag,
-		mode_t mode
+		const char			*name,
+		int				oflag,
+		mode_t				mode
 	)
 **Parameters**
-- `const char *name`	: 
-- `int oflag`		: 
-- `mode_t mode`		: 
+- `const char *name`	: 만들거나 열 공유메모리 객체명 ("/파일명" 의 형태)
+- `int oflag`		: [파일열기 속성](../etc.md#open)
+- `mode_t mode`		: 파일 접근권한
 
 **Return Value**
-- 
+- `other`	: 파일디스크립터
+- `-1`		: 에러, errno 설정
 
 **Description**  
-
-
-### [mmap](#mmap-1)
-mmap 함수를 통해서 공유메모리를 구현한다.
-
-### close
-	#include <>
-	[function]
-**Parameters**
-- 
-
-**Return Value**
-- 
-
-**Description**  
+공유메모리 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
+생성 이후에 mmap 함수를 통해 공유메모리를 매핑한다.  
+close 함수를 통해 매핑된 공유메모리를 닫는다.  
+[mmap](#mmap-1)  
+[close](../etc.md#close)  
 
 
 ### shm_unlink
-	#include <>
-	[function]
+	#include <sys/mman.h>
+	#include <sys/stat.h>
+	#include <fcntl.h>
+	int shm_unlink(const char *name)
 **Parameters**
-- 
+- `const char *name`	: 공유메모리를 삭제할 객체명
 
 **Return Value**
-- 
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
 
 **Description**  
-
-
-
-
+공유 메모리를 삭제한다.  
+unlink함수와 유사한 구조를 갖는다.  
 
 
 
 ## 세마포어
+초기 상호배제의 개념에서 만들어졌지만 현재는 동기화 및 락메커니즘 구현 도구를 가르키는 의미로 사용된다.  
+공유 자원에 대한 교착상태를 해결하기 위한 기법이다.  
+P연산과 V 연산으로 이루어져있다.  
+P연산	: 세마포어의 값을 감소시키는 연산 (wait, pend)  
+V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)  
+
+|종류|특징|
+|:--:|:--|
+|카운팅		| 복수개의 자원 카운팅이 가능한 세마포어 |
+|이진		| 1개의 자원 카운팅이 가능한 세마포어 |
+|뮤텍스		| 자원의 독점을 가능하게 하는 락 |
+|스핀락		| 문맥 교환을 막기위해 사용되는 매우 빠른 락 |
+|Reader/Writer락	| 읽기 쓰기가 서로 다르게 적용되는 락 |
+락 메커니즘 : 8장 - 스레드 프로그래밍  
+
+
+### 세마포어와 뮤텍스
+카운팅 세마포어	: n개의 자원에 다수의 프로세스가 접근하는 것을 막아줌  
+이진 세마포어	: 1개의 자원에 다수의 프로세스가 접근하는 것을 막아줌  
+뮤텍스	: 자원의 독점적 사용권한을 부여하는 기능  
+|		|XSI 세마포어|POSIX 세마포어|POSIX 뮤텍스|
+|:--:		|:--|:--|:--|
+| 최대 카운터		| 시스템 설정	| SEM_VALUE_MAX	| 1 |
+| 독점적 소유권		| 불가능	| 불가능	| 가능 |
+| 동작 취소 undo	| 가능		| 불가능	| 가능 |
+| 타이머 설정		| 가능(비표준)	| 가능		| 가능 |
+
+
+### 세마포어 vs 뮤텍스
+세마포어는 동기화의 목적이고, 동기화를 위한 큐를 만드는 기능을 제공한다.  
+뮤텍스는 독점적 사용권한 획득에 목적이 있으며, 소유권이 존재한다.  
+일반적으로 뮤텍스가 세마포어보다 빠르다.
+
+동작 취소	: 잠금해제를 하지 않은 프로세스가 종료됐을 때, 데드락에 상태를 복구하는 기능  
+뮤텍스의 데드락	: 중복으로 잠금을 한 경우, 뮤텍스를 획득한 스레드가 잠금 해제없이 종료한 경우 발생  
+
+
+
+## XSI 세마포어
+### 주요 속성
+semval	: 현재 세마포어 값
+sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID
+semcnt	: 세마포어 카운트가 양수가 되기를 대기하는 프로세스의 개수
+semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스의 개수
+### semget
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+-->
+
+### semctl
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+-->
+
+### semop
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+-->
+
+### semtimedop
+	#include <>
+	[function]
+**Parameters**
+- 
+
+**Return Value**
+- 
+
+**Description**  
+-->
+
+
+
+## POSIX 세마포어
 
 
 
