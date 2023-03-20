@@ -38,17 +38,10 @@
 - [XSI 세마포어](#xsi-세마포어)
 	- [주요 속성](#주요-속성)
 	- [semget](#semget)
-- [**Parameters**](#parameters)
-- [**Return Value**](#return-value)
 	- [semctl](#semctl)
-- [**Parameters**](#parameters-1)
-- [**Return Value**](#return-value-1)
+	- [struct seminfo](#struct-seminfo)
 	- [semop](#semop)
-- [**Parameters**](#parameters-2)
-- [**Return Value**](#return-value-2)
 	- [semtimedop](#semtimedop)
-- [**Parameters**](#parameters-3)
-- [**Return Value**](#return-value-3)
 - [POSIX 세마포어](#posix-세마포어)
 - [메시지큐](#메시지큐)
 
@@ -351,12 +344,24 @@ IPC 자원에 대한 정보를 얻거나 수정할 때 사용하는 명령이다
 shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.  
 |명령|설명|
 |:--:|:--|
-|IPC_RMID	| IPC 자원을 제거한다.|
-|IPC_SET	| IPC 자원의 권한을 변경한다.|
-|IPC_STAT	| 현재 공유메모리 정보(생성자, 생성 시각, 접근 권한 등)를 읽어 buf에 저장한다.|
-|IPC_INFO	| 자원의 시스템 설정 값을 읽어온다.|
-|SHM_LOCK	| 공유메모리의 세그먼트를 잠근다.|
-|SHM_UNLOCK	| 공유메모리의 세그먼트를 잠금 해제한다.|  
+|IPC_RMID	| IPC 자원을 제거한다. |
+|IPC_SET	| IPC 자원의 권한을 변경한다. |
+|IPC_STAT	| 현재 공유메모리 정보(생성자, 생성 시각, 접근 권한 등)를 읽어 buf에 저장한다. |
+|IPC_INFO	| 자원의 시스템 설정 값을 읽어온다. |
+|SHM_LOCK	| 공유메모리의 세그먼트를 잠근다. |
+|SHM_UNLOCK	| 공유메모리의 세그먼트를 잠금 해제한다. |  
+|SETVAL		| 세마포어 세트 중 sumnum 위치의 세마포어 값을 초기화한다. |
+|SETALL		| 세마포어 세트의 모든 세마포어를 한꺼번에 초기화한다. |
+|GETVAL		| 세마포어 세트 중 semnum 위치의 세마포어 값을 리턴한다. |
+|GETALL		| 세마포어 세트의 모든 세마포어를 한꺼번에 읽어온다. |
+|GETNCNT	| 세마포어 세트 중 semnum 위치의 semnnt 정보를 리턴한다. |
+|GETZCNT	| 세마포어 세트 중 semnum 위치의 semzcnt 정보를 리턴한다. |
+|GETPID		| 세마포어 세트 중 semnum 위치의 sempid 값을 리턴한다. |
+
+|		|  |
+|		|  |
+|		|  |
+
 
 ### shmget
 	#include <sys/ipc.h>
@@ -369,7 +374,7 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 **Parameters**
 - `key_t	key`	: 키값
 - `int		size`	: 공유메모리의 크기
-- `int		shmflg`	: [옵션](#ipc-flag)
+- `int		shmflg`	: [공유메모리 동적 옵션](#ipc-flag)
 
 **Return Value**
 - `other`	: id값
@@ -535,52 +540,84 @@ sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID
 semcnt	: 세마포어 카운트가 양수가 되기를 대기하는 프로세스의 개수  
 semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스의 개수  
 ### semget
-	#include <>
-	[function]
+	#include <sys/sem.h>
+	int semget(
+		key_t				key,
+		int				nsems,
+		int				semflg
+	)
 **Parameters**
-- 
+- `key_t key`	: 세마포어 식별 키
+- `int nsems`	: 세마포어 자원의 갯수
+- `int semflg`	: [세마포어 동적 옵션](#ipc-flag)
 
 **Return Value**
-- 
+- `other`	: 세마포어 식별
+- `-1`	: 에러, errno 설정
 
 **Description**  
--->
+세마포어 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
 
 ### semctl
-	#include <>
-	[function]
+	#include <sys/sem.h>
+	int semctl (
+		int 				semid,
+		int 				semnum,
+		int 				cmd,
+		...
+	)
 **Parameters**
-- 
+- `int semid` : 세마포어 식별 키
+- `int semnum` : 인덱스
+- `int cmd` : [제어 명령](#ipc-제어-명령)
 
 **Return Value**
-- 
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
 
 **Description**  
--->
+세마포어를 조작(제거, 메타 데이터 획득, 초기화)한다.  
+
+### struct seminfo
+	struct seminfo{
+		int			semmap;		// 엔트리 맵 개수
+		int			semmni;		// 최대 세트 개수
+		int			semmns;		// 세마포어 최대 개수
+		int			semmnu;		// undo 구조체 최대 개수
+		int			semmsl;		// 한 세마포어세트 내의 최대 세마포어 개수
+		int			semopm;		// semop 콜의 최대 값
+		int			semume;		// 프로세스당 최대 undo 엔트리 개수
+		int			semusz;		// undo 구조체가 사용하는 메모리 크기
+		int			semvmx;		// 세마포어 값의 최대 값
+		int			semaem;		// 프로세스 종료시 복구될 수 있는 undo의 최대 
+	}
+	
 
 ### semop
-	#include <>
-	[function]
+	#include <sys/sem.h>
+	int semop(
+		int				semid,
+		struct				sembuf *sops,
+		size_t				nsops
+	)
 **Parameters**
-- 
-
-**Return Value**
-- 
+- `int semid`		: 새마포어 식별 키
+- `struct sembuf *sops`	: 설정 값
+- `size_t nsops`	: 변경하려는 세마포어의 개수
 
 **Description**  
--->
+세마포어 값을 변경한다.
 
 ### semtimedop
-	#include <>
-	[function]
-**Parameters**
-- 
-
-**Return Value**
-- 
-
+	#include <sys/sem.h>
+	int semtimedop(
+		int 				semid, 
+		struct sembuf 			*sops, 
+		size_t 				nsops,
+		const struct timespcec 		*timeout
+	)
 **Description**  
--->
+semop함수에 타임아웃 기능이 추가된 함수이다.
 
 
 
