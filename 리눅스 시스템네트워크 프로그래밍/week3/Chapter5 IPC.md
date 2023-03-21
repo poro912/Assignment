@@ -26,8 +26,8 @@
 	- [XSI IPC key](#xsi-ipc-key)
 	- [제공 유틸리티](#제공-유틸리티)
 	- [ftok](#ftok)
-	- [IPC Flag](#ipc-flag)
-	- [IPC 제어 명령 Flag](#ipc-제어-명령-flag)
+	- [IPC Get Flag](#ipc-get-flag)
+	- [IPC Ctl Flag](#ipc-ctl-flag)
 - [XSI 공유메모리](#xsi-공유메모리)
 	- [shmget](#shmget)
 	- [shmat](#shmat)
@@ -258,6 +258,7 @@ BSD 표준과 POSIX 표준이 존재하며, 기능과 호환성면에서 차이�
 	| POSIX_FADV_DONTNEED	| 지정한 데이터에 접근하지 않는다.</br>지정 영역과 연계된 캐싱 페이지를 해제 시도한다. |  
 
 
+
 ## Huge Page
 명시적으로 Huge Page를 사용하기 위해서는 커널 설정을 동반 해야한다.  
 리눅스에서는 hugeadm 명령을 사용하여 설정을 변경할 수 있다.  
@@ -275,6 +276,7 @@ THP 설정만으로 성능이 개선될 수 있다.
 | always	| THP 사용 |
 | madvise	| madvise 함수를 적용한 mmap에 대해서만 사용 |
 | never		| THP 사용안함 |
+
 
 
 ## 공유메모리
@@ -301,7 +303,8 @@ V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)
 |이진		| 1개의 자원 카운팅이 가능한 세마포어 |
 |뮤텍스		| 자원의 독점을 가능하게 하는 락 |
 |스핀락		| 문맥 교환을 막기위해 사용되는 매우 빠른 락 |
-|Reader/Writer락	| 읽기 쓰기가 서로 다르게 적용되는 락 |
+|Reader/Writer락	| 읽기 쓰기가 서로 다르게 적용되는 락 |  
+
 락 메커니즘 : 8장 - 스레드 프로그래밍  
 
 
@@ -328,10 +331,13 @@ V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)
 
 
 ## 메시지큐
-1 ~ 2KiB 이하의 짧은 메시지를 주고 받는데 매우 효율적인 통신 메터니즘
-작은 메시지를 빈번하게 전송하는데 유리하다.
-수신측이 접속하지 않아도 데이터를 넣을 수 있다.
-큐가 가득차는 경우를 산정하여 프로그래밍 해야 한다.
+1 ~ 2KiB 이하의 짧은 메시지를 주고 받는데 매우 효율적인 통신 메커니즘  
+작은 메시지를 빈번하게 전송하는데 유리하다.  
+수신측이 접속하지 않아도 데이터를 넣을 수 있다.  
+큐가 가득차는 경우를 산정하여 프로그래밍 해야 한다.  
+메시지 큐의 크기가 작아 송신속도가 빠르면 큐가 가득 차는 문제가 빈번히 발생한다.  
+메시지 큐를 복수개로 만들어 사용하거나 수신측을 빠르게 처리할 수 있는 형태로 만들어야 한다.  
+모든 함수에서 스레드 안전을 만족한다.  
 
 
 
@@ -348,8 +354,8 @@ XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로
 ### XSI IPC key
 일반적으로 IPC key는 유일해야한다.  
 key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.  
-키를 사용하는 경우 외부에서 IPC 자원에 접근할 수 있다.  
-키를 구한 후 semget, shmget, msgget 등을 호출하여 XSI IPC ID를 얻어올 수 있다.  
+키를 보유한 경우 외부에서 IPC 자원에 접근할 수 있다.  
+키를 구한 후 semget, shmget, msgget 등을 호출하여 IPC ID를 얻어올 수 있다.  
 
 임시로 사용되는 자원이라면 IPC_PRIVATE 매크로를 사용해 사설 IPC를 받아야 한다.  
 사설 IPC의 키값은 0이며 호출할 때마다 ID가 랜덤생성된다.  
@@ -359,8 +365,8 @@ key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.
 |유틸리티|설명|
 |:--:|:--|
 |ipcs	|IPC status</br>시스템의 XSI IPC 자원 리스트를 출력한다.|
-|ipcrm	|IPC revmoe</br>시스템의 XSI IPC 자원을 제거한다.|
-|lsipc	|list of IPC, XSI IPC 설정을 출력한다.|
+|ipcrm	|IPC remove</br>시스템의 XSI IPC 자원을 제거한다.|
+|lsipc	|list of IPC</br>XSI IPC 설정을 출력한다.|
 
 ### ftok
 	#include <sys/types.h>
@@ -371,7 +377,7 @@ key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.
 	)
 **Parameters**
 - `const char *pathname`	: 실제로 존재하고 접속 가능한 파일 또는 디렉터리
-- `int proj_id`			: 같은 path에 대해 구분하기 위한 값
+- `int proj_id`			: 같은 path에 대해 구분하기 위한 값(번호)
 
 **Return Value**
 - `other`	: 성공
@@ -382,9 +388,9 @@ System V IPC에서 사용할 key를 생성하는 함수
 매개변수값이 동일하다면 같은 key를 생성합니다.  
 
 
-### IPC Flag
+### IPC Get Flag
 IPC 자원을 얻을 때 사용하는 설정이다.  
-shmget, semget, msgget 메소드에서 동일하게 사용된다.  
+shmget, semget, msgget 메소드에서 사용된다.  
 |옵션	|설명|
 |:--:	|:--|
 |IPC_CREATE	| 해당 자원이 존재하지 않으면 생성한다.|
@@ -393,9 +399,9 @@ shmget, semget, msgget 메소드에서 동일하게 사용된다.
 |접근권한	| 자원에 대한 접근 권한을 설정한다. ex)0660 |  
 
 
-### IPC 제어 명령 Flag
+### IPC Ctl Flag
 IPC 자원에 대한 정보를 얻거나 수정할 때 사용하는 명령이다.  
-shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.  
+shmctl, semctl, msgctl 메소드에서 사용된다.  
 |명령|설명|
 |:--:|:--|
 |IPC_RMID	| IPC 자원을 제거한다. |
@@ -412,19 +418,21 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 |GETZCNT	| 세마포어 세트 중 semnum 위치의 semzcnt 정보를 리턴한다. |
 |GETPID		| 세마포어 세트 중 semnum 위치의 sempid 값을 리턴한다. |
 
+
+
 ## XSI 공유메모리
-### shmget
 	#include <sys/ipc.h>
 	#include <sys/shm.h>
+### shmget
 	int shmget(
 		key_t				key,
 		int				size,
 		int				shmflg
 	)
 **Parameters**
-- `key_t	key`	: 키값
-- `int		size`	: 공유메모리의 크기
-- `int		shmflg`	: [공유메모리 동적 옵션](#ipc-flag)
+- `key_t key`	: 키값
+- `int size`	: 공유메모리의 크기
+- `int shmflg`	: [옵션](#ipc-get-flag)
 
 **Return Value**
 - `other`	: id값
@@ -435,19 +443,17 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 공유 메모리의 크기가 너무 작은 경우 커널 설정에 따라 에러가 발생할 수 있다.  
 
 ### shmat
-	#include <sys/ipc.h>
-	#include <sys/shm.h>
 	void* shmat(
 		int				shmid,
 		const void			*shmaddr,
 		int				shmflg
 	)
 **Parameters**
-- `int		shmid`		: id 값
-- `const void	*shmaddr`
+- `int shmid`		: id 값
+- `const void *shmaddr`
   - 매핑할 메모리 주소
-  - null : 매핑되지 않은곳에 자동으로 붙인다.
-- `int		shmflg`
+  - null : 매핑되지 않은공간에 자동으로 붙인다.
+- `int shmflg`
   	메모리 매핑 옵
 	|옵션	|설명|
 	|:--:	|:--|
@@ -462,11 +468,9 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 
 
 ### shmdt
-	#include <sys/ipc.h>
-	#include <sys/shm.h>
 	int shmdt(const void			*shmaddr)
 **Parameters**
-- `const void	*shmaddr`	: 공유메모리 주소
+- `const void *shmaddr`	: 공유메모리 주소
 
 **Return Value**
 - `0`	: 성공
@@ -477,8 +481,6 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 
 
 ### shmctl
-	#include <sys/ipc.h>
-	#include <sys/shm.h>
 	int shmctl(
 		int				shmid,
 		int				cmd,
@@ -486,7 +488,7 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 	)
 **Parameters**
 - `int shmid`	: 공유메모리 id
-- `int cmd`	: [제어 명령](#ipc-제어-명령)
+- `int cmd`	: [명령](#ipc-ctl-flag)
 - `struct shmid_ds *buf`	: 공유메모리 정보를 저장하기위한 구조체
 
 **Return Value**
@@ -496,7 +498,12 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 **Description**  
 공유 메모리를 조작(제거, 메타 데이터 획득)한다.  
 
+
+
 ## XSI 세마포어
+	#include <sys/ipc.h>
+	#include <sys/sem.h>
+
 ### 주요 속성
 semval	: 현재 세마포어 값  
 sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID  
@@ -532,7 +539,6 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 
 
 ### semget
-	#include <sys/sem.h>
 	int semget(
 		key_t				key,
 		int				nsems,
@@ -541,7 +547,7 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 **Parameters**
 - `key_t key`	: 세마포어 식별 키
 - `int nsems`	: 세마포어 자원의 갯수
-- `int semflg`	: [세마포어 동적 옵션](#ipc-flag)
+- `int semflg`	: [옵션](#ipc-get-flag)
 
 **Return Value**
 - `other`	: 세마포어 식별
@@ -552,7 +558,6 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 
 
 ### semctl
-	#include <sys/sem.h>
 	int semctl (
 		int 				semid,
 		int 				semnum,
@@ -562,7 +567,7 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 **Parameters**
 - `int semid` : 세마포어 식별 키
 - `int semnum` : 인덱스
-- `int cmd` : [제어 명령](#ipc-제어-명령)
+- `int cmd` : [명령](#ipc-ctl-flag)
 
 **Return Value**
 - `0`	: 성공
@@ -573,7 +578,6 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 
 
 ### semop
-	#include <sys/sem.h>
 	int semop(
 		int				semid,
 		struct				sembuf *sops,
@@ -593,7 +597,6 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 
 
 ### semtimedop
-	#include <sys/sem.h>
 	int semtimedop(
 		int				semid, 
 		struct sembuf 			*sops, 
@@ -601,10 +604,10 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 		const struct timespcec 		*timeout
 	)
 **Parameters**
-- int semid		: 세마포어 식별 키
-- struct sembuf *sops	: 세마포어 작동 버퍼 구조체의 주소
-- size_t nsops		: 버퍼 구조체의 개수
-- struct timespcec *timeout	: 
+- `int semid`		: 세마포어 식별 키
+- `struct sembuf *sops`	: 세마포어 작동 버퍼 구조체의 주소
+- `size_t nsops`	: 버퍼 구조체의 개수
+- `struct timespcec *timeout`	: timeout 시간을 저장한 구조체
 
 **Return Value**
 - `0`	: 성공
@@ -613,9 +616,13 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 **Description**  
 semop함수에 타임아웃 기능이 추가된 함수이다.
 
+
+
 ## XSI 메시지 큐
-메시지 타입을 선택할 수 있다.
-채널을 분리하거나 우선순위 용도로 사용된다.
+	#include <sys/ipc.h>
+	#include <sys/msg.h>
+메시지 타입을 선택할 수 있다.  
+때문에 채널을 분리하거나 우선순위 용도로 사용된다.  
 
 | 함수명 | 기능 |
 | :--: | :-- |
@@ -627,13 +634,15 @@ semop함수에 타임아웃 기능이 추가된 함수이다.
 
 
 ## POSIX IPC
-파일 입출력과 구성이 비슷하여 XSI보다 직관적이다.
+모든 함수가 파일 입출력과 구성이 비슷하여 XSI보다 직관적이다.  
+
 
 
 ## POSIX 공유메모리
 	#include <sys/mman.h>
 	#include <sys/stat.h>
 	#include <fcntl.h>
+
 
 ### shm_open
 	int shm_open(
@@ -671,14 +680,17 @@ close 함수를 통해 매핑된 공유메모리를 닫는다.
 공유 메모리를 삭제한다.  
 unlink함수와 유사한 구조를 갖는다.  
 
+
+
 ## POSIX 세마포어
 	#include<semaphore.h>  
 접근 방법에 따라 명명된 세마포어, 익명 세마포어로 나뉜다.  
+
 명명된 세마포어는 외부에서 접근 가능한 인터페이스 경로를 가진다.  
 명명된 세마포어는 이름을 알고 있다면 다른 프로세스에서도 접근 가능한 방식이다.  
+
 익명 세마포어는 해당 세마포어를 생성 및 초기화한 프로세스에서만 유효하다.  
 익명 세마포어는 외부에서 접근 불가능하다.  
-
 
 |함수|설명|
 | :--:		| :-- |
@@ -692,6 +704,7 @@ unlink함수와 유사한 구조를 갖는다.
 | sem_timedwait	| sem_wait에 타임아웃 기능을 추가한다. |
 | sem_post	| 세마포어 값을 1 증가시킨다. |
 | sem_getvalue	| 세마포어 카운터 값을 읽어온다. |
+
 
 ### sem_init
 	int sem_init(
@@ -725,6 +738,8 @@ unlink함수와 유사한 구조를 갖는다.
 
 **Description**  
 세마포어를 생성하거나 이미 존재하는 세마포어를 연다.  
+
+
 
 ## POSIX 메시지 큐
 	#include <fcntl.h>
