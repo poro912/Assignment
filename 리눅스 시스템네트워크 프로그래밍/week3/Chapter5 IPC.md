@@ -385,7 +385,7 @@ key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.
 
 **Description**  
 System V IPC에서 사용할 key를 생성하는 함수  
-매개변수값이 동일하다면 같은 key를 생성합니다.  
+매개변수값이 각각 동일하다면 같은 key를 생성합니다.  
 
 
 ### IPC Get Flag
@@ -405,9 +405,9 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 |명령|설명|
 |:--:|:--|
 |IPC_RMID	| IPC 자원을 제거한다. |
+|IPC_INFO	| 자원의 시스템 설정 값을 읽어온다. |
 |IPC_SET	| IPC 자원의 권한을 변경한다. |
 |IPC_STAT	| 현재 공유메모리 정보(생성자, 생성 시각, 접근 권한 등)를 읽어 buf에 저장한다. |
-|IPC_INFO	| 자원의 시스템 설정 값을 읽어온다. |
 |SHM_LOCK	| 공유메모리의 세그먼트를 잠근다. |
 |SHM_UNLOCK	| 공유메모리의 세그먼트를 잠금 해제한다. |  
 |SETVAL		| 세마포어 세트 중 sumnum 위치의 세마포어 값을 초기화한다. |
@@ -454,7 +454,7 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
   - 매핑할 메모리 주소
   - null : 매핑되지 않은공간에 자동으로 붙인다.
 - `int shmflg`
-  	메모리 매핑 옵
+  	메모리 매핑 옵션
 	|옵션	|설명|
 	|:--:	|:--|
 	| SHM_RND	| 페이지주소를 반내림하여 경계에 맞춘다.|
@@ -634,15 +634,18 @@ semop함수에 타임아웃 기능이 추가된 함수이다.
 
 
 ## POSIX IPC
-모든 함수가 파일 입출력과 구성이 비슷하여 XSI보다 직관적이다.  
-
+저수준 파일 입출력과 구성이 비슷하여 XSI보다 직관적이다.  
+확장성을 고려하여 기존의 구조와 비슷하게 구성된다.  
+[posix](../etc.md#posix)
 
 
 ## POSIX 공유메모리
 	#include <sys/mman.h>
 	#include <sys/stat.h>
 	#include <fcntl.h>
-
+메모리의 일부를 파티션 공간처럼 만들어 파일을 만들고 페이지를 공유하는 방식  
+mmap파일 시스템과 POSIX의 공유 방식이 비슷하여 상호 변환이 가능하다.  
+/dev/shm 이라는 가상메모리 디스크 영역을 사용한다.
 
 ### shm_open
 	int shm_open(
