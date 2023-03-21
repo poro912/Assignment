@@ -17,33 +17,39 @@
 	- [memory advice](#memory-advice)
 	- [posix\_madvise](#posix_madvise)
 - [Huge Page](#huge-page)
+- [공유메모리](#공유메모리)
+- [세마포어](#세마포어)
+	- [세마포어와 뮤텍스](#세마포어와-뮤텍스)
+	- [세마포어 vs 뮤텍스](#세마포어-vs-뮤텍스)
+- [메시지큐](#메시지큐)
 - [XSI IPC](#xsi-ipc)
 	- [XSI IPC key](#xsi-ipc-key)
 	- [제공 유틸리티](#제공-유틸리티)
 	- [ftok](#ftok)
-- [공유메모리](#공유메모리)
-- [XSI 공유 메모리](#xsi-공유-메모리)
 	- [IPC Flag](#ipc-flag)
-	- [IPC 제어 명령](#ipc-제어-명령)
+	- [IPC 제어 명령 Flag](#ipc-제어-명령-flag)
+- [XSI 공유메모리](#xsi-공유메모리)
 	- [shmget](#shmget)
 	- [shmat](#shmat)
 	- [shmdt](#shmdt)
 	- [shmctl](#shmctl)
+- [XSI 세마포어](#xsi-세마포어)
+	- [주요 속성](#주요-속성)
+	- [struct seminfo](#struct-seminfo)
+	- [struct sembuf](#struct-sembuf)
+	- [semget](#semget)
+	- [semctl](#semctl)
+	- [semop](#semop)
+	- [semtimedop](#semtimedop)
+- [XSI 메시지 큐](#xsi-메시지-큐)
+- [POSIX IPC](#posix-ipc)
 - [POSIX 공유메모리](#posix-공유메모리)
 	- [shm\_open](#shm_open)
 	- [shm\_unlink](#shm_unlink)
-- [세마포어](#세마포어)
-	- [세마포어와 뮤텍스](#세마포어와-뮤텍스)
-	- [세마포어 vs 뮤텍스](#세마포어-vs-뮤텍스)
-- [XSI 세마포어](#xsi-세마포어)
-	- [주요 속성](#주요-속성)
-	- [semget](#semget)
-	- [semctl](#semctl)
-	- [struct seminfo](#struct-seminfo)
-	- [semop](#semop)
-	- [semtimedop](#semtimedop)
 - [POSIX 세마포어](#posix-세마포어)
-- [메시지큐](#메시지큐)
+	- [sem\_init](#sem_init)
+	- [sem\_t \*sem\_open](#sem_t-sem_open)
+- [POSIX 메시지 큐](#posix-메시지-큐)
 
 
 ## 서론
@@ -271,6 +277,64 @@ THP 설정만으로 성능이 개선될 수 있다.
 | never		| THP 사용안함 |
 
 
+## 공유메모리
+함수 콜 없이 주소번지에 직접 접근한다.  
+입출력시 포인터 변수로 직접 접근하기 때문에 가장 빠른 성능을 보장한다.  
+
+프로그래머가 배타적 접근을 보장해야한다.  
+배타적 접근을 LOCK 매커니즘이라 하며 세마포어, 뮤텍스, rwlock, spinlock 등이 있다.  
+8장 스레드 프로그래밍  
+
+
+
+## 세마포어
+초기 상호배제의 개념에서 만들어졌지만 현재는 동기화 및 락메커니즘 구현 도구를 가르키는 의미로 사용된다.  
+공유 자원에 대한 교착상태를 해결하기 위한 기법이다.  
+
+P연산과 V 연산으로 이루어져있다.  
+P연산	: 세마포어의 값을 감소시키는 연산 (wait, pend)  
+V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)  
+
+|종류|특징|
+|:--:|:--|
+|카운팅		| 복수개의 자원 카운팅이 가능한 세마포어 |
+|이진		| 1개의 자원 카운팅이 가능한 세마포어 |
+|뮤텍스		| 자원의 독점을 가능하게 하는 락 |
+|스핀락		| 문맥 교환을 막기위해 사용되는 매우 빠른 락 |
+|Reader/Writer락	| 읽기 쓰기가 서로 다르게 적용되는 락 |
+락 메커니즘 : 8장 - 스레드 프로그래밍  
+
+
+### 세마포어와 뮤텍스
+카운팅 세마포어	: n개의 자원에 다수의 프로세스가 접근하는 것을 막아줌  
+이진 세마포어	: 1개의 자원에 다수의 프로세스가 접근하는 것을 막아줌  
+뮤텍스	: 자원의 독점적 사용권한을 부여하는 기능  
+|		|XSI 세마포어|POSIX 세마포어|POSIX 뮤텍스|
+|:--:		|:--|:--|:--|
+| 최대 카운터		| 시스템 설정	| SEM_VALUE_MAX	| 1 |
+| 독점적 소유권		| 불가능	| 불가능	| 가능 |
+| 동작 취소 undo	| 가능		| 불가능	| 가능 |
+| 타이머 설정		| 가능(비표준)	| 가능		| 가능 |
+
+
+### 세마포어 vs 뮤텍스
+세마포어는 동기화의 목적이고, 동기화를 위한 큐를 만드는 기능을 제공한다.  
+뮤텍스는 독점적 사용권한 획득에 목적이 있으며, 소유권이 존재한다.  
+일반적으로 뮤텍스가 세마포어보다 빠르다.
+
+동작 취소	: 잠금해제를 하지 않은 프로세스가 종료됐을 때, 데드락에 상태를 복구하는 기능  
+뮤텍스의 데드락	: 중복으로 잠금을 한 경우, 뮤텍스를 획득한 스레드가 잠금 해제없이 종료한 경우 발생  
+
+
+
+## 메시지큐
+1 ~ 2KiB 이하의 짧은 메시지를 주고 받는데 매우 효율적인 통신 메터니즘
+작은 메시지를 빈번하게 전송하는데 유리하다.
+수신측이 접속하지 않아도 데이터를 넣을 수 있다.
+큐가 가득차는 경우를 산정하여 프로그래밍 해야 한다.
+
+
+
 ## XSI IPC
 System V (System Five)에서 제공하는 IPC  
 Key 획득 -> ID 획득 -> 자원 사용의 순서로 진행된다.  
@@ -280,7 +344,6 @@ IPC ID	: IPC key로 가져온 자원의 ID 값
 XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로 이루어져있다.  
 자원 획득 함수 사용시 생성을 진행하지만 이미 자원할당이 되어있다면 ID만을 알려준다.  
 (Ubuntu 22.04 버전에서도 사용중인것으로 확인 되었다.)  
-
 
 ### XSI IPC key
 일반적으로 IPC key는 유일해야한다.  
@@ -298,7 +361,6 @@ key_t 형으로 표현되며 32bit 또는 64bit 정수형이다.
 |ipcs	|IPC status</br>시스템의 XSI IPC 자원 리스트를 출력한다.|
 |ipcrm	|IPC revmoe</br>시스템의 XSI IPC 자원을 제거한다.|
 |lsipc	|list of IPC, XSI IPC 설정을 출력한다.|
-
 
 ### ftok
 	#include <sys/types.h>
@@ -320,15 +382,6 @@ System V IPC에서 사용할 key를 생성하는 함수
 매개변수값이 동일하다면 같은 key를 생성합니다.  
 
 
-## 공유메모리
-함수 콜 없이 주소번지에 직접 접근한다.  
-입출력시 포인터 변수로 직접 접근하기 때문에 가장 빠른 성능을 보장한다.  
-
-프로그래머가 배타적 접근을 보장해야한다.  
-배타적 접근을 LOCK 매커니즘이라 하며 세마포어, 뮤텍스, rwlock, spinlock 등이 있다.  
-8장 스레드 프로그래밍  
-
-## XSI 공유 메모리
 ### IPC Flag
 IPC 자원을 얻을 때 사용하는 설정이다.  
 shmget, semget, msgget 메소드에서 동일하게 사용된다.  
@@ -339,7 +392,8 @@ shmget, semget, msgget 메소드에서 동일하게 사용된다.
 |SHM_HUGETLB	| SHM에 Huge page를 사용한다. (리눅스에서만 지원)|
 |접근권한	| 자원에 대한 접근 권한을 설정한다. ex)0660 |  
 
-### IPC 제어 명령
+
+### IPC 제어 명령 Flag
 IPC 자원에 대한 정보를 얻거나 수정할 때 사용하는 명령이다.  
 shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.  
 |명령|설명|
@@ -358,11 +412,7 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 |GETZCNT	| 세마포어 세트 중 semnum 위치의 semzcnt 정보를 리턴한다. |
 |GETPID		| 세마포어 세트 중 semnum 위치의 sempid 값을 리턴한다. |
 
-|		|  |
-|		|  |
-|		|  |
-
-
+## XSI 공유메모리
 ### shmget
 	#include <sys/ipc.h>
 	#include <sys/shm.h>
@@ -446,13 +496,146 @@ shmctl, semctl, msgctl 메소드에서 동일하게 사용된다.
 **Description**  
 공유 메모리를 조작(제거, 메타 데이터 획득)한다.  
 
+## XSI 세마포어
+### 주요 속성
+semval	: 현재 세마포어 값  
+sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID  
+semcnt	: 세마포어 카운트가 양수가 되기를 대기하는 프로세스의 개수  
+semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스의 개수  
+
+### struct seminfo
+	struct seminfo{
+		int				semmap;		// 엔트리 맵 개수
+		int				semmni;		// 최대 세트 개수
+		int				semmns;		// 세마포어 최대 개수
+		int				semmnu;		// undo 구조체 최대 개수
+		int				semmsl;		// 한 세마포어세트 내의 최대 세마포어 개수
+		int				semopm;		// semop 콜의 최대 값
+		int				semume;		// 프로세스당 최대 undo 엔트리 개수
+		int				semusz;		// undo 구조체가 사용하는 메모리 크기
+		int				semvmx;		// 세마포어 값의 최대 값
+		int				semaem;		// 프로세스 종료시 복구될 수 있는 undo의 최대 
+	}
+
+
+### struct sembuf
+	struct sembuf{
+		unsigned short			sem_num;	// 개별 세마포어의 인덱스 번호
+		short				sem_op;		// 세마포어에 더할 값
+		short				sem_flg;	// 작동옵션 플래그
+
+	}
+| 옵션	|설명|
+| :--:		| :-- |
+| SEM_UNDO	| 세마포어를 조작한 프로세스가 종료되었을 때 조작된 작업은 취소된다.</br>대기하던 다음 세마포어가 실행된다. |
+| SEM_NOWAIT	| 사용 가능자원이 없는 경우 바로 에러를 리턴한다.(넌블로킹 실행) |
+
+
+### semget
+	#include <sys/sem.h>
+	int semget(
+		key_t				key,
+		int				nsems,
+		int				semflg
+	)
+**Parameters**
+- `key_t key`	: 세마포어 식별 키
+- `int nsems`	: 세마포어 자원의 갯수
+- `int semflg`	: [세마포어 동적 옵션](#ipc-flag)
+
+**Return Value**
+- `other`	: 세마포어 식별
+- `-1`	: 에러, errno 설정
+
+**Description**  
+세마포어 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
+
+
+### semctl
+	#include <sys/sem.h>
+	int semctl (
+		int 				semid,
+		int 				semnum,
+		int 				cmd,
+		...
+	)
+**Parameters**
+- `int semid` : 세마포어 식별 키
+- `int semnum` : 인덱스
+- `int cmd` : [제어 명령](#ipc-제어-명령)
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+세마포어를 조작(제거, 메타 데이터 획득, 초기화)한다.  
+
+
+### semop
+	#include <sys/sem.h>
+	int semop(
+		int				semid,
+		struct				sembuf *sops,
+		size_t				nsops
+	)
+**Parameters**
+- `int semid`		: 새마포어 식별 키
+- `struct sembuf *sops`	: 세마포어 작동 버퍼 구조체의 주소
+- `size_t nsops`	: 버퍼 구조체의 개수
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+세마포어 값을 변경한다.
+
+
+### semtimedop
+	#include <sys/sem.h>
+	int semtimedop(
+		int				semid, 
+		struct sembuf 			*sops, 
+		size_t 				nsops,
+		const struct timespcec 		*timeout
+	)
+**Parameters**
+- int semid		: 세마포어 식별 키
+- struct sembuf *sops	: 세마포어 작동 버퍼 구조체의 주소
+- size_t nsops		: 버퍼 구조체의 개수
+- struct timespcec *timeout	: 
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+semop함수에 타임아웃 기능이 추가된 함수이다.
+
+## XSI 메시지 큐
+메시지 타입을 선택할 수 있다.
+채널을 분리하거나 우선순위 용도로 사용된다.
+
+| 함수명 | 기능 |
+| :--: | :-- |
+| msgget	| 메시지 큐의 IPC ID를 얻는다. |
+| msgsnd	| 메시지 큐에 데이터를 송신한다. |
+| msgrcv	| 메시지 큐의 데이터를 수신한다. |
+| msgctl	| 메시지 큐를 조작한다. |
+
+
+
+## POSIX IPC
+파일 입출력과 구성이 비슷하여 XSI보다 직관적이다.
 
 
 ## POSIX 공유메모리
-### shm_open
 	#include <sys/mman.h>
 	#include <sys/stat.h>
 	#include <fcntl.h>
+
+### shm_open
 	int shm_open(
 		const char			*name,
 		int				oflag,
@@ -476,9 +659,6 @@ close 함수를 통해 매핑된 공유메모리를 닫는다.
 
 
 ### shm_unlink
-	#include <sys/mman.h>
-	#include <sys/stat.h>
-	#include <fcntl.h>
 	int shm_unlink(const char *name)
 **Parameters**
 - `const char *name`	: 공유메모리를 삭제할 객체명
@@ -491,142 +671,81 @@ close 함수를 통해 매핑된 공유메모리를 닫는다.
 공유 메모리를 삭제한다.  
 unlink함수와 유사한 구조를 갖는다.  
 
+## POSIX 세마포어
+	#include<semaphore.h>  
+접근 방법에 따라 명명된 세마포어, 익명 세마포어로 나뉜다.  
+명명된 세마포어는 외부에서 접근 가능한 인터페이스 경로를 가진다.  
+명명된 세마포어는 이름을 알고 있다면 다른 프로세스에서도 접근 가능한 방식이다.  
+익명 세마포어는 해당 세마포어를 생성 및 초기화한 프로세스에서만 유효하다.  
+익명 세마포어는 외부에서 접근 불가능하다.  
 
 
-## 세마포어
-초기 상호배제의 개념에서 만들어졌지만 현재는 동기화 및 락메커니즘 구현 도구를 가르키는 의미로 사용된다.  
-공유 자원에 대한 교착상태를 해결하기 위한 기법이다.  
+|함수|설명|
+| :--:		| :-- |
+| sem_init	| 익명 세마포어를 생성 후 초기화 한다. |
+| sem_destroy	| 익명 세마포어를 제거한다. |
+| sem_open	| 명명된 세마포어를 생성 후 초기화 하거나 연다. |
+| sem_close	| 명명된 세마포어의 연결을 해제한다. |
+| sem_unlink	| 명명된 세마포어를 시스템에서 제거한다. |
+| sem_wait	| 세마포어 값을 1 감소시킨다. |
+| sem_trywait	| sem_wait에 넌블러킹 기능을 추가한다 |
+| sem_timedwait	| sem_wait에 타임아웃 기능을 추가한다. |
+| sem_post	| 세마포어 값을 1 증가시킨다. |
+| sem_getvalue	| 세마포어 카운터 값을 읽어온다. |
 
-P연산과 V 연산으로 이루어져있다.  
-P연산	: 세마포어의 값을 감소시키는 연산 (wait, pend)  
-V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)  
-
-|종류|특징|
-|:--:|:--|
-|카운팅		| 복수개의 자원 카운팅이 가능한 세마포어 |
-|이진		| 1개의 자원 카운팅이 가능한 세마포어 |
-|뮤텍스		| 자원의 독점을 가능하게 하는 락 |
-|스핀락		| 문맥 교환을 막기위해 사용되는 매우 빠른 락 |
-|Reader/Writer락	| 읽기 쓰기가 서로 다르게 적용되는 락 |
-락 메커니즘 : 8장 - 스레드 프로그래밍  
-
-
-### 세마포어와 뮤텍스
-카운팅 세마포어	: n개의 자원에 다수의 프로세스가 접근하는 것을 막아줌  
-이진 세마포어	: 1개의 자원에 다수의 프로세스가 접근하는 것을 막아줌  
-뮤텍스	: 자원의 독점적 사용권한을 부여하는 기능  
-|		|XSI 세마포어|POSIX 세마포어|POSIX 뮤텍스|
-|:--:		|:--|:--|:--|
-| 최대 카운터		| 시스템 설정	| SEM_VALUE_MAX	| 1 |
-| 독점적 소유권		| 불가능	| 불가능	| 가능 |
-| 동작 취소 undo	| 가능		| 불가능	| 가능 |
-| 타이머 설정		| 가능(비표준)	| 가능		| 가능 |
-
-
-### 세마포어 vs 뮤텍스
-세마포어는 동기화의 목적이고, 동기화를 위한 큐를 만드는 기능을 제공한다.  
-뮤텍스는 독점적 사용권한 획득에 목적이 있으며, 소유권이 존재한다.  
-일반적으로 뮤텍스가 세마포어보다 빠르다.
-
-동작 취소	: 잠금해제를 하지 않은 프로세스가 종료됐을 때, 데드락에 상태를 복구하는 기능  
-뮤텍스의 데드락	: 중복으로 잠금을 한 경우, 뮤텍스를 획득한 스레드가 잠금 해제없이 종료한 경우 발생  
-
-
-
-## XSI 세마포어
-### 주요 속성
-semval	: 현재 세마포어 값  
-sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID  
-semcnt	: 세마포어 카운트가 양수가 되기를 대기하는 프로세스의 개수  
-semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스의 개수  
-### semget
-	#include <sys/sem.h>
-	int semget(
-		key_t				key,
-		int				nsems,
-		int				semflg
+### sem_init
+	int sem_init(
+		sem_t				*sem,
+		int				pshard,
+		unsigned int			value
 	)
 **Parameters**
-- `key_t key`	: 세마포어 식별 키
-- `int nsems`	: 세마포어 자원의 갯수
-- `int semflg`	: [세마포어 동적 옵션](#ipc-flag)
-
-**Return Value**
-- `other`	: 세마포어 식별
-- `-1`	: 에러, errno 설정
-
-**Description**  
-세마포어 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
-
-### semctl
-	#include <sys/sem.h>
-	int semctl (
-		int 				semid,
-		int 				semnum,
-		int 				cmd,
-		...
-	)
-**Parameters**
-- `int semid` : 세마포어 식별 키
-- `int semnum` : 인덱스
-- `int cmd` : [제어 명령](#ipc-제어-명령)
+- `sem_t *sem`	: 세마포어 객체를 저장할 포인터
+- `int pshard`	: 공유 설정 플래그
+- `unsigned int value`	: 세마포어 초기 값
 
 **Return Value**
 - `0`	: 성공
 - `-1`	: 에러, errno 설정
-
 **Description**  
-세마포어를 조작(제거, 메타 데이터 획득, 초기화)한다.  
 
-### struct seminfo
-	struct seminfo{
-		int			semmap;		// 엔트리 맵 개수
-		int			semmni;		// 최대 세트 개수
-		int			semmns;		// 세마포어 최대 개수
-		int			semmnu;		// undo 구조체 최대 개수
-		int			semmsl;		// 한 세마포어세트 내의 최대 세마포어 개수
-		int			semopm;		// semop 콜의 최대 값
-		int			semume;		// 프로세스당 최대 undo 엔트리 개수
-		int			semusz;		// undo 구조체가 사용하는 메모리 크기
-		int			semvmx;		// 세마포어 값의 최대 값
-		int			semaem;		// 프로세스 종료시 복구될 수 있는 undo의 최대 
-	}
-	
 
-### semop
-	#include <sys/sem.h>
-	int semop(
-		int				semid,
-		struct				sembuf *sops,
-		size_t				nsops
+### sem_t *sem_open
+	sem_t *sem_open(
+		const char *name,
+		int oflag
 	)
 **Parameters**
-- `int semid`		: 새마포어 식별 키
-- `struct sembuf *sops`	: 설정 값
-- `size_t nsops`	: 변경하려는 세마포어의 개수
+- `const char *name`	: 
+- `int oflag`	: 
+
+**Return Value**
+- `other`	: 세마포어 주소 반환
+- `SEM_FAILED`	: 에러, errno 설정
 
 **Description**  
-세마포어 값을 변경한다.
+세마포어를 생성하거나 이미 존재하는 세마포어를 연다.  
 
-### semtimedop
-	#include <sys/sem.h>
-	int semtimedop(
-		int 				semid, 
-		struct sembuf 			*sops, 
-		size_t 				nsops,
-		const struct timespcec 		*timeout
-	)
-**Description**  
-semop함수에 타임아웃 기능이 추가된 함수이다.
+## POSIX 메시지 큐
+	#include <fcntl.h>
+	#include <sys/stat.h>
+	#include <mqueue.h>
+이벤트 통지 기능을 쓸 수 있다.  
+데이터 수신 시 시그널 발생, 콜백 스레드 생성 등의 작동이 가능하다.  
+비동기적 구조로 작동시킬 때 편리하다.  
 
-
-
-## POSIX 세마포어
-
-
-
-## 메시지큐
-
+| 함수명 | 기능 |
+| :--: | :-- |
+| mq_open	| 메시지 큐의 객체를 얻는다. |
+| mq_close	| 메시지 큐를 닫는다. |
+| mq_unlink	| 메시지 큐를 시스템에서 제거한다. |
+| mq_send	| 메시지 큐에 데이터를 송신한다. |
+| mq_timedsend	| mq_send에 타임아웃 기능이 추가된 함수이다. |
+| mq_receive	| 메시지 큐로부터 데이터를 수신한다. |
+| mq_timedreceive	| mq_receive에 타임아웃 기능이 추가된 함수이다. |
+| mq_setattr	| 메시지 큐의 속성을 설정한다. |
+| mq_getattr	| 메시지 큐의 속성을 읽어온다. |
+| mq_notify	| 메시지 큐에 데이터가 도착했을 때 통지 기능을 이용한다. |
 
 
 
