@@ -995,14 +995,14 @@ open 메소드와 사용방법이 동일하다.
 
 ### POSIX 세마포어 P,V 동작
 ```cpp
-	int sem_wait(sem_t *sem);		// 블로킹 실행
-	int sem_trywait(sem_t *sem);		// 넌블로킹 실행
-	int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);	// 타임아웃 실행
-	int sem_post(sem_t *sem);		// 세마포어 증가(잠금 해제)
-	struct timespec{
-		time_t		tv_sec;		// 초
-		long		tv_nsec;	// 나노초
-	}
+int sem_wait(sem_t *sem);		// 블로킹 실행
+int sem_trywait(sem_t *sem);		// 넌블로킹 실행
+int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);	// 타임아웃 실행
+int sem_post(sem_t *sem);		// 세마포어 증가(잠금 해제)
+struct timespec{
+	time_t		tv_sec;		// 초
+	long		tv_nsec;	// 나노초
+}
 ```
 **Return Value**
 - `0`	: 성공
@@ -1017,9 +1017,9 @@ timespec는 절대시간에 대한 구조체로 타임 아웃을 주고싶은 �
 
 ### POSIX 세마포어 제거 동작
 ```cpp
-	int sem_destroy(sem_t *sem);		// 익명 세마포어 제거
-	int sem_close(sem_t *sem);		// 명명된 세마포어 닫기
-	int sem_unlock(const char *name);	// 명명된 세마포어 제거
+int sem_destroy(sem_t *sem);		// 익명 세마포어 제거
+int sem_close(sem_t *sem);		// 명명된 세마포어 닫기
+int sem_unlock(const char *name);	// 명명된 세마포어 제거
 ```
 
 **Return Value**  
@@ -1096,10 +1096,12 @@ mq_maxmsg와 mq_msgsize는 커널의 영향을 받으므로 크게 설정하면 
 	
 ### POSIX 메시지 큐 송수신
 ``` cpp
-	int mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, unsigned int msg_prio);
-	ssize_t mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len, unsigned int *msg_prio);
-	int mq_timedsend(mqd_t mqdes, const char *msg_ptr, size_t msg_len, unsigned int msg_prio, const struct timespec *abs_timeout);
-	ssize_t mq_timedreceive(mqd_t mqdes, char *restrict msg_ptr, size_t msg_len, unsigned int *restrict msg_prio, const struct timespec *restrict abs_timeout);
+int	mq_send		(mqd_t mqdes, const char *msg_ptr,	size_t msg_len, unsigned int msg_prio);
+ssize_t	mq_receive	(mqd_t mqdes, char *msg_ptr,		size_t msg_len, unsigned int *msg_prio);
+int	mq_timedsend	(mqd_t mqdes, const char *msg_ptr,	size_t msg_len, unsigned int msg_prio,
+	const struct timespec *abs_timeout);
+ssize_t	mq_timedreceive	(mqd_t mqdes, char *restrict msg_ptr, 	size_t msg_len, unsigned int *restrict msg_prio,
+	const struct timespec *restrict abs_timeout);
 ```
 **Parameters**
 - `mqd_t mqdes`			: 메시지 큐 기술자
