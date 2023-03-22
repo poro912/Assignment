@@ -372,7 +372,7 @@ IPC ID	: IPC key로 가져온 자원의 ID 값
 
 XSI IPC 자원들은 IPC key, IPC ID, 소유권자, 소유권한의 속성으로 이루어져있다.  
 자원 획득 함수 사용시 생성을 진행하지만 이미 자원할당이 되어있다면 ID만을 알려준다.  
-(Ubuntu 22.04 버전에서도 사용중인것으로 확인 되었다.)  
+(Ubuntu 22.04 버전에서 사용중인것으로 확인 되었다.)  
 
 ### XSI IPC key
 일반적으로 IPC key는 유일해야한다.  
@@ -994,6 +994,7 @@ open 메소드와 사용방법이 동일하다.
 
 
 ### POSIX 세마포어 P,V 동작
+```cpp
 	int sem_wait(sem_t *sem);		// 블로킹 실행
 	int sem_trywait(sem_t *sem);		// 넌블로킹 실행
 	int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);	// 타임아웃 실행
@@ -1002,6 +1003,7 @@ open 메소드와 사용방법이 동일하다.
 		time_t		tv_sec;		// 초
 		long		tv_nsec;	// 나노초
 	}
+```
 **Return Value**
 - `0`	: 성공
 - `-1`	: 에러, errno 설정
@@ -1014,9 +1016,11 @@ timespec는 절대시간에 대한 구조체로 타임 아웃을 주고싶은 �
 
 
 ### POSIX 세마포어 제거 동작
+```cpp
 	int sem_destroy(sem_t *sem);		// 익명 세마포어 제거
 	int sem_close(sem_t *sem);		// 명명된 세마포어 닫기
 	int sem_unlock(const char *name);	// 명명된 세마포어 제거
+```
 
 **Return Value**  
 - `0`	: 성공
@@ -1091,11 +1095,12 @@ mq_maxmsg와 mq_msgsize는 커널의 영향을 받으므로 크게 설정하면 
 	int mq_unlink(const char *name);
 	
 ### POSIX 메시지 큐 송수신
+``` cpp
 	int mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, unsigned int msg_prio);
 	ssize_t mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len, unsigned int *msg_prio);
 	int mq_timedsend(mqd_t mqdes, const char *msg_ptr, size_t msg_len, unsigned int msg_prio, const struct timespec *abs_timeout);
 	ssize_t mq_timedreceive(mqd_t mqdes, char *restrict msg_ptr, size_t msg_len, unsigned int *restrict msg_prio, const struct timespec *restrict abs_timeout);
-
+```
 **Parameters**
 - `mqd_t mqdes`			: 메시지 큐 기술자
 - `char *msg_ptr`		: 메시지
