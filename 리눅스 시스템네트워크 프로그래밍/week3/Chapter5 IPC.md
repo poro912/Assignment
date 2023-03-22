@@ -33,15 +33,28 @@
 	- [shmat](#shmat)
 	- [shmdt](#shmdt)
 	- [shmctl](#shmctl)
+	- [struct shmid\_ds](#struct-shmid_ds)
 - [XSI 세마포어](#xsi-세마포어)
-	- [주요 속성](#주요-속성)
-	- [struct seminfo](#struct-seminfo)
-	- [struct sembuf](#struct-sembuf)
+	- [주요 값](#주요-값)
 	- [semget](#semget)
-	- [semctl](#semctl)
 	- [semop](#semop)
 	- [semtimedop](#semtimedop)
+	- [struct sembuf](#struct-sembuf)
+	- [semctl](#semctl)
+	- [union semun](#union-semun)
+	- [struct semid\_ds](#struct-semid_ds)
+	- [struct ipc\_perm](#struct-ipc_perm)
+	- [struct seminfo](#struct-seminfo)
+	- [wait-for-zero](#wait-for-zero)
+	- [wait-for-zero의 4가지 이벤트](#wait-for-zero의-4가지-이벤트)
 - [XSI 메시지 큐](#xsi-메시지-큐)
+	- [msgget](#msgget)
+	- [struct msgbuf](#struct-msgbuf)
+	- [msgsnd](#msgsnd)
+	- [msgrcv](#msgrcv)
+	- [msgctl](#msgctl)
+	- [struct msqid\_ds](#struct-msqid_ds)
+	- [struct msginfo](#struct-msginfo)
 - [POSIX IPC](#posix-ipc)
 - [POSIX 공유메모리](#posix-공유메모리)
 	- [shm\_open](#shm_open)
@@ -49,7 +62,14 @@
 - [POSIX 세마포어](#posix-세마포어)
 	- [sem\_init](#sem_init)
 	- [sem\_t \*sem\_open](#sem_t-sem_open)
+	- [POSIX 세마포어 P,V 동작](#posix-세마포어-pv-동작)
+	- [POSIX 세마포어 제거 동작](#posix-세마포어-제거-동작)
 - [POSIX 메시지 큐](#posix-메시지-큐)
+	- [mq\_open](#mq_open)
+	- [struct mq\_attr](#struct-mq_attr)
+	- [POSIX 메시지 큐 삭제](#posix-메시지-큐-삭제)
+	- [POSIX 메시지 큐 송수신](#posix-메시지-큐-송수신)
+	- [POSIX 메시지 큐 이벤트 통지](#posix-메시지-큐-이벤트-통지)
 
 
 ## 서론
@@ -60,7 +80,7 @@ IPC(Inter Process Communication)
 
 
 ## mmap
-mmap(memory mapped I/O)
+mmap(memory mapped I/O)  
 장치나 파일을 메모리와 대응시키는 기법  
 복수의 프로세스가 같은 파일에 대해 mmap을 호출하면 가상주소는 달라도 물리적 주소는 동일하여 공유 효과를 가진다.  
 rwx (read, write, execute) 프로텍션(권한)이 존재한다.  
@@ -263,13 +283,13 @@ BSD 표준과 POSIX 표준이 존재하며, 기능과 호환성면에서 차이�
 명시적으로 Huge Page를 사용하기 위해서는 커널 설정을 동반 해야한다.  
 리눅스에서는 hugeadm 명령을 사용하여 설정을 변경할 수 있다.  
 /proc/meminfo 파일의 HugePages_Total 속성을 참조하여 설정 여부를 알 수 있다.  
-만약 설정되어있지 않다면 SIGBUG시그널이 발생하여 프로세스가 종료될 수 있다.
+만약 설정되어있지 않다면 SIGBUG시그널이 발생하여 프로세스가 종료될 수 있다.  
 
 THP(Transparent Huge Page)  
 묵시적으로 일정 크기가 넘어가는 대용량 메모리맵에 대해 자동으로 Huge page를 적용하는 기능  
 /sys/kernel/mm/transparent_hugepage/enabled 에서 설정을 볼 수 있다.  
-소스 코드 수정 없이 Huge Page를 쓸 수 있게 해준다.
-THP 설정만으로 성능이 개선될 수 있다.
+소스 코드 수정 없이 Huge Page를 쓸 수 있게 해준다.  
+THP 설정만으로 성능이 개선될 수 있다.  
 
 | 속성	|설명|
 | :--:	|:--|
@@ -292,6 +312,10 @@ THP 설정만으로 성능이 개선될 수 있다.
 ## 세마포어
 초기 상호배제의 개념에서 만들어졌지만 현재는 동기화 및 락메커니즘 구현 도구를 가르키는 의미로 사용된다.  
 공유 자원에 대한 교착상태를 해결하기 위한 기법이다.  
+
+블록킹 모드로 작동하기 때문에 대기시간이 길어질 가능성이 있다.  
+이를 해결하기위해 넌블록킹 모드에서 재시도 방식으로 코딩할 경우 CPU의 사용률이 치솟는 현상이 생긴다.  
+타이머 작업 큐, semtimedop 사용으로 해결할 수 있다.  
 
 P연산과 V 연산으로 이루어져있다.  
 P연산	: 세마포어의 값을 감소시키는 연산 (wait, pend)  
@@ -323,7 +347,7 @@ V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)
 ### 세마포어 vs 뮤텍스
 세마포어는 동기화의 목적이고, 동기화를 위한 큐를 만드는 기능을 제공한다.  
 뮤텍스는 독점적 사용권한 획득에 목적이 있으며, 소유권이 존재한다.  
-일반적으로 뮤텍스가 세마포어보다 빠르다.
+일반적으로 뮤텍스가 세마포어보다 빠르다.  
 
 동작 취소	: 잠금해제를 하지 않은 프로세스가 종료됐을 때, 데드락에 상태를 복구하는 기능  
 뮤텍스의 데드락	: 중복으로 잠금을 한 경우, 뮤텍스를 획득한 스레드가 잠금 해제없이 종료한 경우 발생  
@@ -332,13 +356,12 @@ V연산	: 세마포어의 값을 증가시키는 연산 (signal, post)
 
 ## 메시지큐
 1 ~ 2KiB 이하의 짧은 메시지를 주고 받는데 매우 효율적인 통신 메커니즘  
+모든 함수에서 스레드 안전을 만족한다.  
 작은 메시지를 빈번하게 전송하는데 유리하다.  
 수신측이 접속하지 않아도 데이터를 넣을 수 있다.  
 큐가 가득차는 경우를 산정하여 프로그래밍 해야 한다.  
 메시지 큐의 크기가 작아 송신속도가 빠르면 큐가 가득 차는 문제가 빈번히 발생한다.  
 메시지 큐를 복수개로 만들어 사용하거나 수신측을 빠르게 처리할 수 있는 형태로 만들어야 한다.  
-모든 함수에서 스레드 안전을 만족한다.  
-
 
 
 ## XSI IPC
@@ -419,10 +442,11 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 |GETPID		| 세마포어 세트 중 semnum 위치의 sempid 값을 리턴한다. |
 
 
-
 ## XSI 공유메모리
 	#include <sys/ipc.h>
 	#include <sys/shm.h>
+
+
 ### shmget
 	int shmget(
 		key_t				key,
@@ -430,17 +454,18 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 		int				shmflg
 	)
 **Parameters**
-- `key_t key`	: 키값
+- `key_t key`	: 공유메모리 식별 키
 - `int size`	: 공유메모리의 크기
 - `int shmflg`	: [옵션](#ipc-get-flag)
 
 **Return Value**
-- `other`	: id값
+- `other`	: 공유메모리 식별 id
 - `-1`		: 에러, errno설정
 
 **Description**  
 공유 메모리의 IPC ID를 얻는다.(없는경우 생성)  
 공유 메모리의 크기가 너무 작은 경우 커널 설정에 따라 에러가 발생할 수 있다.  
+
 
 ### shmat
 	void* shmat(
@@ -449,7 +474,7 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 		int				shmflg
 	)
 **Parameters**
-- `int shmid`		: id 값
+- `int shmid`		: 공유메모리 식별 id
 - `const void *shmaddr`
   - 매핑할 메모리 주소
   - null : 매핑되지 않은공간에 자동으로 붙인다.
@@ -487,7 +512,7 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 		struct shmid_ds			*buf
 	)
 **Parameters**
-- `int shmid`	: 공유메모리 id
+- `int shmid`	: 공유메모리 식별 id
 - `int cmd`	: [명령](#ipc-ctl-flag)
 - `struct shmid_ds *buf`	: 공유메모리 정보를 저장하기위한 구조체
 
@@ -499,43 +524,34 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 공유 메모리를 조작(제거, 메타 데이터 획득)한다.  
 
 
+### struct shmid_ds
+	struct shmid_ds {
+		struct ipc_perm			shm_perm;		// 접근권한 
+		int  				shm_segsz;		// 세그먼트의 크기(bytes)
+		time_t				shm_atime;		// 마지막 접근 시간
+		time_t				shm_dtime;		// 마지막 제거 시간
+		time_t				shm_ctime;		// 마지막 변경 시간
+		unsigned short			shm_cpid;		//생성자의 프로세스의 프로세스 id
+		unsigned short			shm_lpid;		// 마지막으로 작동한 프로세스의 프로세스 pid
+		short				shm_nattch;		// 현재 접근한 프로세스의 수
+		
+		unsigned short			shm_npages;		// 세그먼트의 크기(pages)
+		unsigned long			*shm_pages;
+		struct shm_desc			*attaches;		// 접근을 위한 기술자들 */
+	}
+
+
 
 ## XSI 세마포어
 	#include <sys/ipc.h>
 	#include <sys/sem.h>
 
-### 주요 속성
+
+### 주요 값 
 semval	: 현재 세마포어 값  
 sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID  
 semcnt	: 세마포어 카운트가 양수가 되기를 대기하는 프로세스의 개수  
 semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스의 개수  
-
-### struct seminfo
-	struct seminfo{
-		int				semmap;		// 엔트리 맵 개수
-		int				semmni;		// 최대 세트 개수
-		int				semmns;		// 세마포어 최대 개수
-		int				semmnu;		// undo 구조체 최대 개수
-		int				semmsl;		// 한 세마포어세트 내의 최대 세마포어 개수
-		int				semopm;		// semop 콜의 최대 값
-		int				semume;		// 프로세스당 최대 undo 엔트리 개수
-		int				semusz;		// undo 구조체가 사용하는 메모리 크기
-		int				semvmx;		// 세마포어 값의 최대 값
-		int				semaem;		// 프로세스 종료시 복구될 수 있는 undo의 최대 
-	}
-
-
-### struct sembuf
-	struct sembuf{
-		unsigned short			sem_num;	// 개별 세마포어의 인덱스 번호
-		short				sem_op;		// 세마포어에 더할 값
-		short				sem_flg;	// 작동옵션 플래그
-
-	}
-| 옵션	|설명|
-| :--:		| :-- |
-| SEM_UNDO	| 세마포어를 조작한 프로세스가 종료되었을 때 조작된 작업은 취소된다.</br>대기하던 다음 세마포어가 실행된다. |
-| SEM_NOWAIT	| 사용 가능자원이 없는 경우 바로 에러를 리턴한다.(넌블로킹 실행) |
 
 
 ### semget
@@ -550,41 +566,21 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 - `int semflg`	: [옵션](#ipc-get-flag)
 
 **Return Value**
-- `other`	: 세마포어 식별
+- `other`	: 세마포어 식별 id
 - `-1`	: 에러, errno 설정
 
 **Description**  
 세마포어 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
 
 
-### semctl
-	int semctl (
-		int 				semid,
-		int 				semnum,
-		int 				cmd,
-		...
-	)
-**Parameters**
-- `int semid` : 세마포어 식별 키
-- `int semnum` : 인덱스
-- `int cmd` : [명령](#ipc-ctl-flag)
-
-**Return Value**
-- `0`	: 성공
-- `-1`	: 에러, errno 설정
-
-**Description**  
-세마포어를 조작(제거, 메타 데이터 획득, 초기화)한다.  
-
-
 ### semop
 	int semop(
 		int				semid,
-		struct				sembuf *sops,
+		struct sembuf			*sops,
 		size_t				nsops
 	)
 **Parameters**
-- `int semid`		: 새마포어 식별 키
+- `int semid`		: 새마포어 식별 id
 - `struct sembuf *sops`	: 세마포어 작동 버퍼 구조체의 주소
 - `size_t nsops`	: 버퍼 구조체의 개수
 
@@ -593,7 +589,7 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 - `-1`	: 에러, errno 설정
 
 **Description**  
-세마포어 값을 변경한다.
+세마포어 값을 변경한다.  
 
 
 ### semtimedop
@@ -604,7 +600,7 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 		const struct timespcec 		*timeout
 	)
 **Parameters**
-- `int semid`		: 세마포어 식별 키
+- `int semid`		: 세마포어 식별 id
 - `struct sembuf *sops`	: 세마포어 작동 버퍼 구조체의 주소
 - `size_t nsops`	: 버퍼 구조체의 개수
 - `struct timespcec *timeout`	: timeout 시간을 저장한 구조체
@@ -616,6 +612,111 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 **Description**  
 semop함수에 타임아웃 기능이 추가된 함수이다.
 
+
+### struct sembuf
+	struct sembuf{
+		unsigned short 			sem_num;		// 세마포어 세트의 개별 인덱스 번호, 0부터 시작 
+		short				sem_op;			// 세마포어에 더할 값 (음수, 양수, 0)
+		short				sem_flg;		// 작동옵션 플래그
+	}
+| 옵션		|설명|
+| :--:		| :-- |
+| SEM_UNDO	| 세마포어를 조작한 프로세스가 종료되었을 때 조작된 작업은 취소된다.</br>대기하던 다음 세마포어가 실행된다. |
+| SEM_NOWAIT	| 사용 가능자원이 없는 경우 바로 에러를 리턴한다.(넌블로킹 실행) |
+
+
+### semctl
+	int semctl (
+		int 				semid,
+		int 				semnum,
+		int 				cmd,
+		...
+		union semnum			
+	)
+**Parameters**
+- `int semid`	: 세마포어 식별 id
+- `int semnum`	: 인덱스
+- `int cmd`	: [명령](#ipc-ctl-flag)
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+세마포어를 조작(제거, 메타 데이터 획득, 초기화)한다.  
+cmd 값에 따라 가변인수의 사용 여부가 결정된다.  
+네번째 인자는 세마포어 조작 공용체 semun 타입이다.  
+semun 공용체는 사용자가 선언하여 사용하도록 되어있다.  
+다만 호환성을 위해 선언 권고사항이 있으며 다음과 같다.  
+
+### union semun
+```cpp
+	#include<sys/sem.h>
+	#if defined(__GNU__LIBRARY__) && !(_SEM_SEMUM_UNDEFIND)
+	/* union semun is defined by including <sys/sem.h> */
+	#else
+	/* according to X/OPEN we have to define it ourselves */
+	union semun {
+		int val;			/* Value for SETVAL */
+		struct semid_ds *buf;		/* Buffer for IPC_STAT, IPC_SET */
+		unsigned short  *array;		/* Array for GETALL, SETALL */
+		struct seminfo  *__buf;		/* Buffer for IPC_INFO(Linux-specific) */
+	};
+	#endif
+```
+
+### struct semid_ds
+	struct semid_ds{
+		struct ipc_perm			sem_perm;	// 권한 구조체
+		time_t				sem_otime;	// 마지막 semop() 시간
+		time_t				sem_ctime;	// 마지막 semctl() 변경시간 
+		unsigned long int		sem_nsems;	// 세마포어 개수
+	}
+
+### struct ipc_perm
+	struct ipc_perm{
+		key_t				__key;		// key (리눅스 전용)
+		uid_t				uid;		// 소유자 uid
+		gid_t				gid;		// 소유자 gid
+		uid_t				cuid;		// 생성자 uid
+		gid_t				cgid;		// 생성자 gid
+		unsigned short int		mode;		// 읽기/쓰기 권한
+		unsigned short int		__seq;		// 시퀀스 번호 (리눅스 전용)
+	}
+
+### struct seminfo
+	struct seminfo{
+		int				semmap;		// 엔트리 맵 개수
+		int				semmni;		// 최대 세트 개수
+		int				semmns;		// 세마포어 최대 개수
+		int				semmnu;		// undo 구조체 최대 개수
+		int				semmsl;		// 한 세마포어세트 내의 최대 세마포어 개수
+		int				semopm;		// semop 콜의 최대 값
+		int				semume;		// 프로세스당 최대 undo 엔트리 개수
+		int				semusz;		// undo 구조체가 사용하는 메모리 크기
+		int				semvmx;		// 세마포어 값의 최대 값
+		int				semaem;		// 프로세스 종료시 복구될 수 있는 undo의 최대 값
+	}
+
+
+### wait-for-zero
+세마포어 호출 시 0을 더하도록 하면 wait-for-zero 라는 특수한 작동을 실행한다.  
+기존 방식과 반대로 세마포어 값이 0이되면 깨어나게 된다.  
+사용 가능한 자원이 없을 때 해야 하는 작업을 처리하는 경우 사용된다.  
+로드 밸런싱 모니터링, 대기큐의 혼잡 방지 배리어 등의 용도에 사용된다.  
+
+
+### wait-for-zero의 4가지 이벤트
+1. 세마포어 값이 0이 되는경우
+2. 대기하던 프로세스가 시그널을 받는 경우
+   - 시스템 콜 실패
+   - errno EINTR 설정
+3. 세마포어 세트가 시스템에서 제거된 경우
+   - 시스템 콜 실패
+   - errno EIDRM 설정
+4. 타임아웃 만료에 의해 깨어난 경우
+   - 시스템 콜 실패
+   - errno EAGAIN 설정
 
 
 ## XSI 메시지 큐
@@ -632,11 +733,152 @@ semop함수에 타임아웃 기능이 추가된 함수이다.
 | msgctl	| 메시지 큐를 조작한다. |
 
 
+### msgget
+	int semget(
+		key_t				key,
+		int				msgflg
+	)
+**Parameters**
+- `key_t key`	: 메시지 큐 식별 키
+- `int msgflg`	: [옵션](#ipc-get-flag)
+
+**Return Value**
+- `other`	: 메시지 큐 식별 id
+- `-1`	: 에러, errno 설정
+
+**Description**  
+메시지 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
+
+
+### struct msgbuf
+	struct msgbuf{
+		long				mtype;		// 0 보다 큰 숫자
+		char				mtext[size]	// 메시지가 들어갈 적당한 크기의 배열
+	}
+**Description**  
+전송할 메시지를 담는 구조체
+
+### msgsnd
+	int msgsnd(
+		int				msqid,
+		const void			*msgp,
+		size_t				msgsz,
+		int				msgflg
+	)
+**Parameters**
+- `int msqid`		: 메시지 큐 식별 id
+- `const void *msgp`	: 송신할 데이터 (structg msgbuf를 캐스팅해서 전달)
+- `size_t msgsz`	: 송신할 데이터 크기
+- `int msgflg`
+  - 메시지 플래그
+  - IPC_NOWAIT	: 넌블럭킹 모드로 작동한다.
+
+**Return Value**
+- `0`	: 전송 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+메시지큐에 메시지를 송신한다.  
+메시지크기가 너무 크거나 큐가 가득차면 실패한다.  
+msgp 매개변수는 char형으로 사용하는게 아닌 struct msgbuf를 캐스팅해서 전달해야 한다.  
+
+### msgrcv
+	int msgrcv(
+		int				msqid,
+		void				*msgp,
+		size_t				msgsz,
+		long				msgtyp,
+		int				msgflg
+	)
+**Parameters**
+- `int msqid`		: 메시지 큐 식별 id
+- `const void *msgp`	: 수신할 데이터
+- `size_t msgsz`	: 수신할 데이터 크기
+- `long msgtyp`
+  - 수신받을 메시지 타입  
+
+  | 값		| 의미 |
+  | :--: 	| :-- |
+  |양수		| 양수와 일치하는 메시지 타입만 수신한다. |
+  |0		| 메시지 타입을 무시하고 큐에 있는 메시지를 입력된 순서대로 수신한다. |
+  |음수		| 음수의 절대값과 같거나 작은 숫자를 순서대로 받는다. |
+
+- `int msgflg`
+  - 메시지 플래그  
+
+  | 속성 	| 설명 |
+  | :--: 	| :-- |
+  | IPC_NOWAIT	| 넌블럭킹 모드로 작동한다. |
+  | MSG_NOERROR | 수신 메시지가 MSGSZ 보다 클 때 에러 대신 초과부분을 잘라버린다. |
+  | MSG_EXCEPT	| 메시지 타입 인수를 초과하는 메시지만 수신한다. |
+
+
+**Return Value**
+- `other`	: 수신한 메시지 크기
+- `-1`	: 에러, errno 설정
+  
+**Description**  
+메시지큐에 있는 메시지를 수신한다.  
+아무 메시지도 없으면 곧바로 리턴된다.  
+
+### msgctl
+	int semctl (
+		int 				msgid,
+		int 				cmd,
+		struct msqid_ds			*buf
+	)
+**Parameters**
+- `int semid`	: 메시지 식별 id
+- `int cmd`	: [명령](#ipc-ctl-flag)
+- `struct msqid_ds *buf`
+  - 결과를 받아올 버퍼
+  - IPC_INFO 명령 시 msginfo를 msqid_ds로 캐스팅해야한다.
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+메시지 객체를 조작(제거, 메타 데이터 획득)한다.  
+
+
+### struct msqid_ds
+	struct msqid_ds{
+		struct ipc_perm			msg_perm;
+		time_t				msg_stime;	// 마지막 msgsnd() 호출시간
+		time_t				msg_rtime;	// 마지막 msgrcv() 호출시간
+		time_t				msg_ctime;	// 마지막 큐 변경(생성) 시간
+		unsigned long			msg_cbytes;	// 현재 큐 바이트
+		msgqnum_t			msg_qnum;	// 현재 큐 메시지 수
+		msglen_t			msg_qbytes;	// 최대 큐 바이트
+		pid_t				msg_lspid;	// 마지막으로 msgsnd() 호출한 pid
+		pid_t				msg_lrpid;	// 마지막으로 msgrcv() 호출한 pid
+	}
+[struct ipc_perm](#struct-ipc_perm)
+
+
+
+### struct msginfo
+	struct msginfo{
+		int				msgpool;
+		int				msgmap;
+		int				msgmax;		// 메시지 하나의 최대 크기
+		int				msgmnb;		// 메시지 큐 한개의 용량
+		int				msgmni;		// 생성 가능한 메시지 큐 최대 개수
+		int				msgssz;
+		int				msgtql;
+		unsigned short			msgseg;
+	}
+
+**Description**  
+주석이 없으면 사용되지 않거나 의미없는 설정이다.  
+
 
 ## POSIX IPC
 저수준 파일 입출력과 구성이 비슷하여 XSI보다 직관적이다.  
 확장성을 고려하여 기존의 구조와 비슷하게 구성된다.  
-[posix](../etc.md#posix)
+[posix](../etc.md#posix)  
+
 
 
 ## POSIX 공유메모리
@@ -645,7 +887,8 @@ semop함수에 타임아웃 기능이 추가된 함수이다.
 	#include <fcntl.h>
 메모리의 일부를 파티션 공간처럼 만들어 파일을 만들고 페이지를 공유하는 방식  
 mmap파일 시스템과 POSIX의 공유 방식이 비슷하여 상호 변환이 가능하다.  
-/dev/shm 이라는 가상메모리 디스크 영역을 사용한다.
+/dev/shm 이라는 가상메모리 디스크 영역을 사용한다.  
+
 
 ### shm_open
 	int shm_open(
@@ -687,13 +930,16 @@ unlink함수와 유사한 구조를 갖는다.
 
 ## POSIX 세마포어
 	#include<semaphore.h>  
+한번에 +1 또는 -1만 연산할 수 있다.  
 접근 방법에 따라 명명된 세마포어, 익명 세마포어로 나뉜다.  
-
+무한 대기 상태가 발생할 수 있으므로 넌블럭킹 모드를 사용하는게 신뢰성을 높일 수 있다.  
+ 
 명명된 세마포어는 외부에서 접근 가능한 인터페이스 경로를 가진다.  
 명명된 세마포어는 이름을 알고 있다면 다른 프로세스에서도 접근 가능한 방식이다.  
 
-익명 세마포어는 해당 세마포어를 생성 및 초기화한 프로세스에서만 유효하다.  
-익명 세마포어는 외부에서 접근 불가능하다.  
+익명 세마포어는 메모리 기반 세마포어라 불린다.  
+해당 세마포어를 생성 및 초기화한 프로세스에서만 유효하다.  
+외부에서 접근 불가능하다.  
 
 |함수|설명|
 | :--:		| :-- |
@@ -723,13 +969,16 @@ unlink함수와 유사한 구조를 갖는다.
 **Return Value**
 - `0`	: 성공
 - `-1`	: 에러, errno 설정
+
 **Description**  
+익명 세마포어를 생성한다.
 
 
 ### sem_t *sem_open
 	sem_t *sem_open(
 		const char *name,
 		int oflag
+		...
 	)
 **Parameters**
 - `const char *name`	: 
@@ -741,7 +990,37 @@ unlink함수와 유사한 구조를 갖는다.
 
 **Description**  
 세마포어를 생성하거나 이미 존재하는 세마포어를 연다.  
+open 메소드와 사용방법이 동일하다.  
 
+
+### POSIX 세마포어 P,V 동작
+	int sem_wait(sem_t *sem);		// 블로킹 실행
+	int sem_trywait(sem_t *sem);		// 넌블로킹 실행
+	int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);	// 타임아웃 실행
+	int sem_post(sem_t *sem);		// 세마포어 증가(잠금 해제)
+	struct timespec{
+		time_t		tv_sec;		// 초
+		long		tv_nsec;	// 나노초
+	}
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+시그널 인터럽트로 깨어나면 EINTR 에러가 발생하며, 이를 꼭 해결해야한다.  
+무한 대기 상태가 발생할 수 있으므로 넌블럭킹 모드를 사용하는게 신뢰성을 높일 수 있다.  
+post시 EOVERFLOW 에러가 발생하면 계속 세마포어를 증가시키는 구간이 있는지 확인해야 한다.  
+timespec는 절대시간에 대한 구조체로 타임 아웃을 주고싶은 시간만큼 더하는 작업을 해야한다.  
+
+
+### POSIX 세마포어 제거 동작
+	int sem_destroy(sem_t *sem);		// 익명 세마포어 제거
+	int sem_close(sem_t *sem);		// 명명된 세마포어 닫기
+	int sem_unlock(const char *name);	// 명명된 세마포어 제거
+
+**Return Value**  
+- `0`	: 성공
+- `-1`	: 에러. errno 설정
 
 
 ## POSIX 메시지 큐
@@ -751,6 +1030,11 @@ unlink함수와 유사한 구조를 갖는다.
 이벤트 통지 기능을 쓸 수 있다.  
 데이터 수신 시 시그널 발생, 콜백 스레드 생성 등의 작동이 가능하다.  
 비동기적 구조로 작동시킬 때 편리하다.  
+
+mqd_t	: 메시지 큐 기술자  
+공유 메모리 기술자를 사용하여 처리함  
+저수준 파일 처리와 동일한 메커니즘  
+mq_overview 메뉴얼 참고  
 
 | 함수명 | 기능 |
 | :--: | :-- |
@@ -765,19 +1049,81 @@ unlink함수와 유사한 구조를 갖는다.
 | mq_getattr	| 메시지 큐의 속성을 읽어온다. |
 | mq_notify	| 메시지 큐에 데이터가 도착했을 때 통지 기능을 이용한다. |
 
-
-
-<!--
-## sub-title
-### function_name
-	#include <>
-	[function]
+### mq_open
+	mqd_t mq_open(
+		const char			*naem,
+		int				oflag,
+		...
+		mode_t				mode,
+		struct mq_attr			attr
+	)
 **Parameters**
-- 
+- `const char *name`	: 만들거나 열 메시지 큐 객체명 ("/파일명" 의 형태)
+- `int oflag`		: [파일열기 속성](../etc.md#open)
+- `mode_t mode`		: 파일 접근권한
+- `struct mq_attr attr` : 메시지 큐 속성
 
 **Return Value**
-- 
+- `other`	: 파일디스크립터
+- `-1`		: 에러, errno 설정
 
 **Description**  
--->
+공유메모리 객체를 생성하고 열거나 기존에 생성된 객체를 연다.  
+생성 이후에 mmap 함수를 통해 공유메모리를 매핑한다.  
+close 함수를 통해 매핑된 공유메모리를 닫는다.  
 
+
+### struct mq_attr
+	struct mq_attr{
+		long int			mq_flags;	// 메시지 큐 플래그 (O_NONBLOCK)	
+		long int			mq_maxmsg;	// 메시지 큐의 최대 메시지 개수 제한
+		long int			mq_msgsize;	// 메시지 1개의 최대 용량
+		long int			mq_curmsgs;	// 현재 큐에 저장된 메시지 개수
+	}
+**Description**  
+mq_flags값은 변경 불가능 하다.  
+mq_flags 값은 oflag와 mq_setattr 함수에서 변경할 수 있다.  
+mq_maxmsg와 mq_msgsize는 커널의 영향을 받으므로 크게 설정하면 에러가 발생한다.  
+
+
+### POSIX 메시지 큐 삭제
+	int mq_close(mqd_t);
+	int mq_unlink(const char *name);
+	
+### POSIX 메시지 큐 송수신
+	int mq_send(mqd_t mqdes, const char *msg_ptr, size_t msg_len, unsigned int msg_prio);
+	ssize_t mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len, unsigned int *msg_prio);
+	int mq_timedsend(mqd_t mqdes, const char *msg_ptr, size_t msg_len, unsigned int msg_prio, const struct timespec *abs_timeout);
+	ssize_t mq_timedreceive(mqd_t mqdes, char *restrict msg_ptr, size_t msg_len, unsigned int *restrict msg_prio, const struct timespec *restrict abs_timeout);
+
+**Parameters**
+- `mqd_t mqdes`			: 메시지 큐 기술자
+- `char *msg_ptr`		: 메시지
+- `size_t msg_len`		: 메시지 길이
+- `unsigned int msg_prio`	: 우선순위
+- `const struct timespec *restrict abs_timeout`	: 타임아웃 객체
+
+**Return Value**
+- `other`	: 수신 길이
+- `0`		: 송신 성공
+- `-1`		: 에러, errno 설정
+
+
+### POSIX 메시지 큐 이벤트 통지
+	int mq_notify(
+		mqd_t 				mqdes,
+		cosnt struct sigevent		*norification
+	)
+**Parameters**
+- `mqd_t mqdes`		: 메시지 큐 기술자
+- `cosnt struct sigevent *norification`	: 
+
+**Return Value**
+- `0`	: 성공
+- `-1`	: 에러, errno 설정
+
+**Description**  
+메시지 최초 도착 시 sigevent구조체에 지정한 이벤트를 자동으로 실행한다.  
+일회성 이벤트 핸들러 이므로 한번 호출 후 삭제된다.  
+이벤트 통지를 위해서는 재호출이 필요하다.  
+10장 - 리얼타임 시그널 확장 - sigevent  
