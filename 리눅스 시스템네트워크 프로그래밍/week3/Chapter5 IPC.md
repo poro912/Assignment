@@ -1099,9 +1099,9 @@ mq_maxmsg와 mq_msgsize는 커널의 영향을 받으므로 크게 설정하면 
 int	mq_send		(mqd_t mqdes, const char *msg_ptr,	size_t msg_len, unsigned int msg_prio);
 ssize_t	mq_receive	(mqd_t mqdes, char *msg_ptr,		size_t msg_len, unsigned int *msg_prio);
 int	mq_timedsend	(mqd_t mqdes, const char *msg_ptr,	size_t msg_len, unsigned int msg_prio,
-	const struct timespec *abs_timeout);
+			const struct timespec *abs_timeout);
 ssize_t	mq_timedreceive	(mqd_t mqdes, char *restrict msg_ptr, 	size_t msg_len, unsigned int *restrict msg_prio,
-	const struct timespec *restrict abs_timeout);
+			const struct timespec *restrict abs_timeout);
 ```
 **Parameters**
 - `mqd_t mqdes`			: 메시지 큐 기술자
