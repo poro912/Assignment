@@ -4,7 +4,7 @@
 </br> 출판사 : 에이콘
 
 ## Chapter3
-기간 : 2023/03/20 ~ 2023//
+기간 : 2023/04/03 ~ 2023//
 </br> 제목 : 
 </br> 주제 : 
 </br> [link](chapter%203/SystemMechanism.md)
