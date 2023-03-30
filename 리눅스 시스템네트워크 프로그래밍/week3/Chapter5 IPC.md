@@ -35,7 +35,7 @@
 	- [shmctl](#shmctl)
 	- [struct shmid\_ds](#struct-shmid_ds)
 - [XSI 세마포어](#xsi-세마포어)
-	- [주요 값](#주요-값)
+	- [중요 값](#중요-값)
 	- [semget](#semget)
 	- [semop](#semop)
 	- [semtimedop](#semtimedop)
@@ -48,6 +48,7 @@
 	- [wait-for-zero](#wait-for-zero)
 	- [wait-for-zero의 4가지 이벤트](#wait-for-zero의-4가지-이벤트)
 - [XSI 메시지 큐](#xsi-메시지-큐)
+	- [메시지 큐 크기 확인](#메시지-큐-크기-확인)
 	- [msgget](#msgget)
 	- [struct msgbuf](#struct-msgbuf)
 	- [msgsnd](#msgsnd)
@@ -65,6 +66,7 @@
 	- [POSIX 세마포어 P,V 동작](#posix-세마포어-pv-동작)
 	- [POSIX 세마포어 제거 동작](#posix-세마포어-제거-동작)
 - [POSIX 메시지 큐](#posix-메시지-큐)
+	- [메시지 큐 크기 확인](#메시지-큐-크기-확인-1)
 	- [mq\_open](#mq_open)
 	- [struct mq\_attr](#struct-mq_attr)
 	- [POSIX 메시지 큐 삭제](#posix-메시지-큐-삭제)
@@ -547,7 +549,8 @@ shmctl, semctl, msgctl 메소드에서 사용된다.
 	#include <sys/sem.h>
 
 
-### 주요 값 
+### 중요 값 
+직접 접근은 불가능 하며, 관련 시스템 함수로만 참조 가능한 값
 semval	: 현재 세마포어 값  
 sempid	: 마지막으로 세마포어에 접근했던 프로세스의 PID  
 semcnt	: 세마포어 카운트가 양수가 되기를 대기하는 프로세스의 개수  
@@ -597,20 +600,20 @@ semnzcnt	: 세마포어 카운트가 0이 되기까지 대기하는 프로세스
 		int				semid, 
 		struct sembuf 			*sops, 
 		size_t 				nsops,
-		const struct timespcec 		*timeout
+		const struct timespec 		*timeout
 	)
 **Parameters**
 - `int semid`		: 세마포어 식별 id
 - `struct sembuf *sops`	: 세마포어 작동 버퍼 구조체의 주소
 - `size_t nsops`	: 버퍼 구조체의 개수
-- `struct timespcec *timeout`	: timeout 시간을 저장한 구조체
+- `struct timespec *timeout`	: timeout 시간을 저장한 구조체
 
 **Return Value**
 - `0`	: 성공
 - `-1`	: 에러, errno 설정
 
 **Description**  
-semop함수에 타임아웃 기능이 추가된 함수이다.
+semop함수에 타임아웃 기능이 추가된 함수이다.  
 
 
 ### struct sembuf
@@ -732,6 +735,10 @@ semun 공용체는 사용자가 선언하여 사용하도록 되어있다.
 | msgrcv	| 메시지 큐의 데이터를 수신한다. |
 | msgctl	| 메시지 큐를 조작한다. |
 
+
+### 메시지 큐 크기 확인
+msgctl 메소드를 사용하거나 리눅스 명령을 통해 확인할 수 있다  
+`sysctl -a | grep kernel.msg`  
 
 ### msgget
 	int semget(
@@ -1012,7 +1019,8 @@ struct timespec{
 시그널 인터럽트로 깨어나면 EINTR 에러가 발생하며, 이를 꼭 해결해야한다.  
 무한 대기 상태가 발생할 수 있으므로 넌블럭킹 모드를 사용하는게 신뢰성을 높일 수 있다.  
 post시 EOVERFLOW 에러가 발생하면 계속 세마포어를 증가시키는 구간이 있는지 확인해야 한다.  
-timespec는 절대시간에 대한 구조체로 타임 아웃을 주고싶은 시간만큼 더하는 작업을 해야한다.  
+timespec는 절대시간에 대한 구조체로 유닉스 시간에 타임 아웃을 주고싶은 시간만큼 더하는 작업을 해야한다.  
+ex) time(NULL) + 10;  
 
 
 ### POSIX 세마포어 제거 동작
@@ -1034,11 +1042,17 @@ int sem_unlock(const char *name);	// 명명된 세마포어 제거
 이벤트 통지 기능을 쓸 수 있다.  
 데이터 수신 시 시그널 발생, 콜백 스레드 생성 등의 작동이 가능하다.  
 비동기적 구조로 작동시킬 때 편리하다.  
+가 도착했을 때 통지 기능을 이용한다. |
 
 mqd_t	: 메시지 큐 기술자  
 공유 메모리 기술자를 사용하여 처리함  
 저수준 파일 처리와 동일한 메커니즘  
 mq_overview 메뉴얼 참고  
+
+### 메시지 큐 크기 확인
+mq_open 시 큐의 크기를 지정할 수 있으며 이 크기는 커널 설정보다 클 수 없다.  
+커널 설정을 확인하는 리눅스 명령이다.  
+`sysctl -a | grep mqueue`  
 
 | 함수명 | 기능 |
 | :--: | :-- |
@@ -1051,8 +1065,7 @@ mq_overview 메뉴얼 참고
 | mq_timedreceive	| mq_receive에 타임아웃 기능이 추가된 함수이다. |
 | mq_setattr	| 메시지 큐의 속성을 설정한다. |
 | mq_getattr	| 메시지 큐의 속성을 읽어온다. |
-| mq_notify	| 메시지 큐에 데이터가 도착했을 때 통지 기능을 이용한다. |
-
+| mq_notify	| 메시지 큐에 데이터
 ### mq_open
 	mqd_t mq_open(
 		const char			*naem,
@@ -1108,7 +1121,10 @@ ssize_t	mq_timedreceive	(mqd_t mqdes, char *restrict msg_ptr, 	size_t msg_len, u
 - `char *msg_ptr`		: 메시지
 - `size_t msg_len`		: 메시지 길이
 - `unsigned int msg_prio`	: 우선순위
-- `const struct timespec *restrict abs_timeout`	: 타임아웃 객체
+- `const struct timespec *restrict abs_timeout`  
+	: 타임아웃 객체 절대시간  
+	timespec는 절대시간에 대한 구조체로 유닉스 시간에 타임 아웃을 주고싶은 시간만큼 더하는 작업을 해야한다.  
+ex) time(NULL) + 10; 
 
 **Return Value**
 - `other`	: 수신 길이

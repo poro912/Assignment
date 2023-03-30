@@ -1,0 +1,9 @@
+I/O 인터페이스
+
+파일
+파이프
+소켓
+캐릭터 장치
+mmap, 공유메모리, 세마포어, 메시지 큐
+eventfd, signalfd, timerfd
+
