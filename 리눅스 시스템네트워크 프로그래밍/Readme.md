@@ -13,41 +13,41 @@
 기간 : 2023/02/20 ~ 2023/02/25  
 제목 : 프로세스  
 주제 : fork-exec 구조를 대체하는 Posix 프로세스  
-[link](week1/Chapter1%20Process.md)  
+[link](Chapter1/Chapter1%20Process.md)  
 
 
 ## Chapter2
 기간 : 2023/02/27 ~ 2023/03/03  
 제목 : 파일 처리  
 주제 : 파일 입출력과 고려해야하는 요소  
-[link](week2/Chapter2%20File.md)  
+[link](Chapter2/Chapter2%20File.md)  
 
 
 ## Chapter3
 기간 : 2023/02/27 ~ 2023/03/03  
 제목 : 텍스트 처리  
 주제 : 텍스트 처리 및 정규 표현식  
-[link](week2/Chapter3%20TextProcessing.md)  
+[link](Chapter3/Chapter3%20TextProcessing.md)  
 
 
 ## Chapter4
 기간 : 2023/03/06 ~ 2023/03/10  
 제목 : 메모리  
 주제 : 메모리와 적재위치에 따른 기능과 페이징 락  
-[link](week3/Chapter4%20Memory.md)  
+[link](Chapter4/Chapter4%20Memory.md)  
 
 
 ## Chapter5
 기간 : 2023/03/06 ~ 2023/03/24  
 제목 : IPC  
 주제 : 프로세스간 통신 메커니즘 mmap, 공유메모리, 세마포어, 메시지 큐  
-[link](week3/Chapter5%20IPC.md)  
+[link](Chapter5/Chapter5%20IPC.md)  
 
 ## Chapter6
 기간 : 2023/03/27 ~ 2023//  
 제목 : I/O 인터페이스  
 주제 :   
-[link](chapter6/)  
+[link](Chapter6/Chapter6%20IO%20Interface.md)  
 
 
 ## Chapter
