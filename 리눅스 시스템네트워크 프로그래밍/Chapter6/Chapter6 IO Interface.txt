@@ -7,3 +7,37 @@ I/O 인터페이스
 mmap, 공유메모리, 세마포어, 메시지 큐
 eventfd, signalfd, timerfd
 
+
+파이프
+익명 파이프
+	pipe
+	popen
+	pclose
+명명된 파이프
+	mkfifo
+	mkfifoat
+
+소켓
+	유닉스 도메인 소켓
+	네트워크 도메인 소켓
+
+소캣 생성
+
+소켓 연결
+
+Byte Order
+
+소켓 통신 기초
+	소켓 연결 제어 함수
+		bind
+		listen
+		connect
+		close
+		shutdown
+	데이터 입출력 함수	
+		recv, read
+		write, send
+		readv
+		writev
+
+socket -> bind -> listen 순서로 함수 호출
