@@ -41,3 +41,6 @@ Byte Order
 		writev
 
 socket -> bind -> listen 순서로 함수 호출
+
+
+소켓 통신 주의사항
