@@ -64,6 +64,10 @@
 		- [file-backed 메모리](#file-backed-메모리)
 	- [API](#api-3)
 		- [ftruncate](#ftruncate)
+- [6장](#6장)
+	- [API](#api-4)
+		- [readv](#readv)
+		- [writev](#writev)
 
 # 1장  
 ## 이론  
@@ -775,6 +779,18 @@ fd2가 이미 열려있다면 fd2를 닫은 후 복제하여 반환한다.
 쓰기모드로 열린 fd의 파일 크기를 length 크기로 변경한다.  
 length가 파일 크기보다 작으면 length 만큼의 크기로 파일 뒤쪽을 자른다.  
 length가 파일 크기보다 크면 파일 크기를 변경하고 0x00으로 채운다.  
+
+
+# 6장
+## API
+### readv
+소켓으로부터 벡터를 구성하여 데이터를 수신한다.  
+
+### writev
+소켓으로부터 벡터를 구성하여 데이터를 송신한다.  
+
+
+
 
 <!-- 
 ## sub-title
