@@ -46,7 +46,7 @@
 ## Chapter6
 기간 : 2023/03/27 ~ 2023//  
 제목 : I/O 인터페이스  
-주제 :   
+주제 : 외부와 데이터를 교환하기 위한 통신 메커니즘 pipe, socket   
 [link](Chapter6/Chapter6%20IO%20Interface.md)  
 
 
