@@ -406,6 +406,8 @@ n : network	(Big Endian)
 데이터 전송 시 데이터의 경계를 보존하지 않는다.  
 따로 어플리케이션 헤더를 만들거나 경계를 구분할 수 있는 구분자를 사용해야 한다.  
 소켓에는 읽기채널과 쓰기채널이 존재하며 수신버퍼와 송신버퍼가 따로있다.  
+흐름 제어를 하기때문에 통신이 실시간으로 일어나지 않을 수 있다.  
+수신을 정교하고 빠르게 처리하는 것이 중요하다.  
 
 server side	: socket -> bind -> listen  
 client side	: socket (+ bind) -> connect  
@@ -700,9 +702,12 @@ close를 호출하는 경우 즉시 리턴되지만 연결이 바로해제되는
 연결 과정이 없고 가볍다.  
 데이터 경계면을 보존하여 송 수신횟수가 동일하다.  
 데이터가 유실될 가능성이 존재하며, 수신 순서가 뒤집힐 수 있다.  
+실패, 오버플로우 발생의 경우에도 재전송하지 않는다.
+재전송이 필요하다면 프로그래머가 따로 구현해야한다.
 한 번의 전송으로 여러 호스트에게 데이터를 보낼 수 있다.(브로드캐스트, 멀티캐스트)  
 connect 함수를 사용하는 경우 sendto를 사용하지 않고 send, write를 사용해도 된다.
 connect 함수를 사용하는 경우 sockaddr 구조체에 관련된 부분을 자동으로 채워주는 효과를 나타낸다.
+
 
 ### [socket](#socket)
 ```cpp
@@ -843,14 +848,13 @@ MTU : (Maximum Transmission Unit)패킷에 담을 수 있는 데이터의 최대
 - 모든 프로토콜은 MTU 크기를 따른다.  
   
 path MTU : 두 호스트 사이에 존재하는 네트워크 장비 중 가장 작은 MTU  
-단편화 : (fregmentation) MTU 값에 맞춰 데이터를 쪼개는 행위
-- UDP에서만 발생한다.
+단편화 : (fregmentation) MTU 값에 맞춰 데이터를 쪼개는 행위 (UDP에서만 발생한다.)
 
 
 ### IP, TCP, UDP 헤더
 헤더의 정보는 각 프로토콜의 제약에 영향을 미친다.  
 각 헤더의 크기를 알아야 실제 데이터와 패킷의 크기가 달라지는 크기와 비율을 알 수 있다.  
-헤더의 크기는 word의 배수로 지정된다.
+헤더의 크기는 word의 배수로 지정된다.  
 
 ### IP 헤더(IPv4)
 기본적으로 20byte이다.
@@ -864,7 +868,7 @@ Total Length
 - IP길이가 MTU보다 크다면 단편화가 발생한다.
 - 단편화가 발생하면 식별자(Identification) 정보가 필요하게 된다.
 
-Identification : 식별자 정보, 라우팅에서 중복 검사에도 사용한다.
+Identification : 식별자 정보, 라우팅에서 중복 검사에도 사용한다.  
 
 Flag
 - DF와 MF가 있다. 
@@ -885,28 +889,60 @@ TTL (Time To Live)
 - 한개의 노드를 지날 때마다 1씩 감소한다.
 - 패킷이 오랫동안 살아남아 네트워크를 어지럽히는 것을 방지한다.  
 
-Protocol : 패킷이 사용하는 전송(Transport)계층의 프로토콜
+Protocol : 패킷이 사용하는 전송(Transport)계층의 프로토콜  
 | ICMP	| 1, Internet Control Message Protocol |
 | :--	| :-- |
 | IGMP	| 2, Internet Group Management Protocol |
 | TCP	| 6, Transaction Control Protocol |
 | UDP	| 17, User Datagram Protocol |
 
-Checksum : 데이터의 오류를 발견하기위한 정보 (checksum offload 기능이 NIC에 탑재되기도 함)
+Checksum : 데이터의 오류를 발견하기위한 정보 (checksum offload 기능이 NIC에 탑재되기도 함)  
 
-Source IP Address : 송신측 IP 주소
-Destination IP Address : 수신측 IP 주소
+Source IP Address : 송신측 IP 주소  
+Destination IP Address : 수신측 IP 주소  
 
 ### TCP 헤더
 기본적으로 20byte이나 플래그 값에 따라 늘어날 수 있다.  
+용도에 따라 옵션필드를 추가할 수 있다.  
+각 옵션은 고정된 위치를 갖는다.  
 ![](./img/TCP%20Header.png)  
 Source port : 송신측 포트 번호  
 Destination port : 수신측 포트 번호  
 Sequnce number : 패킷의 시퀀스 번호, 세그먼트의 연속된 데이터 번호  
 ACK number : (Acknowledgement) 상대로부터 받아야하는 다음 세그먼트 번호  
+Data Offset : 헤더의 길이, 워드 단위를 사용한다. (기본 5, 옵션 필드 5개 추가시 10으로 지정 40byte)  
+Reserved : 예약 영역, 아직 사용하지 않는다.  
+Flags
+- 제어 플래그들  
+  
+| 플래그 | 설명 |
+| :--:	| :-- |
+| URG	| 긴급 데이터</br>Urgent 뒤의 urgent pointer 필드를 사용함 |
+| ACK	| acknowledgement 앞의 ack number 필드를 사용함 |
+| PSH	| push</br>현재 세그먼트 데이터는 즉시 전달되어야 함 |
+| PST	| reset</br>현재 연결을 재설정함 |
+| SYN 	| synchronization</br>새로운 연결 설정을 요구함 |
+| FIN	| finish</br>연결의 종료를 요구함 |
+| NS	| ECN-nonce concealment protection</br>CWR, ECE 필드를 실수 또는 악의적인 은폐 보호 |
+| CWR	| congestion Window Reduced</br>혼잡제어 윈도우 크기를 축소함을 알림 |
+| ECE	| ECN-echo</br>혼잡통지 |  
+
+Window Size : TCP 슬라이딩 윈도우의 윈도우 크기아다.  
+Checksum : 데이터의 오류를 발견하기위한 정보 (checksum offload 기능이 NIC에 탑재되기도 함)  
+Urgent pointer
+- 전송데이터 중 빨리 처리하기를 바라는 데이터의 위치를 가르키는 포인터
+- URG 플래그가 설정되면 긴급 포인터가 가리키는 위치를 따로 읽을 수 있다.
+- 긴급 포인터를 이용하는 전송을 OOB(Out Of Band)데이터라고 부른다.
 
 
 ### UDP 헤더
+8Byte로 고정된다.
+![](./img/UDP%20Header.png)
+Source port : 송신측 포트 번호  
+Destination port : 수신측 포트 번호  
+Data Length : 헤더를 제외한 실제 전송 가능 데이터는 65527
+Checksum : 데이터의 오류를 발견하기위한 정보 (checksum offload 기능이 NIC에 탑재되기도 함)  
+
 
 ## TCP 소켓 기법
 ### function_name
