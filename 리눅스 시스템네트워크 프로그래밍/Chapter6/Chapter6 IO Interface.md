@@ -98,6 +98,7 @@
 - [**Return Value**](#return-value)
 
 
+
 ## 서론
 I/O Interface  
 외부와 자료를 교환하기 위한 기능을 의미한다.  
@@ -227,7 +228,7 @@ FIFO를 닫으면 수신측은 EOF가 수신된다.
 
 **Description**  
 fd가 가리키는 위치에서 상대경로로 파일을 연다.  
-배번 바뀌는 임시 디렉터리에 FIFO를 생성할 때 유용하다.  
+매번 바뀌는 임시 디렉터리에 FIFO를 생성할 때 유용하다.  
 이 때 fd는 파일이 아닌 디렉터리이다.  
 생성 이후 open 함수를 통해 접근한다.  
 수신측은 O_RDONLY, 수신측은 O_WDONLY로 파일을 열어야 한다.  
@@ -431,6 +432,8 @@ IPPROTO_ICMP	: ICMP 프로토콜
 #include<sys/un.h>
 
 	int sockfd = socket(AF_UNIX, SOCK_STREAM, IPPROTO_IP);
+
+	int sockfd = socket(AF_UNIX, SOCK_DGRAM, IPPROTO_IP);
 ```
 
 
@@ -447,38 +450,37 @@ IPPROTO_ICMP	: ICMP 프로토콜
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_UNIX, SOCK_STREAM, 0);
+	// Create a socket
+	int sock = socket(AF_UNIX, SOCK_STREAM, 0);
 
-  // Bind the socket to the path
-  struct sockaddr_un addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strcpy(addr.sun_path, "/tmp/echo.sock");
+	// Bind the socket to the path
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strcpy(addr.sun_path, "/tmp/echo.sock");
   
-  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+	bind(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Listen for connections
-  listen(sock, 5);
+	// Listen for connections
+	listen(sock, 5);
 
-  // Accept connections
-  while (true) {
-    struct sockaddr_un client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    int client_sock = accept(sock, (struct sockaddr *)&client_addr, &client_addr_len);
+	// Accept connections
+	while (true) {
+	struct sockaddr_un client_addr;
+	socklen_t client_addr_len = sizeof(client_addr);
+	int client_sock = accept(sock, (struct sockaddr *)&client_addr, &client_addr_len);
 
-    // Receive data
-    char data[1024];
-    int bytes_received = recv(client_sock, data, sizeof(data), 0);
+	// Receive data
+	char data[1024];
+	int bytes_received = recv(client_sock, data, sizeof(data), 0);
 
-    // Echo the data back to the client
-    send(client_sock, data, bytes_received, 0);
+	// Echo the data back to the client
+	send(client_sock, data, bytes_received, 0);
 
-    // Close the client connection
-    close(client_sock);
-  }
-
-  return 0;
+	// Close the client connection
+	close(client_sock);
+	}
+	return 0;
 }
 ```
 
@@ -496,32 +498,32 @@ int main() {
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_UNIX, SOCK_STREAM, 0);
+	// Create a socket
+	int sock = socket(AF_UNIX, SOCK_STREAM, 0);
 
-  // Connect to the server
-  struct sockaddr_un addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strcpy(addr.sun_path, "/tmp/echo.sock");
+	// Connect to the server
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strcpy(addr.sun_path, "/tmp/echo.sock");
 
-  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+	connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Send data to the server
-  char data[1024] = "Hello, world!";
-  send(sock, data, strlen(data), 0);
+	// Send data to the server
+	char data[1024] = "Hello, world!";
+	send(sock, data, strlen(data), 0);
 
-  // Receive data from the server
-  int bytes_received = recv(sock, data, sizeof(data), 0);
+	// Receive data from the server
+	int bytes_received = recv(sock, data, sizeof(data), 0);
 
-  // Print the data
-  data[bytes_received] = '\0';
-  cout << data << endl;
+	// Print the data
+	data[bytes_received] = '\0';
+	cout << data << endl;
 
-  // Close the socket
-  close(sock);
+	// Close the socket
+	close(sock);
 
-  return 0;
+	return 0;
 }
 ```
 
@@ -538,29 +540,29 @@ int main() {
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+	// Create a socket
+	int sock = socket(AF_UNIX, SOCK_DGRAM, 0);
 
-  // Bind the socket to the path
-  struct sockaddr_un addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strcpy(addr.sun_path, "/tmp/echo.sock");
+	// Bind the socket to the path
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strcpy(addr.sun_path, "/tmp/echo.sock");
 
-  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+	bind(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Listen for datagrams
-  while (true) {
-    char data[1024];
-    struct sockaddr_un client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    int bytes_received = recvfrom(sock, data, sizeof(data), 0, (struct sockaddr *)&client_addr, &client_addr_len);
+	// Listen for datagrams
+	while (true) {
+		char data[1024];
+		struct sockaddr_un client_addr;
+		socklen_t client_addr_len = sizeof(client_addr);
+		int bytes_received = recvfrom(sock, data, sizeof(data), 0, (struct sockaddr *)&client_addr, &client_addr_len);
 
-    // Echo the data back to the client
-    sendto(sock, data, bytes_received, 0, (struct sockaddr *)&client_addr, client_addr_len);
-  }
+		// Echo the data back to the client
+		sendto(sock, data, bytes_received, 0, (struct sockaddr *)&client_addr, client_addr_len);
+	}
 
-  return 0;
+	return 0;
 }
 ```
 
@@ -577,32 +579,32 @@ int main() {
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+	// Create a socket
+	int sock = socket(AF_UNIX, SOCK_DGRAM, 0);
 
-  // Connect to the server
-  struct sockaddr_un addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strcpy(addr.sun_path, "/tmp/echo.sock");
+	// Connect to the server
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	strcpy(addr.sun_path, "/tmp/echo.sock");
 
-  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+	connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Send data to the server
-  char data[1024] = "Hello, world!";
-  sendto(sock, data, strlen(data), 0, (struct sockaddr *)&addr, sizeof(addr));
+	// Send data to the server
+	char data[1024] = "Hello, world!";
+	sendto(sock, data, strlen(data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Receive data from the server
-  int bytes_received = recvfrom(sock, data, sizeof(data), 0, NULL, NULL);
+	// Receive data from the server
+	int bytes_received = recvfrom(sock, data, sizeof(data), 0, NULL, NULL);
 
-  // Print the data
-  data[bytes_received] = '\0';
-  cout << data << endl;
+	// Print the data
+	data[bytes_received] = '\0';
+	cout << data << endl;
 
-  // Close the socket
-  close(sock);
+	// Close the socket
+	close(sock);
 
-  return 0;
+	return 0;
 }
 ```
 
@@ -646,39 +648,39 @@ passive close	: 연결 종료 요청을 받아 close 함수를 호출하는 행�
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
+	// Create a socket
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
 
-  // Bind the socket to port 8080
-  struct sockaddr_in addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(8080);
-  addr.sin_addr.s_addr = INADDR_ANY;
+	// Bind the socket to port 8080
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(8080);
+	addr.sin_addr.s_addr = INADDR_ANY;
 
-  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+	bind(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Listen for connections
-  listen(sock, 5);
+	// Listen for connections
+	listen(sock, 5);
 
-  // Accept connections
-  while (true) {
-    struct sockaddr_in client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    int client_sock = accept(sock, (struct sockaddr *)&client_addr, &client_addr_len);
+	// Accept connections
+	while (true) {
+		struct sockaddr_in client_addr;
+		socklen_t client_addr_len = sizeof(client_addr);
+		int client_sock = accept(sock, (struct sockaddr *)&client_addr, &client_addr_len);
 
-    // Receive data
-    char data[1024];
-    int bytes_received = recv(client_sock, data, sizeof(data), 0);
+		// Receive data
+		char data[1024];
+		int bytes_received = recv(client_sock, data, sizeof(data), 0);
 
-    // Echo the data back to the client
-    send(client_sock, data, bytes_received, 0);
+		// Echo the data back to the client
+		send(client_sock, data, bytes_received, 0);
 
-    // Close the client connection
-    close(client_sock);
-  }
+		// Close the client connection
+		close(client_sock);
+	}
 
-  return 0;
+	return 0;
 }
 ```
 
@@ -697,33 +699,33 @@ int main() {
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
+	// Create a socket
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
 
-  // Connect to the server
-  struct sockaddr_in addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(8080);
-  addr.sin_addr.s_addr = inet_addr("localhost");
+	// Connect to the server
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(8080);
+	addr.sin_addr.s_addr = inet_addr("localhost");
 
-  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+	connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Send data to the server
-  char data[1024] = "Hello, world!";
-  send(sock, data, strlen(data), 0);
+	// Send data to the server
+	char data[1024] = "Hello, world!";
+	send(sock, data, strlen(data), 0);
 
-  // Receive data from the server
-  int bytes_received = recv(sock, data, sizeof(data), 0);
+	// Receive data from the server
+	int bytes_received = recv(sock, data, sizeof(data), 0);
 
-  // Print the data
-  data[bytes_received] = '\0';
-  cout << data << endl;
+	// Print the data
+	data[bytes_received] = '\0';
+	cout << data << endl;
 
-  // Close the socket
-  close(sock);
+	// Close the socket
+	close(sock);
 
-  return 0;
+	return 0;
 }
 ```
 
@@ -840,8 +842,8 @@ sockaddr_in6 구조체를 추가적으로 감싸기 위해 만들어졌다.
 
 ### listen
 	int listen(
-		int		socket,
-		int		backlog
+		int			socket,
+		int			backlog
 	)
 **Parametters**
 - `int socket` : bind된 파일디스크립터
@@ -866,7 +868,8 @@ sockaddr_in6 구조체를 추가적으로 감싸기 위해 만들어졌다.
 - `int sockfd`		: connect요청을 수락할 파일디스크립터
 - `struct sockaddr *restrict address`
   - 접속을 시도한 클라이언트의 주소 정보
-  - sockaddr_* 구조체, sockaddr 구조체로 캐스팅 해야 함
+  - sockaddr_* 구조체를 사용 (sockaddr_in, sockaddr_un 등)
+  - sockaddr 구조체로 캐스팅 해야 함
   - 필요 없다면 NULL로 지정
 - `socklen_t *restrict address_len`
   - sockaddr 구조체의 실제 크기
@@ -880,7 +883,7 @@ sockaddr_in6 구조체를 추가적으로 감싸기 위해 만들어졌다.
 클라이언트 측에서 보낸 접속 요청을 받아들인다.  
 백로그에 여유가 있는 경우 접속요청을 받아들인다.  
 새로운 연결이 도착할 때 까지 블록상태로 대기한다.  
-accept가 루프를 도는 경우 매 루프마다 sockaddr 매개변수를 설정해서 넣어야 한다.  
+accept가 루프를 도는 경우 매 루프마다 sockaddr 매개변수를 설정(초기화)해서 넣어야 한다.  
 
 
 ### connect
@@ -918,14 +921,14 @@ connect 성공 시 해당 소켓은 통신 가능상태가 되어 데이터를 �
 - `size_t length` : 버퍼에 담긴 데이터의 크기
 - `int flags`
   - 작동 플래그
-   |     옵션     | 설명                                                                                                                      |
-   | :----------: | :------------------------------------------------------------------------------------------------------------------------ |
-   |      0       | write와 동일하게 동작한다.                                                                                                |
-   |   MSG_OOB    | 아웃오브밴드 데이터를 송신한다.                                                                                           |
-   | MSG_NOSIGNAL | 반대편 소켓 연결이 끊어졌을 대 SIGPIPE 시그널을 발생시키지 않는다.</br>EPIPE 에러 설정은 여전히 작동한다.                 |
-   | MSG_DONTWAIT | 1회성 넌블록킹 작동을 한다.                                                                                               |
-   |   MSG_EOR    | 레코드의 끝을 알리는 EOR을 지정한다.                                                                                      |
-   |   MSG_MORE   | 1회성으로 TCP_COR 옵션 기능을 사용한다.(리눅스전용)</br>데이터를 모아 MORE명령이 없는 전송시도가 있을 때 한번에 전송한다. |
+  - |     옵션     | 설명                                                                                                                      |
+	| :----------: | :------------------------------------------------------------------------------------------------------------------------ |
+	|      0       | write와 동일하게 동작한다.                                                                                                |
+	|   MSG_OOB    | 아웃오브밴드 데이터를 송신한다.                                                                                           |
+	| MSG_NOSIGNAL | 반대편 소켓 연결이 끊어졌을 대 SIGPIPE 시그널을 발생시키지 않는다.</br>EPIPE 에러 설정은 여전히 작동한다.                 |
+	| MSG_DONTWAIT | 1회성 넌블록킹 작동을 한다.                                                                                               |
+	|   MSG_EOR    | 레코드의 끝을 알리는 EOR을 지정한다.                                                                                      |
+	|   MSG_MORE   | 1회성으로 TCP_COR 옵션 기능을 사용한다.(리눅스전용)</br>데이터를 모아 MORE명령이 없는 전송시도가 있을 때 한번에 전송한다. |
 	
 **Return Value**
 - `other`	: 데이터 복사에 성공한 바이트 크기
@@ -959,13 +962,13 @@ connect 성공 시 해당 소켓은 통신 가능상태가 되어 데이터를 �
 - `size_t length` : 데이터를 저장할 버퍼의 크기
 - `int flags` 
   - 작동 플래그
-   |    옵션     | 설명                                                                                            |
-   | :---------: | :---------------------------------------------------------------------------------------------- |
-   |      0      | read와 동일하게 동작한다                                                                        |
-   |   MSG_OOB   | 아웃오브밴드 데이터를 수신한다                                                                  |
-   |  MSG_PEEK   | recv가 성공한 뒤에도 소켓 수신 버퍼큐에서 데이터를 제거하지 않는다.                             |
-   | MSG_WAITALL | 버퍼 크기가 다 채워질 때까지 대기한다.</br>시그널 개입이나 연결이 끊어진 경우엔 에러로 리턴한다 |
-   |  MSG_TRUNC  | recv 호출시 사용한 버퍼보다 큰 데이터를 수신해야 하는 경우 초과분을 삭제한다.                   |
+	|    옵션     | 설명                                                                                            |
+	| :---------: | :---------------------------------------------------------------------------------------------- |
+	|      0      | read와 동일하게 동작한다                                                                        |
+	|   MSG_OOB   | 아웃오브밴드 데이터를 수신한다                                                                  |
+	|  MSG_PEEK   | recv가 성공한 뒤에도 소켓 수신 버퍼큐에서 데이터를 제거하지 않는다.                             |
+	| MSG_WAITALL | 버퍼 크기가 다 채워질 때까지 대기한다.</br>시그널 개입이나 연결이 끊어진 경우엔 에러로 리턴한다 |
+	|  MSG_TRUNC  | recv 호출시 사용한 버퍼보다 큰 데이터를 수신해야 하는 경우 초과분을 삭제한다.                   |
 
 **Return Value**
 - `other`	: 데이터 수신에 성공한 바이트 크기
@@ -992,11 +995,11 @@ connect 성공 시 해당 소켓은 통신 가능상태가 되어 데이터를 �
 - `int socket`	: 닫을 소켓 파일디스크립터
 - `int how`
   - 닫을 채널과 방법
- |   옵션    | 설명                                                                                                                           |
- | :-------: | :----------------------------------------------------------------------------------------------------------------------------- |
- |  SHUT_RD  | 읽기 채널을 닫는다.</br>해당 소켓에 읽기 행동을 할 수 없다.                                                                    |
- |  SHUT_WR  | 쓰기 채널을 닫는다.</br>해당 소켓에 쓰기 행동을 할 수 없다.</br>명령이 성공하면 상대방에게 소켓을 닫기위한 신호(FIN)를 보낸다. |
- | SHUT_RDWR | 소켓을 즉시 닫는다.                                                                                                            |
+	|   옵션    | 설명                                                                                                                           |
+	| :-------: | :----------------------------------------------------------------------------------------------------------------------------- |
+	|  SHUT_RD  | 읽기 채널을 닫는다.</br>해당 소켓에 읽기 행동을 할 수 없다.                                                                    |
+	|  SHUT_WR  | 쓰기 채널을 닫는다.</br>해당 소켓에 쓰기 행동을 할 수 없다.</br>명령이 성공하면 상대방에게 소켓을 닫기위한 신호(FIN)를 보낸다. |
+	| SHUT_RDWR | 소켓을 즉시 닫는다.                                                                                                            |
 
 **Return Value**
 - `0`	: 성공
@@ -1030,6 +1033,13 @@ connect 함수를 사용하는 경우 sockaddr 구조체에 관련된 부분을 
 
 ![](./img/udp_flow.gif)
 
+| 함수 | 설명 |
+|---|---|
+| socket() | 새 소켓을 생성합니다. |
+| bind() | 소켓을 특정 포트와 바인딩합니다. |
+| recvfrom() | 소켓에서 데이터그램을 수신합니다. |
+| sendto() | 소켓으로 데이터그램을 보냅니다. |
+| close() | 소켓을 닫습니다. |
 
 ### example UDP/IP server
 ```cpp 
@@ -1045,30 +1055,30 @@ connect 함수를 사용하는 경우 sockaddr 구조체에 관련된 부분을 
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_INET, SOCK_DGRAM, 0);
+	// Create a socket
+	int sock = socket(AF_INET, SOCK_DGRAM, 0);
 
-  // Bind the socket to port 8080
-  struct sockaddr_in addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(8080);
-  addr.sin_addr.s_addr = INADDR_ANY;
+	// Bind the socket to port 8080
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(8080);
+	addr.sin_addr.s_addr = INADDR_ANY;
 
-  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+	bind(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Listen for datagrams
-  while (true) {
-    char data[1024];
-    struct sockaddr_in client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    int bytes_received = recvfrom(sock, data, sizeof(data), 0, (struct sockaddr *)&client_addr, &client_addr_len);
+	// Listen for datagrams
+	while (true) {
+		char data[1024];
+		struct sockaddr_in client_addr;
+		socklen_t client_addr_len = sizeof(client_addr);
+		int bytes_received = recvfrom(sock, data, sizeof(data), 0, (struct sockaddr *)&client_addr, &client_addr_len);
 
-    // Echo the data back to the client
-    sendto(sock, data, bytes_received, 0, (struct sockaddr *)&client_addr, client_addr_len);
-  }
+		// Echo the data back to the client
+		sendto(sock, data, bytes_received, 0, (struct sockaddr *)&client_addr, client_addr_len);
+	}
 
-  return 0;
+	return 0;
 }
 ```
 
@@ -1087,33 +1097,33 @@ int main() {
 using namespace std;
 
 int main() {
-  // Create a socket
-  int sock = socket(AF_INET, SOCK_DGRAM, 0);
+	// Create a socket
+	int sock = socket(AF_INET, SOCK_DGRAM, 0);
 
-  // Connect to the server
-  struct sockaddr_in addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(8080);
-  addr.sin_addr.s_addr = inet_addr("localhost");
+	// Connect to the server
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(8080);
+	addr.sin_addr.s_addr = inet_addr("localhost");
 
-  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+	connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Send data to the server
-  char data[1024] = "Hello, world!";
-  sendto(sock, data, strlen(data), 0, (struct sockaddr *)&addr, sizeof(addr));
+	// Send data to the server
+	char data[1024] = "Hello, world!";
+	sendto(sock, data, strlen(data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
-  // Receive data from the server
-  int bytes_received = recvfrom(sock, data, sizeof(data), 0, NULL, NULL);
+	// Receive data from the server
+	int bytes_received = recvfrom(sock, data, sizeof(data), 0, NULL, NULL);
 
-  // Print the data
-  data[bytes_received] = '\0';
-  cout << data << endl;
+	// Print the data
+	data[bytes_received] = '\0';
+	cout << data << endl;
 
-  // Close the socket
-  close(sock);
+	// Close the socket
+	close(sock);
 
-  return 0;
+	return 0;
 ```
 
 
@@ -1382,11 +1392,12 @@ ACK(긍정 응답 패킷) : TCP 프로토콜에서 수신측이 패킷을 받았
 setcokopt를 통해 소켓 옵션을 TCP_NODELAY로 설정하면 네이글 알고리즘을 비활성화 할 수 있다.  
 ``` cpp
 	int option = TRUE;			// 네이글 알고리즘 on/off
-	setsockopt(m_Socket,			// 해당 소켓
-	           IPPROTO_TCP			// 소켓의 레벨
-	           TCP_NODELAY,			// 설정 옵션
-	           (const char*)&option,	// 옵션 포인터
-	           sizeof(option));		// 옵션 크기
+	setsockopt(
+		m_Socket,			// 해당 소켓
+		IPPROTO_TCP			// 소켓의 레벨
+		TCP_NODELAY,			// 설정 옵션
+		(const char*)&option,		// 옵션 포인터
+		sizeof(option));		// 옵션 크기
 ```
 
 
