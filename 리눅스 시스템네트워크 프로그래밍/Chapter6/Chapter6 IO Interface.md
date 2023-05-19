@@ -24,12 +24,15 @@
 - [유닉스 소켓](#유닉스-소켓)
 	- [socket](#socket-1)
 - [TCP 소켓 (SOCK\_STREAM)](#tcp-소켓-sock_stream)
+	- [example server](#example-server)
+	- [example client](#example-client)
 	- [socket](#socket-2)
 	- [bind](#bind)
 	- [struct sockaddr](#struct-sockaddr)
 	- [struct sockaddr\_strage](#struct-sockaddr_strage)
 	- [struct sockaddr\_in](#struct-sockaddr_in)
 	- [struct sockaddr\_in6](#struct-sockaddr_in6)
+	- [struct sockaddr\_un](#struct-sockaddr_un)
 	- [listen](#listen)
 	- [accept](#accept)
 	- [connect](#connect)
@@ -38,6 +41,8 @@
 	- [close](#close)
 	- [shutdown](#shutdown)
 - [UDP 소켓 (SOCK\_DGRAM)](#udp-소켓-sock_dgram)
+	- [example server](#example-server-1)
+	- [example client](#example-client-1)
 	- [socket](#socket-3)
 	- [bind](#bind-1)
 	- [close](#close-1)
@@ -79,6 +84,8 @@
 - [블로킹, 동기](#블로킹-동기)
 - [블록킹 넌블록킹](#블록킹-넌블록킹)
 - [동기 비동기](#동기-비동기)
+	- [블로킹 모드의 약점](#블로킹-모드의-약점)
+	- [넌블록킹 모드 전환](#넌블록킹-모드-전환)
 - [아웃오브 밴드](#아웃오브-밴드)
 - [공통 기법](#공통-기법)
 - [sub-title](#sub-title)
@@ -437,6 +444,112 @@ client side	: socket (+ bind) -> connect
 active close	: close, shutdown 함수를 호출한 행위  
 passive close	: 연결 종료 요청을 받아 close 함수를 호출하는 행위  
 
+| 함수 | 설명 |
+|---|---|
+| socket() | 새 소켓을 생성합니다. |
+| bind() | 소켓을 특정 포트와 바인딩합니다. |
+| listen() | 소켓을 수신 연결을 기다리는 모드로 설정합니다. |
+| accept() | 수신 연결을 수락하고 새 소켓을 반환합니다. |
+| connect() | 소켓을 서버에 연결합니다. |
+| recv() | 소켓에서 데이터를 수신합니다. |
+| send() | 소켓으로 데이터를 보냅니다. |
+| close() | 소켓을 닫습니다. |
+
+### example server
+```cpp 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_INET, SOCK_STREAM, 0);
+
+  // Bind the socket to port 8080
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(8080);
+  addr.sin_addr.s_addr = INADDR_ANY;
+
+  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Listen for connections
+  listen(sock, 5);
+
+  // Accept connections
+  while (true) {
+    struct sockaddr_in client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    int client_sock = accept(sock, (struct sockaddr *)&client_addr, &client_addr_len);
+
+    // Receive data
+    char data[1024];
+    int bytes_received = recv(client_sock, data, sizeof(data), 0);
+
+    // Echo the data back to the client
+    send(client_sock, data, bytes_received, 0);
+
+    // Close the client connection
+    close(client_sock);
+  }
+
+  return 0;
+}
+```
+
+
+### example client
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_INET, SOCK_STREAM, 0);
+
+  // Connect to the server
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(8080);
+  addr.sin_addr.s_addr = inet_addr("localhost");
+
+  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Send data to the server
+  char data[1024] = "Hello, world!";
+  send(sock, data, strlen(data), 0);
+
+  // Receive data from the server
+  int bytes_received = recv(sock, data, sizeof(data), 0);
+
+  // Print the data
+  data[bytes_received] = '\0';
+  cout << data << endl;
+
+  // Close the socket
+  close(sock);
+
+  return 0;
+}
+```
+
 
 ### [socket](#socket)
 ```cpp
@@ -458,11 +571,12 @@ TCP 소켓을 생성한다.
   - 빅엔디안으로 저장되어야 한다.
   - 아래는 sockaddr_* 구조체이다.
   - (struct sockaddr *) 타입으로 캐스팅해 사용한다.
- |          | sockadr_* 구조체 명 |
- | :------: | :-----------------: |
- | AF_INET  | struct sockaddr_in  |
- | AF_INET6 | struct sockaddr_in6 |
- | AF_UNIX  | struct sockaddr_un  |
+
+	 |          | sockadr_* 구조체 명 |
+	 | :------: | :-----------------: |
+	 | AF_INET  | struct sockaddr_in  |
+	 | AF_INET6 | struct sockaddr_in6 |
+	 | AF_UNIX  | struct sockaddr_un  |
 - `socklen_t addrlen`	: sockaddr 구조체의 크기
 
 **Return Value**
@@ -539,6 +653,13 @@ sockaddr_in6 구조체를 추가적으로 감싸기 위해 만들어졌다.
 	};
 ```
 
+### struct sockaddr_un
+``` cpp
+	struct sockaddr_un{
+		sa_family_t		sun_family;	// AF_UNIX
+		char			sun_path[];	// 리눅스 108 (시스템마다 다를 수 있음)
+	};
+```
 
 ### listen
 	int listen(
@@ -729,6 +850,94 @@ close를 호출하는 경우 즉시 리턴되지만 연결이 바로해제되는
 한 번의 전송으로 여러 호스트에게 데이터를 보낼 수 있다.(브로드캐스트, 멀티캐스트)  
 connect 함수를 사용하는 경우 send, write를 사용해도 된다.  
 connect 함수를 사용하는 경우 sockaddr 구조체에 관련된 부분을 자동으로 채워준다.  
+
+![](./img/udp_flow.gif)
+
+
+### example server
+```cpp 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+  // Bind the socket to port 8080
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(8080);
+  addr.sin_addr.s_addr = INADDR_ANY;
+
+  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Listen for datagrams
+  while (true) {
+    char data[1024];
+    struct sockaddr_in client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    int bytes_received = recvfrom(sock, data, sizeof(data), 0, (struct sockaddr *)&client_addr, &client_addr_len);
+
+    // Echo the data back to the client
+    sendto(sock, data, bytes_received, 0, (struct sockaddr *)&client_addr, client_addr_len);
+  }
+
+  return 0;
+}
+```
+
+
+### example client
+```cpp 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+  // Connect to the server
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(8080);
+  addr.sin_addr.s_addr = inet_addr("localhost");
+  
+  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Send data to the server
+  char data[1024] = "Hello, world!";
+  sendto(sock, data, strlen(data), 0, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Receive data from the server
+  int bytes_received = recvfrom(sock, data, sizeof(data), 0, NULL, NULL);
+
+  // Print the data
+  data[bytes_received] = '\0';
+  cout << data << endl;
+
+  // Close the socket
+  close(sock);
+
+  return 0;
+```
 
 
 ### [socket](#socket)
@@ -1090,6 +1299,7 @@ IPv4-mapped IPv6 : IPv4 주소를 포함하는 IPv6
 	 | IPPROTO_IP   | IP 레벨   |
 	 | IPPROTO_TCP  | TCP 레벨  |
 	 | IPPROTO_IPV6 | IPv6 레벨 |
+	 | SOL_SOCKET	| 소켓 레벨 |
 
 - `int option_name` : 변경할 옵션 대상 / 획득할 옵션 대상
 - `void *option_value` : 변경할 값 (경우에 따라 구조체를 사용한다.) / 값을 획득할 버퍼 주소
@@ -1153,6 +1363,12 @@ TCP / UDP
 other : 활성화  
 0 : 비활성화(default)  
 
+**example**
+``` cpp
+	int optval = 1;
+	setsockopt( sock_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+```
+
 **Description**  
 이미 사용중인 포트도 소켓에 바인드할 수 있게 해준다.  
 (소켓이 포트에 바인드될 때 포트가 이미 사용중인 경우에도 소켓을 바인드할 수 있게 해준다.)  
@@ -1181,6 +1397,16 @@ UDP
 ### SO_RCVBUF, SO_SNDBUF
 **Layer**  
 모든 타입의 소켓에서 사용가능하다. (TCP / UDP / IP)  
+
+**example**  
+```cpp
+	int optval = 1024;
+	int optlen = sizeof(optval);
+	getsockopt( sock_fd, SOL_SOCKET, SO_RCVBUF, (char*)&optval, &optlen);
+	
+	optval = optval * 2;
+	setsockopt( sock_fd, SOL_SOCKET, SO_RCVBUF, (char*)&optval, sizeof(optval));
+```
 
 **Description**  
 송수신 소켓버퍼의 크기를 지정한다.  
@@ -1251,6 +1477,14 @@ struct timeval 구조체를 인수로 사용한다.
 	}
 ```
 
+**example**
+```cpp
+	struct timeval sttTime;
+	sttTime.tv_sec = 10;
+	sttTime.tv_usec = 0;
+	setsockopt( sock_fd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&sttTime, sizeof(sttTime) );
+```
+
 **Description**  
 송신 목적 함수(send, sendto, connect)가 블록되었을 때 타임아웃 시간을 지정한다.  
 타임아웃 시간이 지나도록 함수가 리턴되지 않는다면 함수는 에러로 리턴되고 errno는 EAGAIN으로 설정된다.  
@@ -1271,6 +1505,29 @@ l_onoff 옵션이 on이라면 l_linger 멤버를 사용하게 된다.
 l_linger : 연결을 끊고자 할 때 데이터를 보내기 위해 대기하는 시간  
 close, shutdown이 실행될 때 블록될 타임아웃을 의미한다.  
 
+**example**
+```cpp
+	struct linger optval;
+	optval.l_onoff	= 1;
+	optval.l_linger	= 10;
+	setsockopt( sock_fd, SOL_SOCKET, SO_LINGER, (char*)&optval, sizeof(optval));
+```
+
+**Description**  
+연결을 끊을 때 l_linger의 시간만큼 기다린다.  
+시간 내 전송 완료 시 일반적인 연결해제와 같이 작동되어 TIME_WAIT 상태로 전이된다.  
+전송을 완료하지 못한경우 소켓은 강제로 닫히
+l_onoff 옵션이 on이라면 l_linger 멤버를 사용하게 된다.  
+l_linger : 연결을 끊고자 할 때 데이터를 보내기 위해 대기하는 시간  
+close, shutdown이 실행될 때 블록될 타임아웃을 의미한다.  
+
+**example**
+```cpp
+	struct linger optval;
+	optval.l_onoff	= 1;
+	optval.l_linger	= 10;
+	setsockopt( sock_fd, SOL_SOCKET, SO_LINGER, (char*)&optval, sizeof(optval));
+```
 
 **Description**  
 연결을 끊을 때 l_linger의 시간만큼 기다린다.  
@@ -1313,6 +1570,12 @@ TCP
 **Option**  
 other : 활성화
 0 : 비활성화 (default)
+
+**example**
+```cpp
+	BOOL optval = TRUE;
+	setsockopt(sock_fd, SOL_SOCKET, SO_KEEPALIVE, (char*)&optval, sizeof(optval));
+```
 
 **Description**  
 일정 시간마다 연결 상태를 검사한다.  
@@ -1400,6 +1663,7 @@ TCP 연결을 맺기 전에 옵션을 설정해야 반영된다.
 
 MSS 옵션을 세팅하지 않은경우 MTU값에서 TCP IP 헤더를 뺀 크기로 정해진다.  
 
+
 ### TCP_CORK
 **Layer**  
 TCP  
@@ -1439,14 +1703,65 @@ other : IPv6전용으로 사용한다.
 ## 블로킹, 동기
 
 ## 블록킹 넌블록킹
-블록킹과 넌블록킹의 분류 기준은 대기의 여부이다.
+블록킹과 넌블록킹의 분류 기준은 대기의 여부이다.  
+
+대기가 존재하는 경우
+요청작업이 완료될 때까지 리턴하지 않는다.  
+
+성공, 실패 두가지 리턴 상태가 존재한다.  
+
+블로킹 모드에서 send 함수의 경우 즉시처리되거나 대기가 발생한다.  
+함수가 리턴되는 순간 성공인지 실패인지 알 수 있다.  
+
+넌블록킹 모드에서는 성공이든 실패든 무조건 즉시 처리하고 리턴한다.  
+제어를 처리할 수 있을 때까지 대기하지 않으므로 성공, 실패, 부분성공의 3가지 결과값이 존재한다.  
+
+공통점으로는 함수가 리턴한 시점에서 성공, 실패를 알 수 있다는 점이다.  
+
 
 넌블록킹
 비봉쇄라고도 부른다.
 
 
 ## 동기 비동기
-동기와 비동기의 분류기준은 순서이다.
+동기와 비동기의 분류기준은 순서이다.  
+
+동기 : 순서대로(in-order) 처리되는 것  
+
+비동기 : 순서가 보장되지 않는(out of order) 것  
+
+비동기는 처리 순서가 바뀔 수 있기 대문에 리턴 시점에서 성공 실패를 알 수 없다.
+
+확인 함수의 호출, 시그널, 특수한 방법을 활용한 통지 구조를 사용해야한다.
+
+스레드는 태스크 레벨에서만 비동기일 분 함수 자체로는 동기적으로 작동한다.
+따라서 동기 비동기를 엄격히 분류하기 위해서는 시점을 명시해야한다.
+ex) send 메소드, 시스템 프로그래밍 레벨 : 동기, 커널 레벨 : 비동기
+특정 라이브러리에서 비동기로 처리하더라도 시스템에서 동기로 처리되는 경우가 많다.  
+
+
+
+### 블로킹 모드의 약점
+파일, 소켓, IPC 등 모든 I/O 함수는 블록킹 모드가 기본값이다.  
+
+블록킹 모드는 대기시간이 기약 없이 길어질 수 있다.
+
+블록킹 상태의 프로세스든 더 이상다른 작업을 할 수 없고 대기만 해야한다.
+
+큰 문제는 통신하는 소켓이 둘 이상히며 루프를 돌면서 데이터를 읽어야하는 경우 첫 번재 소켓의 recv에서 몇 초만에 수신에 성공했다 하더라도 두 번째 소켓은 그만큼 지연이 발생한다.
+
+1:1 통신이나 외부 개입이 없는 프로그램이라면 큰 문제가되지 않는다.
+하지만 그런 경우는 드물다.
+
+
+### 넌블록킹 모드 전환
+
+
+
+
+
+
+
 
 ## 아웃오브 밴드
 
@@ -1473,3 +1788,4 @@ other : 활성화
 0 : 비활성화(default)
 
 **Description**  
+tjffpadmf smRlsms ruddn
