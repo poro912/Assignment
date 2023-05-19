@@ -22,10 +22,12 @@
 	- [소켓 프로토콜](#소켓-프로토콜)
 	- [소켓의 주요 조합](#소켓의-주요-조합)
 - [유닉스 소켓](#유닉스-소켓)
-	- [socket](#socket-1)
-- [TCP 소켓 (SOCK\_STREAM)](#tcp-소켓-sock_stream)
 	- [example server](#example-server)
 	- [example client](#example-client)
+	- [socket](#socket-1)
+- [TCP 소켓 (SOCK\_STREAM)](#tcp-소켓-sock_stream)
+	- [example server](#example-server-1)
+	- [example client](#example-client-1)
 	- [socket](#socket-2)
 	- [bind](#bind)
 	- [struct sockaddr](#struct-sockaddr)
@@ -41,8 +43,8 @@
 	- [close](#close)
 	- [shutdown](#shutdown)
 - [UDP 소켓 (SOCK\_DGRAM)](#udp-소켓-sock_dgram)
-	- [example server](#example-server-1)
-	- [example client](#example-client-1)
+	- [example server](#example-server-2)
+	- [example client](#example-client-2)
 	- [socket](#socket-3)
 	- [bind](#bind-1)
 	- [close](#close-1)
@@ -420,6 +422,98 @@ IPPROTO_ICMP	: ICMP 프로토콜
 도메인 범위가 로컬 호스트에 국한되어 IPC의 일종으로 쓰인다.  
 네트워크 도메인 소켓으로 쉽게 전환할 수 있다.  
 메시지 큐와 성격이 비슷하다.  
+
+
+### example server
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_UNIX, SOCK_STREAM, 0);
+
+  // Bind the socket to the path
+  struct sockaddr_un addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, "/tmp/echo.sock");
+  
+  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Listen for connections
+  listen(sock, 5);
+
+  // Accept connections
+  while (true) {
+    struct sockaddr_un client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    int client_sock = accept(sock, (struct sockaddr *)&client_addr, &client_addr_len);
+
+    // Receive data
+    char data[1024];
+    int bytes_received = recv(client_sock, data, sizeof(data), 0);
+
+    // Echo the data back to the client
+    send(client_sock, data, bytes_received, 0);
+
+    // Close the client connection
+    close(client_sock);
+  }
+
+  return 0;
+}
+```
+
+
+### example client
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_UNIX, SOCK_STREAM, 0);
+
+  // Connect to the server
+  struct sockaddr_un addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, "/tmp/echo.sock");
+  
+  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Send data to the server
+  char data[1024] = "Hello, world!";
+  send(sock, data, strlen(data), 0);
+
+  // Receive data from the server
+  int bytes_received = recv(sock, data, sizeof(data), 0);
+
+  // Print the data
+  data[bytes_received] = '\0';
+  cout << data << endl;
+
+  // Close the socket
+  close(sock);
+
+  return 0;
+}
+```
 
 
 ### [socket](#socket)
@@ -919,7 +1013,7 @@ int main() {
   addr.sin_family = AF_INET;
   addr.sin_port = htons(8080);
   addr.sin_addr.s_addr = inet_addr("localhost");
-  
+
   connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
   // Send data to the server
