@@ -22,12 +22,14 @@
 	- [소켓 프로토콜](#소켓-프로토콜)
 	- [소켓의 주요 조합](#소켓의-주요-조합)
 - [유닉스 소켓](#유닉스-소켓)
-	- [example server](#example-server)
-	- [example client](#example-client)
 	- [socket](#socket-1)
+	- [example TCP/UNIX server](#example-tcpunix-server)
+	- [example TCP/UNIX client](#example-tcpunix-client)
+	- [example UDP/UNIX server](#example-udpunix-server)
+	- [example UDP/UNIX clinet](#example-udpunix-clinet)
 - [TCP 소켓 (SOCK\_STREAM)](#tcp-소켓-sock_stream)
-	- [example server](#example-server-1)
-	- [example client](#example-client-1)
+	- [example TCP/IP server](#example-tcpip-server)
+	- [example TCP/IP client](#example-tcpip-client)
 	- [socket](#socket-2)
 	- [bind](#bind)
 	- [struct sockaddr](#struct-sockaddr)
@@ -43,8 +45,8 @@
 	- [close](#close)
 	- [shutdown](#shutdown)
 - [UDP 소켓 (SOCK\_DGRAM)](#udp-소켓-sock_dgram)
-	- [example server](#example-server-2)
-	- [example client](#example-client-2)
+	- [example UDP/IP server](#example-udpip-server)
+	- [example UDP/IP client](#example-udpip-client)
 	- [socket](#socket-3)
 	- [bind](#bind-1)
 	- [close](#close-1)
@@ -424,7 +426,15 @@ IPPROTO_ICMP	: ICMP 프로토콜
 메시지 큐와 성격이 비슷하다.  
 
 
-### example server
+### [socket](#socket)
+```cpp
+#include<sys/un.h>
+
+	int sockfd = socket(AF_UNIX, SOCK_STREAM, IPPROTO_IP);
+```
+
+
+### example TCP/UNIX server
 ```cpp
 #include <iostream>
 #include <stdio.h>
@@ -473,7 +483,7 @@ int main() {
 ```
 
 
-### example client
+### example TCP/UNIX client
 ```cpp
 #include <iostream>
 #include <stdio.h>
@@ -494,7 +504,7 @@ int main() {
   memset(&addr, 0, sizeof(addr));
   addr.sun_family = AF_UNIX;
   strcpy(addr.sun_path, "/tmp/echo.sock");
-  
+
   connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
   // Send data to the server
@@ -515,12 +525,85 @@ int main() {
 }
 ```
 
-
-### [socket](#socket)
+### example UDP/UNIX server
 ```cpp
-#include<sys/un.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
-	int sockfd = socket(AF_UNIX, SOCK_STREAM, IPPROTO_IP);
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+
+  // Bind the socket to the path
+  struct sockaddr_un addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, "/tmp/echo.sock");
+
+  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Listen for datagrams
+  while (true) {
+    char data[1024];
+    struct sockaddr_un client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    int bytes_received = recvfrom(sock, data, sizeof(data), 0, (struct sockaddr *)&client_addr, &client_addr_len);
+
+    // Echo the data back to the client
+    sendto(sock, data, bytes_received, 0, (struct sockaddr *)&client_addr, client_addr_len);
+  }
+
+  return 0;
+}
+```
+
+### example UDP/UNIX clinet
+```cpp
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+
+using namespace std;
+
+int main() {
+  // Create a socket
+  int sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+
+  // Connect to the server
+  struct sockaddr_un addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, "/tmp/echo.sock");
+
+  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Send data to the server
+  char data[1024] = "Hello, world!";
+  sendto(sock, data, strlen(data), 0, (struct sockaddr *)&addr, sizeof(addr));
+
+  // Receive data from the server
+  int bytes_received = recvfrom(sock, data, sizeof(data), 0, NULL, NULL);
+
+  // Print the data
+  data[bytes_received] = '\0';
+  cout << data << endl;
+
+  // Close the socket
+  close(sock);
+
+  return 0;
+}
 ```
 
 
@@ -549,7 +632,7 @@ passive close	: 연결 종료 요청을 받아 close 함수를 호출하는 행�
 | send() | 소켓으로 데이터를 보냅니다. |
 | close() | 소켓을 닫습니다. |
 
-### example server
+### example TCP/IP server
 ```cpp 
 #include <iostream>
 #include <stdio.h>
@@ -600,7 +683,7 @@ int main() {
 ```
 
 
-### example client
+### example TCP/IP client
 ```cpp
 #include <iostream>
 #include <stdio.h>
@@ -948,7 +1031,7 @@ connect 함수를 사용하는 경우 sockaddr 구조체에 관련된 부분을 
 ![](./img/udp_flow.gif)
 
 
-### example server
+### example UDP/IP server
 ```cpp 
 #include <iostream>
 #include <stdio.h>
@@ -990,7 +1073,7 @@ int main() {
 ```
 
 
-### example client
+### example UDP/IP client
 ```cpp 
 #include <iostream>
 #include <stdio.h>
