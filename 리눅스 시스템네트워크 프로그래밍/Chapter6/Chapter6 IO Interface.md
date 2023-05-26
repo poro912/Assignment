@@ -1772,13 +1772,13 @@ telnet이나 ssh 클라이언처럼 오랫동안 패킷 전송이 없을 가능�
 **Layer**  
 TCP  
 
-**Option**  
-other : 활성화
-0 : 비활성화
+**Option**   
+other : 활성화  
+0 : 비활성화  
 
 **Description**  
-아웃오브밴드 채널을 일반 채널에 합쳐 수신할 수 있도록 한다.
-아웃오브 밴드를 무시하고 일반 노멀밴드로 취급한다.
+아웃오브밴드 채널을 일반 채널에 합쳐 수신할 수 있도록 한다.  
+아웃오브 밴드를 무시하고 일반 노멀밴드로 취급한다.  
 
 
 ### SO_RCVLOWAT, SO_SNDLOWAT
@@ -1786,9 +1786,9 @@ other : 활성화
 TCP  
 
 **Option**  
-other : 활성화
-0 : 비활성화
-default : 1
+other : 활성화  
+0 : 비활성화  
+default : 1  
 
 **Description**  
 워터마크 크기를 지정한다.  
