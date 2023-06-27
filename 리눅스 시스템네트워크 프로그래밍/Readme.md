@@ -44,10 +44,16 @@
 [link](Chapter5/Chapter5%20IPC.md)  
 
 ## Chapter6
-기간 : 2023/03/27 ~ 2023//  
+기간 : 2023/03/27 ~ 2023/05/31  
 제목 : I/O 인터페이스  
 주제 : 외부와 데이터를 교환하기 위한 통신 메커니즘 pipe, socket   
 [link](Chapter6/Chapter6%20IO%20Interface.md)  
+
+## Chapter 7
+기간 : 2023/06/26 ~ 2023//  
+제목 : I/O 멀티플렉싱  
+주제 : 다중 입출력 통신  
+[link](week/)  
 
 
 ## Chapter

@@ -71,6 +71,8 @@
 	- [API](#api-4)
 		- [readv](#readv)
 		- [writev](#writev)
+		- [struct timeval](#struct-timeval)
+		- [struct timespec](#struct-timespec)
 
 # 1장  
 ## 이론  
@@ -806,7 +808,20 @@ TIME_WAIT 간격을 결정한다.
 ### writev
 소켓으로부터 벡터를 구성하여 데이터를 송신한다.  
 
-
+### struct timeval
+``` cpp
+	struct timeval	{
+		long		tv_sec;		// 초
+		long		tv_usec;	// 마이크로초
+	}
+```
+### struct timespec
+``` cpp
+	struct timespec{
+		time_t		tv_sec;		// 초
+		long		tv_nsec;	// 나노초
+	}
+```
 
 
 <!-- 
