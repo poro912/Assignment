@@ -11,17 +11,24 @@
 	- [pselect](#pselect)
 	- [select 시 필요 변수](#select-시-필요-변수)
 - [poll](#poll)
-	- [function\_name](#function_name)
+	- [struct pollfd](#struct-pollfd)
+	- [poll events](#poll-events)
+	- [poll](#poll-1)
+	- [ppoll](#ppoll)
+- [epoll](#epoll)
+	- [epoll\_create](#epoll_create)
 - [**Parametters**](#parametters)
 - [**Return Value**](#return-value)
-- [epoll](#epoll)
-	- [function\_name](#function_name-1)
+	- [epoll\_ctl](#epoll_ctl)
 - [**Parametters**](#parametters-1)
 - [**Return Value**](#return-value-1)
-- [sub-title](#sub-title)
-	- [function\_name](#function_name-2)
+	- [epoll\_wait](#epoll_wait)
 - [**Parametters**](#parametters-2)
 - [**Return Value**](#return-value-2)
+- [sub-title](#sub-title)
+	- [function\_name](#function_name)
+- [**Parametters**](#parametters-3)
+- [**Return Value**](#return-value-3)
 
 
 ## 서론
@@ -110,7 +117,7 @@ select 함수를 재 호출 할 때 fd_set을 재설정해 넣어줘야 한다.
 - `fd_set *	readfds`	: 읽기 가능 이벤트
 - `fd_set *	writefds`	: 쓰기 가능 이벤트
 - `fd_set *	errorfds`	: 예외 상황 이벤트
-- `struct timeval *	timeout`	: [타임아웃 객체](../../etc.md#struct-timeval)  
+- `struct timeval *	timeout`	: [타임아웃 객체](../etc.md#struct-timeval)  
 
 **Return Value**
 - `ohter`	: 수신에 성공한 파일디스크립터의 수
@@ -133,11 +140,13 @@ timeval 구조체에 0 입력시 바로 리턴되므로 주의해야한다.
 		const sigset_t	* restrict	sigmask
 	)
 **Parametters**
+- `struct timespec	* timeout` : [타임아웃 객체](../etc.md#struct-timespec)
 - `const sigset_t sigmask` : 감지할 시그널 마스크
   
 **Description**  
 시그널 블록 마스크를 인수로 사용하여 함수 호출시 블록할 시그널을 지정할 수 있다.  
 sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.  
+
 
 ### select 시 필요 변수
 | fd_set| fds		| 이벤트 감시용 파일기술자 세트 |
@@ -150,25 +159,101 @@ sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.
 
 ## poll
 select 함수의 복잡한 인수 리스트와 비효율적인 루프 구조를 개선하기위해 만들어진 함수이다.
+
+
 poll 함수 또한 select 함수에 비해 큰 성능의 향상을 이룩하지는 못했다.  
 
 시그널을 감시할 수 있는 ppoll 함수가 있으나 표준함수가 아니다.
 
-### function_name
-	[function]
+
+### struct pollfd
+감시할 파일디스크립터의 정보를 갖고있는 객체
+revents에 감시 결과가가 저장되어 반환된다.
+``` cpp
+	struct pollfd{
+		int			fd;		// 파일 디스크립터
+		short			events;		// 요구된 이벤트
+		short			revents;	// 반환된 이벤트
+	}
+```
+
+
+### poll events
+| POLLIN	| 읽기 버퍼에 데이터가 있음</br>TCP 연결 요청이 들어옴 |
+| --|--|
+| POLLPRI	| TCP의 OOB 데이터가 감지됨 |
+| POLLOUT	| 쓰기 버퍼가 사용가능한 상태가 됨 |
+| POLLERR	| 연결에 에러가 발생함 |
+| POLLHUP	| 닫힌 연결에 쓰기 시도 감지 |
+| POLLNVAL	| 무효한 파일기술자 지정 에러 |
+
+### poll
+	int poll(
+		struct pollfd 		fds[],
+		nfds_t			nfds,
+		int			timeout,
+	)
 **Parametters**
-- 
+- `struct pollfd fds[]`	: 감시할 파일기술자와 이벤트 정보
+- `nfds_t nfds`	: 감시할 파일기술자의 수 
+- `int timeout`	: 타임아웃 시간
 
 **Return Value**
-- 
+- `ohter`	: 수신에 성공한 파일디스크립터의 수
+- `0`	: timeout 발생시 까지 이벤트 없음
+- `-1`	: 에러, errno 설정 
 
 **Description**  
+타임아웃 시간을 NULL로 넣을경우 0으로 캐스팅되 즉시 반환된다  
+타임아웃 지정을 해제하려면 -1을 넣어야 한다.  
+select와 달리 구조체에 값을 다시 집어넣을 필요가 없다.  
 
+### ppoll
+	int ppoll(
+		struct pollfd 		* fds,
+		nfds_t			nfds,
+		const struct timespeec 	* timeout_ts,
+		const sigset_t 		* sigmask
+	)
+**Parametters**
+- `struct timespec	* timeout` : [타임아웃 객체](../etc.md#struct-timespec)
+- `sigset_t * sigmask` : 감시할 이벤트 마스크
+
+**Description**  
+sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.  
 
 
 ## epoll
-### function_name
-	[function]
+statefull 함수로 파일기술자 정보를 내부적으로 저장한다.
+엣지트리거의 지원이 추가되었다.
+엣지 트리거 : 상태가 변하는 순간을 기준으로 감지한다.
+레벨 트리거 : 상태의 변화가 어떤 일정한 수준을 넘었는지를 감지한다.
+엣지트리거 이전 상태에서 변화가 생겼는지를 감시
+레벨트리거 변화가 기준치 이상에 도달했는지를 감시
+
+
+### epoll_create
+	int epoll_create (int size)
+	int epoll_create1 (int flags)
+**Parametters**
+- `int size`	: 등록할 수 있는 파일기술자의 개수
+- `int flags`	: 플래그
+
+**Return Value**
+- 
+
+**Description**  
+size값은 무시되고 동적으로 메모리를 관리한다.
+size에는 0 이상의 값을 넣어야 한다.
+size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인수이다.
+
+### epoll_ctl
+	int epoll_ctl(
+		int			epfd,
+		int			op,
+		int			fd,
+		struct epoll_event 	* event
+	)
 **Parametters**
 - 
 
@@ -176,6 +261,24 @@ poll 함수 또한 select 함수에 비해 큰 성능의 향상을 이룩하지�
 - 
 
 **Description**  
+### epoll_wait
+	epoll_wait(
+		int			epfd,
+		struct epoll_event	*events,
+		int			maxevents,
+		int			timeout
+	)
+	epoll_pwait(
+		int			epfd,
+		struct epoll_event	*events,
+		int			maxevents,
+		int			timeout,
+		const sigset_t		*sigmask)
+**Parametters**
+- 
+
+**Return Value**
+- 
 
 
 

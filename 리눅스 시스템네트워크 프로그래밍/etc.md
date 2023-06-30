@@ -73,6 +73,10 @@
 		- [writev](#writev)
 		- [struct timeval](#struct-timeval)
 		- [struct timespec](#struct-timespec)
+- [6장](#6장-1)
+	- [이론](#이론-4)
+		- [statefull](#statefull)
+		- [stateless](#stateless)
 
 # 1장  
 ## 이론  
@@ -822,7 +826,10 @@ TIME_WAIT 간격을 결정한다.
 		long		tv_nsec;	// 나노초
 	}
 ```
-
+# 6장
+## 이론
+### statefull
+### stateless
 
 <!-- 
 ## sub-title
