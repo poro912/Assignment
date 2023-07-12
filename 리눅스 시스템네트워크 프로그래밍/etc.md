@@ -819,6 +819,8 @@ TIME_WAIT 간격을 결정한다.
 		long		tv_usec;	// 마이크로초
 	}
 ```
+10E-6초(마이크로초) 까지 지정할 수 있다.
+
 ### struct timespec
 ``` cpp
 	struct timespec{
@@ -826,6 +828,8 @@ TIME_WAIT 간격을 결정한다.
 		long		tv_nsec;	// 나노초
 	}
 ```
+10E-9초(나노초) 까지 지정할 수 있다.
+
 # 6장
 ## 이론
 ### statefull

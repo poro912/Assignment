@@ -3,13 +3,14 @@
 <h2> Index </h2>
 
 - [서론](#서론)
+- [레벨/엣지 트리거](#레벨엣지-트리거)
 - [select](#select)
 	- [select와 pselect의 차이점](#select와-pselect의-차이점)
-	- [fd\_set](#fd_set)
+	- [fd\_set 구조체](#fd_set-구조체)
 	- [fd\_set 변경 매크로](#fd_set-변경-매크로)
 	- [select](#select-1)
 	- [pselect](#pselect)
-	- [select 시 필요 변수](#select-시-필요-변수)
+	- [select 시 필요 주요 변수](#select-시-필요-주요-변수)
 - [poll](#poll)
 	- [struct pollfd](#struct-pollfd)
 	- [poll events](#poll-events)
@@ -17,17 +18,19 @@
 	- [ppoll](#ppoll)
 - [epoll](#epoll)
 	- [epoll\_create](#epoll_create)
-- [**Parametters**](#parametters)
 - [**Return Value**](#return-value)
 	- [epoll\_ctl](#epoll_ctl)
-- [**Parametters**](#parametters-1)
 - [**Return Value**](#return-value-1)
-	- [epoll\_wait](#epoll_wait)
-- [**Parametters**](#parametters-2)
-- [**Return Value**](#return-value-2)
 - [sub-title](#sub-title)
 	- [function\_name](#function_name)
-- [**Parametters**](#parametters-3)
+- [sub-title](#sub-title-1)
+	- [function\_name](#function_name-1)
+	- [epoll\_wait](#epoll_wait)
+- [**Parametters**](#parametters)
+- [**Return Value**](#return-value-2)
+- [sub-title](#sub-title-2)
+	- [function\_name](#function_name-2)
+- [**Parametters**](#parametters-1)
 - [**Return Value**](#return-value-3)
 
 
@@ -36,42 +39,57 @@ I/O 멀티플렉싱의 사전적 의미는 다중 입출력 통신이다.
 데이터 흐름을 하나로 가정하고 설계, 구현하면 bottleneck으로 인한지연이 발생하게된다.  
 bottleneck으로 인한 레이턴시를 최소화할 수 있는 것이 멀티 플랙싱 기법이다.  
 
-통신시 넌블로킹 모드를 설정 후 순서대로 recv를 시도하는 방법도 가능하다.  
+통신시 넌블로킹 모드를 설정 후 모든 소켓을 순서대로 recv를 시도하는 방법도 가능하다.  
 그러나 소켓 버퍼에 수신된 경우에만 recv를 시도하는 편이 더욱 효율적이다.  
 
 select와 poll, epoll 함수가 지원된다.  
+이외에도 /dev/poll, kqueue 등의 비표준 기술이 있다.  
+
 select는 가장 큰 소켓 파일기술자 값이 클 수록 오버헤드가 발생한다.  
 poll은 select보다 정교한 정교한 핸들링이 가능하다.  
 poll은 500~1000개 이하의 통신 규모에서 사용한다.  
-select와 pool은 레벨 트리거만을 지원한다.  
+select와 pool은 레벨 트리거만을 지원한다.   
 epoll은 레벨/엣지 트리거를 지원한다.  
 
-이외에도 /dev/poll, kqueue 등의 비표준 기술이 있다.  
 
+## 레벨/엣지 트리거
+엣지 트리거
+- 상태가 변하는 순간을 기준으로 감지한다.  
+- 버퍼에 데이터가 남아있다면 이벤트를 발생한다.  
+
+레벨 트리거
+- 상태의 변화가 어떤 일정한 수준을 넘었는지를 감지한다.  
+- 버퍼에 데이터가 이전보다 더 많아질 경우에 이벤트를 발생한다.  
+- TCP 통신 중 수신해야하는 데이터가 더 남아있는 경우 사용할 수 있다.  
 
 
 ## select
-select와 pselect의 두가지 함수가 존재한다.
-select보다 pselect 함수를 주로 사용해야 한다. 
+select와 pselect의 두가지 함수가 존재한다.  
+select보다 pselect 함수를 주로 사용해야 한다.  
+
 가장 큰 번호의 파일기술자에 의해 오버헤드가 발생한다.  
 select 호출 시 인자로 가장 큰 파일 기술자 번호에 1을 더해 전달한다.  
 이 인자는 내부 루프 횟수를 의미하며 이로인해 기술자 번호가 클수록 성능에 불이익이 생긴다.  
-감시할 파일 기술자 리스트를 저장 및 관리해야 한다.
-파일 기술자 번호 중 가장 큰 값을 직접 계산하여 넘겨줘야 한다.
-
+파일 기술자 번호 중 가장 큰 값을 직접 계산하여 넘겨줘야 한다.  
+감시할 파일 기술자 리스트를 저장 및 관리해야 한다.  
 
 
 ### select와 pselect의 차이점  
 타임 아웃 구조체  
-- select - [struct timeval](../../etc.md#struct-timeval)  
-- pselect - [struct timespec](../../etc.md#struct-timespec)  
+- select - [struct timeval](../etc.md#struct-timeval)  
+- pselect - [struct timespec](../etc.md#struct-timespec)  
 
 블로킹 중 시그널 발생
-- select - 에러 리턴, 추가적인 시그널 처리 코딩을 해야 함  
-- pselect - 시그널 블록 마스크를 설정 가능  
+- select 
+  - 에러로 리턴
+  - 추가적인 시그널 처리를 직접 코딩해야 함  
+- pselect
+  - 블록 처리
+  - 시그널 마스크를 통해 시그널 지정 가능
 
 
-### fd_set
+### fd_set 구조체
+감시할 이벤트에 파일디스크립터를 등록하는 구조체이다.  
 파이프나 다른 장치의 이벤트 또한 감지할 수 있다.  
 ex) readfds에 stdin을 사용해 키보드 입력 발생을 감지할 수 있다.  
 
@@ -82,15 +100,15 @@ ex) readfds에 stdin을 사용해 키보드 입력 발생을 감지할 수 있�
 | errorfds	| TCP의 OOB데이터가 수신된 경우 |
 
 ### fd_set 변경 매크로
-	void	FD_ZERO(fd_set * fdset);
-	void	FD_CLR(int fd, fd_set * fdset);
-	void	FD_SET(int fd, fd_set * fdset);
-	int	FD_ISSET(int fd, fd_set * fdset);
-|FD_ZERO	| set을 초기화한다. |
+	void	FD_ZERO	(fd_set * fdset);
+	void	FD_CLR	(int fd, fd_set * fdset);
+	void	FD_SET	(int fd, fd_set * fdset);
+	int	FD_ISSET	(int fd, fd_set * fdset);
+|FD_ZERO	| fd_set을 초기화한다. |
 | -- | -- |
-|FD_SET		| set에 파일기술자를 등록한다.|
-|FD_CLR		| set에 파일기술자를 해제한다.|
-|FD_ISSET	| set에 파일기술자가 등록되어있는지 확인한다.|
+|FD_SET		| fd_set에 파일기술자를 등록한다. |
+|FD_CLR		| fd_set에 파일기술자를 해제한다. |
+|FD_ISSET	| fd_set에 파일기술자가 등록되어있는지 확인한다. |
 
 **Parametters**
 - `int fd`		: 변경할 파일디스크립터 번호
@@ -98,10 +116,10 @@ ex) readfds에 stdin을 사용해 키보드 입력 발생을 감지할 수 있�
 
 **Description**  
 fd_set 구조체는 1024bit(128 Byte)크기를 갖는다.  
+이벤트 발생시 파일 기술자에 해당하는 비트가 켜진상태로 반환된다.  
 fd_set 구조체는 감시할 파일디스크립터를 알려주는 동시에 결과를 반환할 때 사용한다.  
-이벤트가 발생시 파일 기술자에 해당하는 비트가 켜진상태로 반환된다.  
-select 함수가 성공적으로 리턴되었다면 입력한 파일 디스트립터를 FD_ISSET 매크로를 이용해서 확인해야한다.  
-select 함수를 재 호출 할 때 fd_set을 재설정해 넣어줘야 한다.  
+select 함수를 재 호출 할 때 fd_set에 감시할 파일 디스크립터를 재설정해 넣어줘야 한다.  
+select 함수가 성공적으로 리턴되었다면 파일 디스트립터를 FD_ISSET 매크로를 이용해서 확인해야한다.  
 
 
 ### select
@@ -128,7 +146,8 @@ select 함수를 재 호출 할 때 fd_set을 재설정해 넣어줘야 한다.
 nfds 인자에 fd_set에 등록된 파일기술자 중 가장 큰 수 + 1를 직접 계산해 넣어야 한다.  
 이벤트 발생으로 리턴시 timeval 구조체에 남은 시간이 기록되어 반환된다.  
 timeout 인자에 NULL 입력시 타임아웃 없이 진행된다.  
-timeval 구조체에 0 입력시 바로 리턴되므로 주의해야한다.  
+timeval 멤버에 0 입력시 바로 리턴되므로 주의해야한다.  
+
 
 ### pselect
 	int pselect(
@@ -148,7 +167,7 @@ timeval 구조체에 0 입력시 바로 리턴되므로 주의해야한다.
 sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.  
 
 
-### select 시 필요 변수
+### select 시 필요 주요 변수
 | fd_set| fds		| 이벤트 감시용 파일기술자 세트 |
 | -- | -- | -- |
 | int	| fd_biggest	| 파일 기술자 세트 중 가장 큰 번호 |
@@ -159,7 +178,6 @@ sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.
 
 ## poll
 select 함수의 복잡한 인수 리스트와 비효율적인 루프 구조를 개선하기위해 만들어진 함수이다.
-
 
 poll 함수 또한 select 함수에 비해 큰 성능의 향상을 이룩하지는 못했다.  
 
@@ -224,12 +242,9 @@ sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.
 
 
 ## epoll
-statefull 함수로 파일기술자 정보를 내부적으로 저장한다.
-엣지트리거의 지원이 추가되었다.
-엣지 트리거 : 상태가 변하는 순간을 기준으로 감지한다.
-레벨 트리거 : 상태의 변화가 어떤 일정한 수준을 넘었는지를 감지한다.
-엣지트리거 이전 상태에서 변화가 생겼는지를 감시
-레벨트리거 변화가 기준치 이상에 도달했는지를 감시
+statefull 함수로 파일기술자 정보를 내부적으로 저장한다.  
+엣지트리거의 지원이 추가되었다.  
+ 
 
 
 ### epoll_create
@@ -243,9 +258,9 @@ statefull 함수로 파일기술자 정보를 내부적으로 저장한다.
 - 
 
 **Description**  
-size값은 무시되고 동적으로 메모리를 관리한다.
-size에는 0 이상의 값을 넣어야 한다.
-size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인수이다.
+size값은 무시되고 동적으로 메모리를 관리되는 방식으로 변경되었다.  
+size에는 0 이상의 값을 넣어야 한다.  
+size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인수이다.  
 
 ### epoll_ctl
 	int epoll_ctl(
@@ -255,12 +270,64 @@ size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인�
 		struct epoll_event 	* event
 	)
 **Parametters**
-- 
+- `int epfd`	: epoll 파일 기술자
+- `int op`	: 조작할 작업
+  |EPOLL_CTL_ADD	| 파일 기술자와 이벤트를 등록한다.	|
+  | :--:		|:--:|
+  |EPOLL_CTL_DEL	| 파일 기술자의 정보를 제거한다.	|
+  |EPOLL_CTL_MOD	| 파일 기술자의 이벤트를 교체한다.	|
+- `int fd`	: 대상 파일기술자
+- `struct epoll_event * event`	: 이벤트 구조체
+  
 
 **Return Value**
 - 
 
 **Description**  
+
+## sub-title
+### function_name
+```cpp
+struct epoll_event{
+	uint32_t events;
+	epoll_data_t data;
+}__attribute__((__packed__));
+```
+**Parametters**
+- `uint32_t events` : 감시 이벤트
+  |EPOLLIN	| 읽기 버퍼에 데이터가 있다.	|
+  |--|--|
+  |EPOLLPRI	| 우선순위 데이터를 사용한다.(TCP의 OOB)	|
+  |EPOLLOUT	| 쓰기 버퍼가 사용가능한 상태	|
+  |EPOLLERR	| 연결에 에러가 발생함	|
+  |EPOLLHUP	| 닫힌 연결에 쓰기 시도 감지	|
+  |EPOLLONESHOT	| 이벤트 감시를 일회용으로 사용한다.	|
+  |EPOLLET	| 이벤트를 엣지 트리거로 작동시킨다.	|
+- `epoll_data_t data` : 감시대상 파일 기술자
+- 
+**Description**  
+
+
+## sub-title
+### function_name
+```cpp
+typedef union epoll_data{
+	void *ptr;
+	int fd;
+	uint32_t u32;
+	uint64_t u64;
+}epoll_data_t;
+```
+
+```cpp
+typedef union epoll_data{
+	void	*ptr;
+	int	fd;
+	uint32_t	u32;
+	uint64_t	u64;
+} epoll_data_t;
+```
+
 ### epoll_wait
 	epoll_wait(
 		int			epfd,
@@ -280,8 +347,8 @@ size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인�
 **Return Value**
 - 
 
-
-
+**Description**  
+이벤트 수신
 
 ## sub-title
 ### function_name
