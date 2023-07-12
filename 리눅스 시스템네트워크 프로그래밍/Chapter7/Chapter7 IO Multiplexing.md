@@ -1,4 +1,4 @@
-<h1> ChapterName </h1>
+<h1> I/O Multiplexing </h1>
 
 <h2> Index </h2>
 
@@ -18,20 +18,11 @@
 	- [ppoll](#ppoll)
 - [epoll](#epoll)
 	- [epoll\_create](#epoll_create)
-- [**Return Value**](#return-value)
 	- [epoll\_ctl](#epoll_ctl)
-- [**Return Value**](#return-value-1)
-- [sub-title](#sub-title)
-	- [function\_name](#function_name)
-- [sub-title](#sub-title-1)
-	- [function\_name](#function_name-1)
+- [**Return Value**](#return-value)
+	- [epoll\_event](#epoll_event)
+	- [epoll\_data](#epoll_data)
 	- [epoll\_wait](#epoll_wait)
-- [**Parametters**](#parametters)
-- [**Return Value**](#return-value-2)
-- [sub-title](#sub-title-2)
-	- [function\_name](#function_name-2)
-- [**Parametters**](#parametters-1)
-- [**Return Value**](#return-value-3)
 
 
 ## 서론
@@ -103,7 +94,7 @@ ex) readfds에 stdin을 사용해 키보드 입력 발생을 감지할 수 있�
 	void	FD_ZERO	(fd_set * fdset);
 	void	FD_CLR	(int fd, fd_set * fdset);
 	void	FD_SET	(int fd, fd_set * fdset);
-	int	FD_ISSET	(int fd, fd_set * fdset);
+	int	FD_ISSET(int fd, fd_set * fdset);
 |FD_ZERO	| fd_set을 초기화한다. |
 | -- | -- |
 |FD_SET		| fd_set에 파일기술자를 등록한다. |
@@ -131,14 +122,14 @@ select 함수가 성공적으로 리턴되었다면 파일 디스트립터를 FD
 		struct timeval	* restrict	timeout
 	)
 **Parametters**
-- `int		nfds`		: fd_set에 등록된 파일기술자 중 가장 큰 수 + 1
-- `fd_set *	readfds`	: 읽기 가능 이벤트
-- `fd_set *	writefds`	: 쓰기 가능 이벤트
-- `fd_set *	errorfds`	: 예외 상황 이벤트
-- `struct timeval *	timeout`	: [타임아웃 객체](../etc.md#struct-timeval)  
+- `int nfds`		: fd_set에 등록된 파일기술자 중 가장 큰 수 + 1
+- `fd_set *readfds`	: 읽기 가능 이벤트
+- `fd_set *writefds`	: 쓰기 가능 이벤트
+- `fd_set *errorfds`	: 예외 상황 이벤트
+- `timeval *timeout`	: [타임아웃 객체](../etc.md#struct-timeval)  
 
 **Return Value**
-- `ohter`	: 수신에 성공한 파일디스크립터의 수
+- `ohter`	: 수신에 성공한 이벤트 수
 - `0`	: timeout 발생시 까지 이벤트 없음
 - `-1`	: 에러, errno 설정 
 
@@ -159,9 +150,14 @@ timeval 멤버에 0 입력시 바로 리턴되므로 주의해야한다.
 		const sigset_t	* restrict	sigmask
 	)
 **Parametters**
-- `struct timespec	* timeout` : [타임아웃 객체](../etc.md#struct-timespec)
-- `const sigset_t sigmask` : 감지할 시그널 마스크
-  
+- `timespec *timeout` : [타임아웃 객체](../etc.md#struct-timespec)
+- `sigset_t sigmask` : 감지할 시그널 마스크
+
+**Return Value**
+- `ohter`	: 수신에 성공한 이벤트 수
+- `0`	: timeout 발생시 까지 이벤트 없음
+- `-1`	: 에러, errno 설정 
+
 **Description**  
 시그널 블록 마스크를 인수로 사용하여 함수 호출시 블록할 시그널을 지정할 수 있다.  
 sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.  
@@ -177,33 +173,33 @@ sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.
 
 
 ## poll
-select 함수의 복잡한 인수 리스트와 비효율적인 루프 구조를 개선하기위해 만들어진 함수이다.
-
+select 함수의 복잡한 인수 리스트와 비효율적인 루프를 개선하기위해 만들어진 함수이다.  
 poll 함수 또한 select 함수에 비해 큰 성능의 향상을 이룩하지는 못했다.  
-
 시그널을 감시할 수 있는 ppoll 함수가 있으나 표준함수가 아니다.
 
 
 ### struct pollfd
-감시할 파일디스크립터의 정보를 갖고있는 객체
-revents에 감시 결과가가 저장되어 반환된다.
 ``` cpp
-	struct pollfd{
-		int			fd;		// 파일 디스크립터
-		short			events;		// 요구된 이벤트
-		short			revents;	// 반환된 이벤트
-	}
+struct pollfd{
+	int			fd;		// 파일 디스크립터
+	short			events;		// 요구된 이벤트
+	short			revents;	// 반환된 이벤트
+}
 ```
+**Description**  
+감시할 파일디스크립터의 정보를 등록하는 구조체  
+revents에 감시 결과가가 저장되어 반환된다.  
 
 
 ### poll events
 | POLLIN	| 읽기 버퍼에 데이터가 있음</br>TCP 연결 요청이 들어옴 |
 | --|--|
 | POLLPRI	| TCP의 OOB 데이터가 감지됨 |
-| POLLOUT	| 쓰기 버퍼가 사용가능한 상태가 됨 |
+| POLLOUT	| 쓰기 버퍼가 사용가능한 상태가 됨</br>버퍼가 비워짐</br>넌블로킹 connect가 완료됨 |
 | POLLERR	| 연결에 에러가 발생함 |
 | POLLHUP	| 닫힌 연결에 쓰기 시도 감지 |
-| POLLNVAL	| 무효한 파일기술자 지정 에러 |
+| POLLNVAL	| 무효한 파일기술자 지정 에러</br>연결되지 않은 파일기술자를 지정함 |
+
 
 ### poll
 	int poll(
@@ -212,9 +208,9 @@ revents에 감시 결과가가 저장되어 반환된다.
 		int			timeout,
 	)
 **Parametters**
-- `struct pollfd fds[]`	: 감시할 파일기술자와 이벤트 정보
+- `pollfd fds[]`	: 감시할 파일기술자와 이벤트 정보
 - `nfds_t nfds`	: 감시할 파일기술자의 수 
-- `int timeout`	: 타임아웃 시간
+- `int timeout`	: 타임아웃
 
 **Return Value**
 - `ohter`	: 수신에 성공한 파일디스크립터의 수
@@ -222,9 +218,10 @@ revents에 감시 결과가가 저장되어 반환된다.
 - `-1`	: 에러, errno 설정 
 
 **Description**  
-타임아웃 시간을 NULL로 넣을경우 0으로 캐스팅되 즉시 반환된다  
-타임아웃 지정을 해제하려면 -1을 넣어야 한다.  
+타임아웃 없이 진행하려면 -1을 넣어야 한다.  
+타임아웃을 NULL로 지정한 경우 0으로 캐스팅돼 즉시 반환된다.  
 select와 달리 구조체에 값을 다시 집어넣을 필요가 없다.  
+
 
 ### ppoll
 	int ppoll(
@@ -234,18 +231,25 @@ select와 달리 구조체에 값을 다시 집어넣을 필요가 없다.
 		const sigset_t 		* sigmask
 	)
 **Parametters**
-- `struct timespec	* timeout` : [타임아웃 객체](../etc.md#struct-timespec)
-- `sigset_t * sigmask` : 감시할 이벤트 마스크
+- `timespec *timeout` : [타임아웃 객체](../etc.md#struct-timespec)
+- `sigset_t *sigmask` : 시그널 마스크
+
+**Return Value**
+- `ohter`	: 수신에 성공한 파일디스크립터의 수
+- `0`	: timeout 발생시 까지 이벤트 없음
+- `-1`	: 에러, errno 설정 
 
 **Description**  
-sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.  
+sigmask 인자를 NULL로 설정 시 poll과 동일한 효과를 갖는다.  
+
 
 
 ## epoll
+엣지트리거 기능의 지원이 추가되었다.  
 statefull 함수로 파일기술자 정보를 내부적으로 저장한다.  
-엣지트리거의 지원이 추가되었다.  
- 
-
+파일 기술자의 등록, 해제, 변경하는 함수와 이벤트를 감시하는함수가 분리되었다.  
+메모리 복사의 부담이 많이 줄어들었다.  
+이벤트가 발생한 파일기술자만 반환하기때문에 루프를 돌며 검사할 필요가 없다.
 
 ### epoll_create
 	int epoll_create (int size)
@@ -255,12 +259,16 @@ statefull 함수로 파일기술자 정보를 내부적으로 저장한다.
 - `int flags`	: 플래그
 
 **Return Value**
-- 
+- `other` : epoll 파일 기술자
+- `-1`
 
 **Description**  
+epoll 파일기술자를 생성한다.  
+epoll 파일기술자는 epoll을 구분할 수 있는 정보로 다른 파일기술자들과는 다르다.  
 size값은 무시되고 동적으로 메모리를 관리되는 방식으로 변경되었다.  
 size에는 0 이상의 값을 넣어야 한다.  
 size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인수이다.  
+close()를 사용해 epoll을 제거한다.  
 
 ### epoll_ctl
 	int epoll_ctl(
@@ -277,56 +285,54 @@ size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인�
   |EPOLL_CTL_DEL	| 파일 기술자의 정보를 제거한다.	|
   |EPOLL_CTL_MOD	| 파일 기술자의 이벤트를 교체한다.	|
 - `int fd`	: 대상 파일기술자
-- `struct epoll_event * event`	: 이벤트 구조체
+- `epoll_event *event`	: 이벤트 구조체
   
 
 **Return Value**
 - 
 
 **Description**  
+감시할 파일기술자의 이벤트를 등록, 변경, 제거한다.
 
-## sub-title
-### function_name
+
+### epoll_event
 ```cpp
 struct epoll_event{
-	uint32_t events;
-	epoll_data_t data;
+	uint32_t		events;
+	epoll_data_t		data;
 }__attribute__((__packed__));
 ```
 **Parametters**
 - `uint32_t events` : 감시 이벤트
-  |EPOLLIN	| 읽기 버퍼에 데이터가 있다.	|
-  |--|--|
-  |EPOLLPRI	| 우선순위 데이터를 사용한다.(TCP의 OOB)	|
-  |EPOLLOUT	| 쓰기 버퍼가 사용가능한 상태	|
-  |EPOLLERR	| 연결에 에러가 발생함	|
-  |EPOLLHUP	| 닫힌 연결에 쓰기 시도 감지	|
-  |EPOLLONESHOT	| 이벤트 감시를 일회용으로 사용한다.	|
-  |EPOLLET	| 이벤트를 엣지 트리거로 작동시킨다.	|
-- `epoll_data_t data` : 감시대상 파일 기술자
-- 
+  | EPOLLIN		| 읽기 버퍼에 데이터가 있다.	|
+  | -- | -- |
+  | EPOLLPRI	| 우선순위 데이터를 사용한다.(TCP의 OOB)	|
+  | EPOLLOUT	| 쓰기 버퍼가 사용가능한 상태가 됨</br>버퍼가 비워짐</br>넌블로킹 connect가 완료됨	|
+  | EPOLLERR	| 연결에 에러가 발생함	|
+  | EPOLLHUP	| 닫힌 연결에 쓰기 시도 감지	|
+  | EPOLLONESHOT	| 이벤트 감시를 일회용으로 사용한다.	|
+  | EPOLLET		| 이벤트를 엣지 트리거로 작동시킨다.	|
+- `epoll_data_t data` : 감시대상 정보를 갖는 union 자료형
+
 **Description**  
 
+EPOLLONESHOT의 경우 한번 감지된 파일기술자의 이벤트 마스크를 비활성화 시킨다.  
+epoll_ctl로 마스크를 재설정시 까지 이벤트를 감시하지 않는다.  
 
-## sub-title
-### function_name
+EPOLLRDNORM, EPOLLRDBAND, EPOLLWRNORM, EPOLLWRBAND 등의 다양한 이벤트가 존재한다.  
+
+### epoll_data
 ```cpp
 typedef union epoll_data{
-	void *ptr;
-	int fd;
-	uint32_t u32;
-	uint64_t u64;
+	void			*ptr;
+	int			fd;
+	uint32_t		u32;
+	uint64_t		u64;
 }epoll_data_t;
 ```
+**Description**  
+감시대상의 정보를 공용체에 저장한다.
 
-```cpp
-typedef union epoll_data{
-	void	*ptr;
-	int	fd;
-	uint32_t	u32;
-	uint64_t	u64;
-} epoll_data_t;
-```
 
 ### epoll_wait
 	epoll_wait(
@@ -342,22 +348,14 @@ typedef union epoll_data{
 		int			timeout,
 		const sigset_t		*sigmask)
 **Parametters**
-- 
+- `int epfd`	: epoll 파일디스크립터
+- `epoll_event *events` : 이벤트를 수신받을 epoll_event 배열
+- `int maxevents` : 수신받을 수 있는 이벤트의 최대 개수
+- `int timeout` : 타임아웃
+- `sigset_t *sigmask` : 시그널 마스크
 
 **Return Value**
-- 
+- `other` : 수신한 이벤트 개수
 
 **Description**  
-이벤트 수신
-
-## sub-title
-### function_name
-	[function]
-**Parametters**
-- 
-
-**Return Value**
-- 
-
-**Description**  
-
+파일기술자의 이벤트 수신 여부를 확인한다.  

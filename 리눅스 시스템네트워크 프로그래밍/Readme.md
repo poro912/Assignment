@@ -50,10 +50,10 @@
 [link](Chapter6/Chapter6%20IO%20Interface.md)  
 
 ## Chapter 7
-기간 : 2023/06/26 ~ 2023//  
+기간 : 2023/06/26 ~ 2023/07/15  
 제목 : I/O 멀티플렉싱  
 주제 : 다중 입출력 통신  
-[link](week/)  
+[link](Chapter7/Chapter7%20IO%20Multiplexing.md)  
 
 
 ## Chapter

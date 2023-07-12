@@ -1,5 +1,5 @@
 # Windows Internals
-![](img/cover.png)
+![](img/cover.jpg)
 </br> 저자 : 마크 러시노비치, 데이비드 솔로몬, 알렉스 이오네스쿠
 </br> 출판사 : 에이콘
 

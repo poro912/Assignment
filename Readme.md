@@ -17,3 +17,14 @@
 기간 : 2023/04/03 ~   
 내용 : 책 내용 정리  
 [Link](Windows%20Internals/Readme.md)
+
+## Windows VIA C/C++
+기간 : 2023/07/10 ~   
+내용 : 책 내용 정리  
+[Link](Windows%20VIA%20C%20C++/Readme.md)
+
+## Effective C++
+기간 : 20// ~   
+내용 : 책 내용 정리  
+[Link](Effective%20C++/Readme.md)
+
