@@ -19,7 +19,6 @@
 - [epoll](#epoll)
 	- [epoll\_create](#epoll_create)
 	- [epoll\_ctl](#epoll_ctl)
-- [**Return Value**](#return-value)
 	- [epoll\_event](#epoll_event)
 	- [epoll\_data](#epoll_data)
 	- [epoll\_wait](#epoll_wait)
@@ -27,7 +26,7 @@
 
 ## 서론
 I/O 멀티플렉싱의 사전적 의미는 다중 입출력 통신이다.  
-데이터 흐름을 하나로 가정하고 설계, 구현하면 bottleneck으로 인한지연이 발생하게된다.  
+데이터 흐름을 하나로 가정하고 입출력을 설계, 구현하면 bottleneck으로 인한지연이 발생하게된다.  
 bottleneck으로 인한 레이턴시를 최소화할 수 있는 것이 멀티 플랙싱 기법이다.  
 
 통신시 넌블로킹 모드를 설정 후 모든 소켓을 순서대로 recv를 시도하는 방법도 가능하다.  
@@ -164,8 +163,9 @@ sigmask 인자를 NULL로 설정 시 select 와 동일한 효과를 갖는다.
 
 
 ### select 시 필요 주요 변수
-| fd_set| fds		| 이벤트 감시용 파일기술자 세트 |
+| 자료형 | 변수명 | 사용 처 |
 | -- | -- | -- |
+| fd_set| fds		| 이벤트 감시용 파일기술자 세트 |
 | int	| fd_biggest	| 파일 기술자 세트 중 가장 큰 번호 |
 | int	| fd_socket[]	| 시스템에서 관리하는 파일기술자 배열|
 | int	| cnt_fd_socket	| fd_socket에서 관리하는 파일기술자 개수 |
@@ -192,8 +192,9 @@ revents에 감시 결과가가 저장되어 반환된다.
 
 
 ### poll events
+| 이벤트 명 | 설명 |
+| :-- | :--|
 | POLLIN	| 읽기 버퍼에 데이터가 있음</br>TCP 연결 요청이 들어옴 |
-| --|--|
 | POLLPRI	| TCP의 OOB 데이터가 감지됨 |
 | POLLOUT	| 쓰기 버퍼가 사용가능한 상태가 됨</br>버퍼가 비워짐</br>넌블로킹 connect가 완료됨 |
 | POLLERR	| 연결에 에러가 발생함 |
@@ -246,9 +247,9 @@ sigmask 인자를 NULL로 설정 시 poll과 동일한 효과를 갖는다.
 
 ## epoll
 엣지트리거 기능의 지원이 추가되었다.  
+메모리 복사의 부담이 많이 줄어들었다.  
 statefull 함수로 파일기술자 정보를 내부적으로 저장한다.  
 파일 기술자의 등록, 해제, 변경하는 함수와 이벤트를 감시하는함수가 분리되었다.  
-메모리 복사의 부담이 많이 줄어들었다.  
 이벤트가 발생한 파일기술자만 반환하기때문에 루프를 돌며 검사할 필요가 없다.
 
 ### epoll_create
@@ -256,19 +257,21 @@ statefull 함수로 파일기술자 정보를 내부적으로 저장한다.
 	int epoll_create1 (int flags)
 **Parametters**
 - `int size`	: 등록할 수 있는 파일기술자의 개수
-- `int flags`	: 플래그
+- `int flags`	: 플래그 (EPOLL_CLOSEXEC)
 
 **Return Value**
 - `other` : epoll 파일 기술자
-- `-1`
+- `-1`	: 에러, errno 설정 
 
 **Description**  
-epoll 파일기술자를 생성한다.  
+epoll 파일기술자를 생성하여 반환한다.  
 epoll 파일기술자는 epoll을 구분할 수 있는 정보로 다른 파일기술자들과는 다르다.  
 size값은 무시되고 동적으로 메모리를 관리되는 방식으로 변경되었다.  
 size에는 0 이상의 값을 넣어야 한다.  
-size 인수에 대한 의미가 사라져 플래그를 지정할 수 있는 인수이다.  
 close()를 사용해 epoll을 제거한다.  
+
+EPOLL_CLOSEXEC exec 계열 함수 실행 시 자동으로 파일 기술자를 닫는다.
+
 
 ### epoll_ctl
 	int epoll_ctl(
@@ -289,7 +292,8 @@ close()를 사용해 epoll을 제거한다.
   
 
 **Return Value**
-- 
+- `0` : 실행 성공
+- `-1` : 에러, errno 설정 
 
 **Description**  
 감시할 파일기술자의 이벤트를 등록, 변경, 제거한다.
@@ -315,11 +319,10 @@ struct epoll_event{
 - `epoll_data_t data` : 감시대상 정보를 갖는 union 자료형
 
 **Description**  
-
 EPOLLONESHOT의 경우 한번 감지된 파일기술자의 이벤트 마스크를 비활성화 시킨다.  
 epoll_ctl로 마스크를 재설정시 까지 이벤트를 감시하지 않는다.  
 
-EPOLLRDNORM, EPOLLRDBAND, EPOLLWRNORM, EPOLLWRBAND 등의 다양한 이벤트가 존재한다.  
+이외에도 EPOLLRDNORM, EPOLLRDBAND, EPOLLWRNORM, EPOLLWRBAND 등의 다양한 이벤트가 존재한다.  
 
 ### epoll_data
 ```cpp
@@ -355,7 +358,9 @@ typedef union epoll_data{
 - `sigset_t *sigmask` : 시그널 마스크
 
 **Return Value**
-- `other` : 수신한 이벤트 개수
-
+- `ohter`	: 수신에 성공한 파일디스크립터 개수
+- `0`	: timeout 발생시 까지 이벤트 없음
+- `-1`	: 에러, errno 설정 
+- 
 **Description**  
 파일기술자의 이벤트 수신 여부를 확인한다.  
