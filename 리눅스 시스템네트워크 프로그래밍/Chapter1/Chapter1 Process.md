@@ -4,14 +4,7 @@
 
 - [서론](#서론)
 - [fork](#fork)
-	- [pid\_t fork(void);](#pid_t-forkvoid)
 - [exec](#exec)
-	- [int execl (const char \*path, const char \*arg, ... );](#int-execl-const-char-path-const-char-arg--)
-	- [int execlp(const char \*file, const char \*arg, ... );](#int-execlpconst-char-file-const-char-arg--)
-	- [int execle(const char \*path, const char \*arg, ..., char \*const envp\[\]);](#int-execleconst-char-path-const-char-arg--char-const-envp)
-	- [int execv (const char \*path, char \*const argv\[\]);](#int-execv-const-char-path-char-const-argv)
-	- [int execvp(const char \*file, char \*const argv\[\]);](#int-execvpconst-char-file-char-const-argv)
-	- [int execve(const char \*path, char \*const argv\[\], char \*const envp\[\]);](#int-execveconst-char-path-char-const-argv-char-const-envp)
 - [posix\_spawn](#posix_spawn)
 	- [posix\_spawn](#posix_spawn-1)
 	- [posix\_spawnp](#posix_spawnp)
@@ -49,7 +42,7 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 이를 더 효율적이며, 세밀하게 제어할 수 있는 POSIX 프로세스에 관해 기술하였다.  
 
 ## fork
-### pid_t fork(void);
+	pid_t fork(void)
 **Return Value**
 - `other`	: 자식프로세스의 pid (부모프로세스일 경우 반환)
 - `0`	: 성공  (자식프로세스일 경우 반환)
@@ -62,12 +55,14 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
  정적 정보 : 힙 메모리, 정적 메모리, IPC 자원 ID, 열린 파일 , 시그널 마스크 등  
 
 ## exec
-### int execl (const char *path, const char *arg, ... );
-### int execlp(const char *file, const char *arg, ... );
-### int execle(const char *path, const char *arg, ..., char *const envp[]);
-### int execv (const char *path, char *const argv[]);
-### int execvp(const char *file, char *const argv[]);
-### int execve(const char *path, char *const argv[], char *const envp[]);
+```
+	int execl (const char *path, const char *arg, ... )
+	int execlp(const char *file, const char *arg, ... )
+	int execle(const char *path, const char *arg, ..., char *const envp[])
+	int execv (const char *path, char *const argv[])
+	int execvp(const char *file, char *const argv[])
+	int execve(const char *path, char *const argv[], char *const envp[])
+```
 **Parameters**
 - `const char *path`    : 실행할 파일, 주소로 경로를 확인
 - `const char *file`	: 실행할 파일, 환경변수에서 경로 탐색(파일 이름만 주면 환경변수에서 확인)
@@ -79,13 +74,10 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 - `char *const envp[]`	: 환경변수 목록
   - 접미사 `e : envitonmental path` 
   
-**Return Value**
-- 실행 성공 시 반환값 없음
+**Return Value**  
 - `-1`	: 실패
 
 **Description**  
-
-실행 코드 복제  
 현재 실행중인 프로세스를 새로운 프로세스로 교체한다.  
 입력한 인자를 바탕으로 프로그램을 실행 한다.  
 기본적인 PID, PPID, 파일 디스크립터 등 프로세스의 정보는 유지된다.  
@@ -129,19 +121,19 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 - `-1`	: 명령 실패 (fork 불가)
 
 **Description**  
- fork-exec 구조의 오버헤드를 방지하고 향상된 기능을 제공하는 함수  
- 저수준 파일 처리, 세션과 프로세스 그룹, 시그널 처리, 스케줄링에 대한 처리가 포함되어있다.  
- file_actions, attrp 인수를 이용하여 부모프로세스의 자원을 선택적으로 복제할 수 있다.  
+fork-exec 구조의 오버헤드를 방지하고 향상된 기능을 제공하는 함수  
+저수준 파일 처리, 세션과 프로세스 그룹, 시그널 처리, 스케줄링에 대한 처리가 포함되어있다.  
+file_actions, attrp 인수를 이용하여 부모프로세스의 자원을 선택적으로 복제할 수 있다.  
 
 ## posix_spawn_file_action_t 구조체
 **Description**  
- posix_spawn함수 호출 시 열거나 닫을 파일을 제어하는 구조체  
- init 함수를 통해 무조건 초기화 후 사용해야 한다.  
- 사용을 완료한 경우 메모리를 해제해야 메모리 누수가 생기지 않는다.  
- EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러  
+posix_spawn함수 호출 시 열거나 닫을 파일을 제어하는 구조체  
+init 함수를 통해 무조건 초기화 후 사용해야 한다.  
+사용을 완료한 경우 메모리를 해제해야 메모리 누수가 생기지 않는다.  
+EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러  
 
 
-**Common Parameters**
+**Parameters**
 - `posix_spawn_file_actions_t *file_actions`
   - 속성을 변경할 객체의 주소
 - `int fildes`	: file descriptor 번호
@@ -149,7 +141,7 @@ exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이�
 - `mode_t mode`	: 파일 접근 권한 ex) 0644, 0777
 
 
-**Common Return Value**
+**Return Value**
 - `other`	: 에러번호
 - `0`		: 성공
 

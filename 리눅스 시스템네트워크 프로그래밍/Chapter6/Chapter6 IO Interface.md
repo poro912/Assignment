@@ -94,7 +94,7 @@
 - [공통 기법](#공통-기법)
 - [sub-title](#sub-title)
 	- [function\_name](#function_name)
-- [**Parametters**](#parametters)
+- [**Parameters**](#Parameters)
 - [**Return Value**](#return-value)
 
 
@@ -126,7 +126,7 @@ popen 함수는 command에 해당하는 명령을 실행하며 fork 한다.
 
 ### pipe
 	int pipe(int filedes[2]);
-**Parametters**
+**Parameters**
 -  `int filedes[2]` : 읽기, 쓰기 파일디스크립터를 반환받을 배열
 
 **Return Value**
@@ -146,7 +146,7 @@ filedes[1]	: 쓰기전용
 		const char		*command,
 		const char		*type
 	)
-**Parametters**
+**Parameters**
 - `char *command` : 실행할 명령어
 - `char *type`
   - "r" : 읽기모드 명령어가 표준출력으로 출력한 문자열을 읽을 수 있도록 함
@@ -165,7 +165,7 @@ FILE * 타입을 반환하지만 pclose로 닫아야 한다.
 
 ### pclose
 	int pclose(FILE *stream)
-**Parametters**
+**Parameters**
 - `FILE *stream` : 닫을 파일 스트림
 
 **Return Value**
@@ -194,7 +194,7 @@ FIFO를 닫으면 수신측은 EOF가 수신된다.
 		const char		*pathname,
 		mode_t			mode
 	)
-**Parametters**
+**Parameters**
 - `const char *pathname` : 파이프로 사용할 파일 이름
 - `mode_t mode` : 파이프 접근 권한  
 
@@ -216,7 +216,7 @@ FIFO를 닫으면 수신측은 EOF가 수신된다.
 		const char		*path,
 		mode_t			mode
 	)
-**Parametters**
+**Parameters**
 - `int fd` : 디렉터리의 기술자
 - `const char *path` : 파이프로 사용할 파일 이름 (상대경로로 해석)
 - `mode_t mode` : 파이프 접근 권한  
@@ -285,7 +285,7 @@ int main() {
 	// big end to little end
 	uint32_t ntohl(uint32_t netlong)	// network to host long
 	uint16_t ntohs(uint16_t netshort)	// network to host short
-**Parametters**
+**Parameters**
 - 해당하는 바이트오더로 변환할 값
 
 **Return Value**
@@ -312,7 +312,7 @@ I/O 인터페이스중 가장 많이 사용된다.
 		int			type,
 		int			protocol
 	)
-**Parametters**
+**Parameters**
 - `int domain` 
 	 | AF_UNIX  | 유닉스 도메인 소켓 (AF_LOCAL로도 가능) |
 	 | :------: | :------------------------------------- |
@@ -744,7 +744,7 @@ TCP 소켓을 생성한다.
 		const struct sockaddr	*addr,
 		socklen_t		addrlen
 	)
-**Parametters**
+**Parameters**
 - `int sockfd`	: socket함수로 생성한 파일디스크립터
 - `struct sockaddr *addr`
   - 바인드 할 외부 인터페이스 정보 구조체
@@ -847,7 +847,7 @@ sockaddr_in6 구조체를 추가적으로 감싸기 위해 만들어졌다.
 		int			socket,
 		int			backlog
 	)
-**Parametters**
+**Parameters**
 - `int socket` : bind된 파일디스크립터
 - `int backlog` : 연결 대기큐의 크기 (2의 제곱수를 주로 사용)
 
@@ -866,7 +866,7 @@ sockaddr_in6 구조체를 추가적으로 감싸기 위해 만들어졌다.
 		struct sockaddr *restrict	address, 
 		socklen_t *restrict		address_len
 	)
-**Parametters**
+**Parameters**
 - `int sockfd`		: connect요청을 수락할 파일디스크립터
 - `struct sockaddr *restrict address`
   - 접속을 시도한 클라이언트의 주소 정보
@@ -895,7 +895,7 @@ accept가 루프를 도는 경우 매 루프마다 sockaddr 매개변수를 설�
 		socklen_t		address_len
 	)
 	
-**Parametters**
+**Parameters**
 - `int socket`			: socket함수(bind)로 생성한 파일디스크립터
 - `struct socaddr *address`	: sockaddr_* 구조체, sockaddr 구조체로 캐스팅 해야 함
 - `socklen_t address_len`	: sockaddr 구조체의 크기
@@ -917,7 +917,7 @@ connect 성공 시 해당 소켓은 통신 가능상태가 되어 데이터를 �
 		int			flags
 	)
 	
-**Parametters**
+**Parameters**
 - `int sockfd` : 소켓 파일디스크립터
 - `void *buffer` : 보낼 데이터의 버퍼
 - `size_t length` : 버퍼에 담긴 데이터의 크기
@@ -958,7 +958,7 @@ connect 성공 시 해당 소켓은 통신 가능상태가 되어 데이터를 �
 		int			flags
 	)
 
-**Parametters**
+**Parameters**
 - `int sockfd` : 소켓 파일디스크립터
 - `void *buffer` : 데이터를 저장할 버퍼
 - `size_t length` : 데이터를 저장할 버퍼의 크기
@@ -993,7 +993,7 @@ connect 성공 시 해당 소켓은 통신 가능상태가 되어 데이터를 �
 		int			socket,
 		int			how
 	)
-**Parametters**
+**Parameters**
 - `int socket`	: 닫을 소켓 파일디스크립터
 - `int how`
   - 닫을 채널과 방법
@@ -1158,7 +1158,7 @@ UDP 소켓을 생성한다.
 		const struct sockaddr 	*dest_addr,
 		socklen_t		dest_len
 	)
-**Parametters**
+**Parameters**
 - `int socket` : 소켓 파일디스크립터
 - `void *messsage` : 보낼 데이터의 버퍼
 - `size_t length` : 버퍼에 담긴 데이터의 크기
@@ -1193,7 +1193,7 @@ UDP 소켓을 생성한다.
 		const struct sockaddr *restrict		address,
 		socklen_t *restrict	address_len
 	)
-**Parametters**
+**Parameters**
 - `int socket` : 소켓 파일디스크립터
 - `void *buffer` : 받을 데이터의 버퍼
 - `size_t length` : 데이터를 저장할 버퍼의 크기
@@ -1480,7 +1480,7 @@ IPv4-mapped IPv6 : IPv4 주소를 포함하는 IPv6
 		socklen_t		*option_len
 	)
 
-**Parametters**
+**Parameters**
 - `int socket` : 변경할 소켓 파일디스크립터 
 - `int level`
   - 변경할 레벨  
@@ -1945,7 +1945,7 @@ ex) send 메소드, 시스템 프로그래밍 레벨 : 동기, 커널 레벨 : �
 ## sub-title
 ### function_name
 	[function]
-**Parametters**
+**Parameters**
 - 
 
 **Return Value**

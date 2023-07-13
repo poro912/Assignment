@@ -50,17 +50,22 @@
 [link](Chapter6/Chapter6%20IO%20Interface.md)  
 
 ## Chapter 7
-기간 : 2023/06/26 ~ 2023/07/15  
+기간 : 2023/06/26 ~ 2023/07/12  
 제목 : I/O 멀티플렉싱  
-주제 : 다중 입출력 통신  
+주제 : 다중 입출력 통신 epoll  
 [link](Chapter7/Chapter7%20IO%20Multiplexing.md)  
 
+## Chapter8
+기간 : 2023/07/13 ~ 2023//  
+제목 : 스레드 프로그래밍  
+주제 :   
+[link](Chapter8/Chapter8%20Thread%20Programming.md)  
 
 ## Chapter
 기간 : 2023// ~ 2023//  
 제목 :   
 주제 :   
-[link](week/)  
+[link](Chapter/)  
 
 
 

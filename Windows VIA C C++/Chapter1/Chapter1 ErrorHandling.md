@@ -12,6 +12,8 @@
 	- [FormatMessage](#formatmessage)
 - [**Parametters**](#parametters)
 - [**Return Value**](#return-value)
+	- [SetLastError](#setlasterror)
+	- [에러코드 필드](#에러코드-필드)
 - [sub-title](#sub-title)
 	- [function\_name](#function_name)
 - [**Parametters**](#parametters-1)
@@ -71,9 +73,14 @@ Visual Studio 내에 포함된 Error Lookup 유틸리티를 활용하면 에러�
 
 ### FormatMessage
 	DWORD FormatMessage(
-		
-
-	)
+  		[in]		DWORD		dwFlags,
+		[in, optional]	LPCVOID		lpSource,
+		[in]		DWORD		dwMessageId,
+		[in]		DWORD		dwLanguageId,
+		[out]		LPTSTR		lpBuffer,
+		[in]		DWORD		nSize,
+		[in, optional]	va_list		*Arguments
+	);
 **Parametters**
 - 
 
@@ -81,7 +88,26 @@ Visual Studio 내에 포함된 Error Lookup 유틸리티를 활용하면 에러�
 - 
 
 **Description**  
-에러코드를 메시지 텍스트로 변환해주는 함수
+에러코드를 메시지 텍스트로 변환해주는 함수  
+에러가 발생한 경우 사용자에게 에러에 대한 설명을 보여주고 싶은 경우 사용한다.  
+https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessage
+
+
+### SetLastError
+	VOID SetLastError(DWORD dwErrCode);
+**Parametters**
+- `DWORD dwErrCode` : 등록할 에러코드
+
+**Description**  
+에러코드를 스레드 마지막 에러코드로 설정한다.
+
+### 에러코드 필드
+| 비트 | 31-30	| 29	| 28	| 27-16	| 15-0	|
+| :--	| :--	| :--	| :--	| :--	| :--	|
+| 비트 | 00	| 0	| 0	| 000 0000 0000 0	| 000 0000 0000 0000	|
+| 내용	| 심각도	| 정의자	| 예약됨	| 식별코드	| 예외코드	|
+| 의미	| 0 = 성공<br>1 = 정보<br>2 = 주의<br>3 =  에러	| 0 = 마이크로소프트<br>1 = 고객	| 항상 0	| 256까지는 이미 예약됨	| 마소나 고객이 정의한 코드	|
+
 
 
 ## sub-title

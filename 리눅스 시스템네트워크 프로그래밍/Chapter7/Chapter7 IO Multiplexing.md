@@ -100,7 +100,7 @@ ex) readfds에 stdin을 사용해 키보드 입력 발생을 감지할 수 있�
 |FD_CLR		| fd_set에 파일기술자를 해제한다. |
 |FD_ISSET	| fd_set에 파일기술자가 등록되어있는지 확인한다. |
 
-**Parametters**
+**Parameters**
 - `int fd`		: 변경할 파일디스크립터 번호
 - `fd_set * fdset`	: 변경을 저장할 fd_set 구조체
 
@@ -120,7 +120,7 @@ select 함수가 성공적으로 리턴되었다면 파일 디스트립터를 FD
 		fd_set	* restrict	errorfds,
 		struct timeval	* restrict	timeout
 	)
-**Parametters**
+**Parameters**
 - `int nfds`		: fd_set에 등록된 파일기술자 중 가장 큰 수 + 1
 - `fd_set *readfds`	: 읽기 가능 이벤트
 - `fd_set *writefds`	: 쓰기 가능 이벤트
@@ -148,7 +148,7 @@ timeval 멤버에 0 입력시 바로 리턴되므로 주의해야한다.
 		struct timespec	* restrict	timeout,
 		const sigset_t	* restrict	sigmask
 	)
-**Parametters**
+**Parameters**
 - `timespec *timeout` : [타임아웃 객체](../etc.md#struct-timespec)
 - `sigset_t sigmask` : 감지할 시그널 마스크
 
@@ -208,7 +208,7 @@ revents에 감시 결과가가 저장되어 반환된다.
 		nfds_t			nfds,
 		int			timeout,
 	)
-**Parametters**
+**Parameters**
 - `pollfd fds[]`	: 감시할 파일기술자와 이벤트 정보
 - `nfds_t nfds`	: 감시할 파일기술자의 수 
 - `int timeout`	: 타임아웃
@@ -231,7 +231,7 @@ select와 달리 구조체에 값을 다시 집어넣을 필요가 없다.
 		const struct timespeec 	* timeout_ts,
 		const sigset_t 		* sigmask
 	)
-**Parametters**
+**Parameters**
 - `timespec *timeout` : [타임아웃 객체](../etc.md#struct-timespec)
 - `sigset_t *sigmask` : 시그널 마스크
 
@@ -255,7 +255,7 @@ statefull 함수로 파일기술자 정보를 내부적으로 저장한다.
 ### epoll_create
 	int epoll_create (int size)
 	int epoll_create1 (int flags)
-**Parametters**
+**Parameters**
 - `int size`	: 등록할 수 있는 파일기술자의 개수
 - `int flags`	: 플래그 (EPOLL_CLOSEXEC)
 
@@ -280,7 +280,7 @@ EPOLL_CLOSEXEC exec 계열 함수 실행 시 자동으로 파일 기술자를 �
 		int			fd,
 		struct epoll_event 	* event
 	)
-**Parametters**
+**Parameters**
 - `int epfd`	: epoll 파일 기술자
 - `int op`	: 조작할 작업
   |EPOLL_CTL_ADD	| 파일 기술자와 이벤트를 등록한다.	|
@@ -306,7 +306,7 @@ struct epoll_event{
 	epoll_data_t		data;
 }__attribute__((__packed__));
 ```
-**Parametters**
+**Parameters**
 - `uint32_t events` : 감시 이벤트
   | EPOLLIN		| 읽기 버퍼에 데이터가 있다.	|
   | -- | -- |
@@ -349,8 +349,9 @@ typedef union epoll_data{
 		struct epoll_event	*events,
 		int			maxevents,
 		int			timeout,
-		const sigset_t		*sigmask)
-**Parametters**
+		const sigset_t		*sigmask
+	)
+**Parameters**
 - `int epfd`	: epoll 파일디스크립터
 - `epoll_event *events` : 이벤트를 수신받을 epoll_event 배열
 - `int maxevents` : 수신받을 수 있는 이벤트의 최대 개수
@@ -361,6 +362,6 @@ typedef union epoll_data{
 - `ohter`	: 수신에 성공한 파일디스크립터 개수
 - `0`	: timeout 발생시 까지 이벤트 없음
 - `-1`	: 에러, errno 설정 
-- 
+  
 **Description**  
 파일기술자의 이벤트 수신 여부를 확인한다.  
