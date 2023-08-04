@@ -7,4 +7,4 @@
 기간 : 2023/07/12 ~ 2023/07/13
 </br> 제목 : 에러 핸들링
 </br> 주제 : 윈도우의 에러 처리와 에러 등록
-</br> [link](chapter%203/SystemMechanism.md)
+</br> [link](Chapter1/Chapter1%20ErrorHandling.md)

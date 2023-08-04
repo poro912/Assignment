@@ -338,13 +338,13 @@ typedef union epoll_data{
 
 
 ### epoll_wait
-	epoll_wait(
+	int epoll_wait(
 		int			epfd,
 		struct epoll_event	*events,
 		int			maxevents,
 		int			timeout
 	)
-	epoll_pwait(
+	int epoll_pwait(
 		int			epfd,
 		struct epoll_event	*events,
 		int			maxevents,
