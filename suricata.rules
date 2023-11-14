@@ -1,0 +1,5 @@
+alert icmp $HOME_NET any -> $EXTERNAL_NET any (msg: "ICMP 8.8.8.8 Running"; sid:1000003; rev:1;)
+#drop icmp 172.25.123.204 any -> 8.8.8.8 any (msg: "ICMP 8.8.8.8 Running"; sid:1000002; rev:1;)
+#alert http any any -> any any (msg:"Do not read gossip during work"; content:"Scarlett"; nocase; classtype:policy-violation; sid:1; rev:1;)
+#alert icmp any any -> any any (msg: "ICMP 8.8.8.8 Running"; sid:1000002; rev:1;)
+#drop icmp 192.168.10.200 any -> 8.8.8.8 any (msg: "ICMP 8.8.8.8 Running"; sid:1000002; rev:1;)
