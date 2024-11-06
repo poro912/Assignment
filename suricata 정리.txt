@@ -1,0 +1,249 @@
+suricata 수리카타
+
+
+오픈소스 IDS 시스템
+Intrusion Detection System
+
+수리카타 공식 문서
+https://docs.suricata.io/en/suricata-6.0.3/index.html
+https://docs.suricata.io/en/suricata-6.0.3/rules/intro.html
+
+수리카타 정리 블로그
+https://boying-blog.tistory.com/33
+https://saynot.tistory.com/entry/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-Suricata%EC%88%98%EB%A6%AC%EC%B9%B4%ED%83%80-%EA%B3%B5%EB%B6%80
+
+
+Snort와 Suricata
+	Snort 또한 IDS이다
+	실시간 트래픽 분석, 패킷 로깅 용도로 사용된다.
+	Snort의 단점인 단일 스레드 처리 방식을 보완하기 위해 만들어졌다
+	Snort 룰이 호환되어 사용가능하다.
+
+Suricata
+	높은 성능의 IDS, IPS 네트워크 모니터링 엔진
+	메타, IP, TCP, UDP, ICMP, 페이로드, 변환, 필터, Flow, ByPass, HTTP, File, DNS, SSL/TLS, SSH 등 대부분을 감지, 차단 가능하다
+	다중코어 다중 쓰레드 지원
+	로드 밸런싱, RSS, 오프로드 지원
+
+ubuntu 설치
+	sudo add-apt-repository ppa:oisf/suricata-stable
+	sudo apt-get update
+	sudo apt-get install suricata
+
+규칙 다운로드
+	sudo suricata-update
+
+
+PCAP	(Packet Capture)
+	네트워크 상에 떠돌아다니는 패킷 포착
+	
+building blocks
+	수리카타의 구성 스레드 명
+
+runmode
+	https://docs.suricata.io/en/suricata-6.0.3/performance/runmodes.html
+	--list-runmodes	옵션을 통해 런모드를 확인할 수 있다.
+	workers	보통 가장 좋은 성능을 발휘함, 하나 이상의 패킷처리 스레드
+	autofp	하나 이상의 캡쳐스레드를 생성
+	single	패킷 처리 스레드를 하나만 갖는다. (개발 시점에 유용)
+
+	패킷 처리 스레드	: 패킷을 받아 분석하는 스레드
+	캡쳐 스레드	: 로드밸런싱을 해주는 스레드 
+
+로드 밸런싱
+	workers 모드에서 가장 좋은 성능을 발휘한다.
+
+RSS
+	Receive Side Scaling
+	트래픽을 분산시키는데 사용하는 기술
+	트래픽 분산 시 서로 다른 큐에 대기하는경우 타이밍 문제가 발생할 수 있다.
+	hand shake 시 SYN/ACK패킷이 뒤늦게 도착할 수 있다, 이경우 유효하지 않은 패킷으로 처리한다.
+
+오프로드
+	기본적으로 NIC 및 드라이버에서 제공하는 오프로드 기능은 비활성화 해야함
+	LRO/GRO를 비활성화 해야함(대규모 수신 오프로드 , 일반 수신 오프로드 )
+
+하이퍼스캔
+	https://www.intel.com/content/www/us/en/developer/articles/technical/introduction-to-hyperscan.html
+	다중 정규식 매칭 라이브러리
+	C++로 작성된 정규식 컴파일러를 사용한다.
+	사용을 위해서는 suricata.yaml을 편집을 통해 종속성을 설정해야한다.
+
+통계
+	8초마다 고정된 간격으로 통계 레코드를 생성한다.
+	패킷 손실 통계를 보고한다.
+	AF_PACKET 모드
+		Capture.kernel_packets	사용자 공간으로 전달된 패킷 수
+		Capture.kernel_drops	폐기처리된 패킷 수
+	PF_PING
+		Capture.kernel_packets	pf_ring에서 본 총 패킷 수
+		Capture.kernel_drops	폐기처리된 패킷 수
+
+그래프 그리기 도구 지원
+
+패킷 프로파일링
+	패킷을 처리하는데 걸리는 시간을 알고싶은 경우 사용함
+	특정 패킷이 더 빠르거나 느리게 처리되는 이유를 알고싶은 경우 사용 가능
+
+규칙 프로파일링
+	규칙번호에 대한 통계를 확인할 수 있다.
+
+문제 및 성능 분석
+	https://docs.suricata.io/en/suricata-6.0.3/performance/analysis.html
+	문제를 쉽게 찾는방법 고려 방법에 대해 설명되어있다.
+	시스템 부하
+		htop 도구를 사용하여 코어 사용량을 분석할 수 있다.
+	로그 파일
+		stats.log 및 suricata.log 파일에 문제가 기록된다.
+		Capture.kernel_drops는 Capture.kernel_packets의 1% 미만이어야 한다.
+	수리카타 부하
+	트래픽
+	규칙
+
+문법
+	크게 Action, header, role로 나뉜다.
+Action		Protocol	SrcIP	srcPort		->	DstIP	DDstPort	Option
+
+example
+drop tcp $HOME_NET any -> $EXTERNAL_NET any (msg:”ET TROJAN Likely Bot Nick in IRC (USA +..)”; flow:established,to_server; flowbits:isset,is_proto_irc; content:”NICK “; pcre:”/NICK .*USA.*[0-9]{3,}/i”; reference:url,doc.emergingthreats.net/2008124; classtype:trojan-activity; sid:2008124; rev:2;)
+
+Action
+	alert		경고 발생 및 로그 기록
+	pass		패킷 무시
+	drop		패킷 차단 및 로그 기록
+	reject		패킷 차단 및 로그 기록(인라인 구조가 되어야함)
+	rejectsrc	retect와 동일
+	rejectdst	일치하는 패킷의 수신자에게 RST/ICMP 오류 패킷을 보낸다.
+	rejectboth	양쪽 모두에게 RST/ICMP 오류 패킷을 보낸다.
+
+Protocol
+	tcp	TCP 탐지
+	udp	UDP 탐지
+	icmp	ICMP 탐지
+	ip	전체 탐지
+	any	전체
+
+SrcIP/DstIP 형식
+192.168.100.2/32
+192.168.100.0/24	서브넷
+[192.168.100.0/24, 192.168.101.0/24]	: 서브넷 집합
+!192.168.100.2			: 192.168.100.2를 제외한 모든 IP 주소
+![192.168.100.2, 192.168.100.3]	: 192.168.100.2, 192.168.100.3을 제외한 모든 주소
+!192.168.100.0/24		: 192.168.20.0/24 를제외한 모든 서브넷
+$HOME_NET		: 내부 IP 주소 변수
+$EXTERNAL_NET		: 외부 IP 주소 변수
+$XXX_SERVERq		: 특정 서버 IP 주소 변수
+
+
+SrcPort/DstPort
+80	: 80번 포트
+[1:500]	: 1~500번 포트
+[80,81,82]	: 포트 80, 81, 82
+!80	: 80을 제외한 나머지 포트
+!1~500	: 1~500을 제외한 나머지 포트
+any	: 모든 포트
+
+
+방향 지정
+->	: 요청 패킷 탐지
+<>	: 요청/응답 패킷 둘 모두 탐지
+
+
+옵션
+
+일반 옵션
+msg		경고 이벤트 메시지		msg:"메시지 내용";
+sid		룰 식별자(3000000 이상 권장)	sid:3000001;
+rev		룰 버전				rev:1;
+priority	우선순위			priority:1;
+classtype	스노트 룰 분류			classtype:분류이름;
+reference	취약점 참고 배포 URL 경로	reference:타입, reference 내용;
+
+
+흐름 옵션
+flow				흐름 옵션 명령어
+to_server 또는 from_client	클라이언트 -> 서버 패킷 룰 매칭
+to_client 또는 from_server	서버 -> 클라이언트 패킷 룰 매칭
+established			세션이 연결된 상태의 패킷 룰 매칭
+statless			세션 연결 유무와 상관없이 룰 매칭
+flow:to_server,established	클라이언트 -> 서버 세션 연결 패킷 룰 매칭
+
+
+페이로드 옵션
+content		문자/숫자 탐지			content:"xxx";		content:"|16진수|";	
+nocase		대소문자 구분 없이 탐지		content:"xxx"; nocase;
+offset		지정한 바이트번째부터 탐지	offset:3;
+depth		지정한 바이트까지 탐지		depth:3;
+distance	content 매칭 후 지정 위치 이후 다른 content 탐색	content:"xxx"; content"yyy"; distance:5;
+within		content 매칭 후 지정 위치 안에 다른 content 탐색	content:"xxx"; content"yyy"; within:5;
+pcre		정규화 표기, '/'는 시작과 끝에 표기	pcre:"/(http|ftp) Traffic/"
+		16진수는 앞에 \x 표기
+
+
+HTTP 탐색 옵션
+http_method		페이로드 앞부분 HTTP메소드 패턴 매칭
+http_url		페이로드 HTTP URL 패턴 매칭
+http_cookie		페이로드 HTTP 쿠키 패턴 매칭
+http_header		HTTP 요청/응답 Header 내용 패턴 매칭
+http_client_body	HTTP 요청/응답 Body 내용 패턴 매칭
+http_stat_code		HTTP 응답 상태 코드 패턴 매칭
+http_stat_message	HTTP 응답 상태 메세지 패턴 매칭
+
+
+pcre
+	content 정보를 세밀하게 검색할 때 사용한다
+	메타문자, 숫자, 클래스, 서브패턴, 옵션으로 구성
+	pcre:"/레직스/옵션";
+
+
+
+suricata 커멘드
+
+-h		명령어 목록 출력
+-r <path>	패킷캡쳐 오프라인 모드 실행
+		미리 기록된 파일에서 패킷을 읽는다.
+		디렉터리 지정 시 디렉터리의 모든 파일간 흐름상태를 유지하며 수정된 순서대로 처리
+-T		테스트 설정
+		/var/lib/suricata/rules/suricata.rules 파일을 기반으로 실행
+-D		데몬 실행
+		백그라운드에서 실행된다.
+--pcap-file-continuous
+		-r 옵션과 함께 사용된다
+		모드가 중단될 때까지 활성상태를 유지함
+--pcap-file-recursive
+		-r 옵션과 함께 사용된다
+		하위 디렉터리를 재귀적으로 이동한다.
+		--pcap-file-continuous와 함께 사용할 수 없다.
+--pcap-file-delete
+		-r 옵션과 함께 사용된다
+		모드가 처리된 후 pcap 파일을 삭제한다.
+
+
+--runmode <runmode>
+		Workers, autofp, Single
+-k [all|none]
+		체크섬 확인을 강제로(모두)하거나, 체크섬 확인을 비활성화 한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
