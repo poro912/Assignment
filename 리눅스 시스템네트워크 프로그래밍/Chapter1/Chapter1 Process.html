@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>&#xd504;&#xb85c;&#xc138;&#xc2a4;</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="프로세스">프로세스</h1>
+<h2 id="index">Index</h2>
+<ul>
+<li><a href="#%ED%94%84%EB%A1%9C%EC%84%B8%EC%8A%A4">프로세스</a>
+<ul>
+<li><a href="#index">Index</a></li>
+<li><a href="#%EC%84%9C%EB%A1%A0">서론</a></li>
+<li><a href="#fork">fork</a>
+<ul>
+<li><a href="#pid_t-forkvoid">pid_t fork(void);</a></li>
+</ul>
+</li>
+<li><a href="#exec">exec</a>
+<ul>
+<li><a href="#int-execl-const-char-path-const-char-arg--">int execl (const char *path, const char *arg, ... );</a></li>
+<li><a href="#int-execlpconst-char-file-const-char-arg--">int execlp(const char *file, const char *arg, ... );</a></li>
+<li><a href="#int-execleconst-char-path-const-char-arg--char-const-envp">int execle(const char *path, const char *arg, ..., char *const envp[]);</a></li>
+<li><a href="#int-execv-const-char-path-char-const-argv">int execv (const char *path, char *const argv[]);</a></li>
+<li><a href="#int-execvpconst-char-file-char-const-argv">int execvp(const char *file, char *const argv[]);</a></li>
+<li><a href="#int-execveconst-char-path-char-const-argv-char-const-envp">int execve(const char *path, char *const argv[], char *const envp[]);</a></li>
+</ul>
+</li>
+<li><a href="#posix_spawn">posix_spawn</a>
+<ul>
+<li><a href="#int-posix_spawn">int posix_spawn(</a></li>
+<li><a href="#int-posix_spawnp">int posix_spawnp(</a></li>
+</ul>
+</li>
+<li><a href="#posix_spawn_file_action_t-%EA%B5%AC%EC%A1%B0%EC%B2%B4">posix_spawn_file_action_t 구조체</a>
+<ul>
+<li><a href="#int-posix_spawn_file_actions_initposix_spawn_file_actions_tfile_actions">int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)</a></li>
+<li><a href="#int-posix_spawn_file_actions_destroyposix_spawn_file_actions_tfile_actions">int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)</a></li>
+<li><a href="#int-posix_spawn_file_actions_addopen">int posix_spawn_file_actions_addopen(</a></li>
+<li><a href="#int-posix_spawn_file_actions_addclose">int posix_spawn_file_actions_addclose(</a></li>
+<li><a href="#int-posix_spawn_file_actions_adddup2">int posix_spawn_file_actions_adddup2(</a></li>
+</ul>
+</li>
+<li><a href="#posix_spawnatter_t-%EA%B5%AC%EC%A1%B0%EC%B2%B4">posix_spawnatter_t 구조체</a>
+<ul>
+<li><a href="#int-posix_spawnattr_initposix_spawnatter_t-attr">int posix_spawnattr_init(posix_spawnatter_t *attr)</a></li>
+<li><a href="#int-posix_spawnattr_destroyposix_spawnatter_t-attr">int posix_spawnattr_destroy(posix_spawnatter_t *attr)</a></li>
+<li><a href="#int-posix_spawnattr_getflags">int posix_spawnattr_getflags(</a></li>
+<li><a href="#int-posix_spawnattr_setflags">int posix_spawnattr_setflags(</a></li>
+</ul>
+</li>
+<li><a href="#%ED%94%84%EB%A1%9C%EC%84%B8%EC%8A%A4-%EA%B7%B8%EB%A3%B9-%EC%86%8D%EC%84%B1-%EC%A1%B0%EC%9E%91">프로세스 그룹 속성 조작</a>
+<ul>
+<li><a href="#int-posix_spawnattr_getgroup">int posix_spawnattr_getgroup(</a></li>
+<li><a href="#int-posix_spawnattr_setgroup">int posix_spawnattr_setgroup(</a></li>
+</ul>
+</li>
+<li><a href="#%EC%8B%9C%EA%B7%B8%EB%84%90-%EC%86%8D%EC%84%B1-%EC%A1%B0%EC%9E%91">시그널 속성 조작</a>
+<ul>
+<li><a href="#int-posix_spawnattr_getsigdefault">int posix_spawnattr_getsigdefault(</a></li>
+<li><a href="#int-posix_spawnattr_setsigdefault">int posix_spawnattr_setsigdefault(</a></li>
+<li><a href="#int-posix_spawnattr_getsigmask">int posix_spawnattr_getsigmask(</a></li>
+<li><a href="#int-posix_spawnattr_setsigmask">int posix_spawnattr_setsigmask(</a></li>
+</ul>
+</li>
+<li><a href="#%EC%8A%A4%EC%BC%80%EC%A4%84%EB%A7%81-%EC%86%8D%EC%84%B1-%EC%A1%B0%EC%9E%91">스케줄링 속성 조작</a>
+<ul>
+<li><a href="#int-posix_spawnattr_getschedpolicy">int posix_spawnattr_getschedpolicy(</a></li>
+<li><a href="#int-posix_spawnattr_setschedpolicy">int posix_spawnattr_setschedpolicy(</a></li>
+<li><a href="#int-posix_spawnattr_getschedparam">int posix_spawnattr_getschedparam(</a></li>
+<li><a href="#int-posix_spawnattr_setschedparam">int posix_spawnattr_setschedparam(</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="서론">서론</h2>
+<p>프로세스를 복제하는 전통적인 방법 fork-exec 방식의 단점을 보완하고자 나온 POSIX 프로세스에 대한 내용을 다뤘다.<br>
+멀티태스킹 구조에서 fork-exec 방식으로 구현할 경우 자원에 대한 복사가 이뤄져 오버헤드가 발생할 수 있다.<br>
+fork에서는 힙 메모리, 정적 메모리, IPC 자원 ID, 열린 파일, 시그널 마스크 등 의 복사가 이뤄지며<br>
+exec에서는 파일 디스크립터 정보의 복사가 발생하기 때문이다.<br>
+이를 더 효율적이며, 세밀하게 제어할 수 있는 POSIX 프로세스에 관해 기술하였다.</p>
+<h2 id="fork">fork</h2>
+<h3 id="pid_t-forkvoid">pid_t fork(void);</h3>
+<p><strong>Return Value</strong></p>
+<ul>
+<li><code>other</code>	: 자식프로세스의 pid (부모프로세스일 경우 반환)</li>
+<li><code>0</code>	: 성공  (자식프로세스일 경우 반환)</li>
+<li><code>-1</code>	: 실패</li>
+</ul>
+<p><strong>Description</strong><br>
+프로세스 복제<br>
+프로세스를 복제하여 병렬 실행한다.<br>
+모든 정적 정보를 복제며 실행된다. (COW로 오버헤드 방지)<br>
+정적 정보 : 힙 메모리, 정적 메모리, IPC 자원 ID, 열린 파일 , 시그널 마스크 등</p>
+<h2 id="exec">exec</h2>
+<h3 id="int-execl-const-char-path-const-char-arg--">int execl (const char *path, const char *arg, ... );</h3>
+<h3 id="int-execlpconst-char-file-const-char-arg--">int execlp(const char *file, const char *arg, ... );</h3>
+<h3 id="int-execleconst-char-path-const-char-arg--char-const-envp">int execle(const char *path, const char *arg, ..., char *const envp[]);</h3>
+<h3 id="int-execv-const-char-path-char-const-argv">int execv (const char *path, char *const argv[]);</h3>
+<h3 id="int-execvpconst-char-file-char-const-argv">int execvp(const char *file, char *const argv[]);</h3>
+<h3 id="int-execveconst-char-path-char-const-argv-char-const-envp">int execve(const char *path, char *const argv[], char *const envp[]);</h3>
+<p><strong>Parametters</strong></p>
+<ul>
+<li><code>const char *path</code>    : 실행할 파일, 주소로 경로를 확인</li>
+<li><code>const char *file</code>	: 실행할 파일, 환경변수에서 경로 탐색(파일 이름만 주면 환경변수에서 확인)
+<ul>
+<li>접미사 <code>p : path enviroment</code></li>
+</ul>
+</li>
+<li><code>const char *arg</code>	: 인자를 가변인자로 받음 (마지막은 NULL이 들어가야함)
+<ul>
+<li>접미사 <code>l : list</code></li>
+</ul>
+</li>
+<li><code>chat const *argv[]</code>	: 인자를 배열로 받음 (마지막은 NULL이 들어가야함)
+<ul>
+<li>접미사 <code>v : vector</code></li>
+</ul>
+</li>
+<li><code>char *const envp[]</code>	: 환경변수 목록
+<ul>
+<li>접미사 <code>e : envitonmental path</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>Return Value</strong></p>
+<ul>
+<li>실행 성공 시 반환값 없음</li>
+<li><code>-1</code>	: 실패</li>
+</ul>
+<p><strong>Description</strong></p>
+<p>실행 코드 복제<br>
+현재 실행중인 프로세스를 새로운 프로세스로 교체한다.<br>
+입력한 인자를 바탕으로 프로그램을 실행 한다.<br>
+기본적인 PID, PPID, 파일 디스크립터 등 프로세스의 정보는 유지된다.</p>
+<h2 id="posix_spawn">posix_spawn</h2>
+<h3 id="int-posix_spawn">int posix_spawn(</h3>
+<pre><code>	pid_t *restrict			pid, 
+	const char *restrict		path,
+	const posix_spawn_file_actions_t	*file_actions,
+	const posix_spawnattr_t *restrict 	attrp,
+	char *const			argv[restrict],
+	char *const			envp[restrict]);
+</code></pre>
+<h3 id="int-posix_spawnp">int posix_spawnp(</h3>
+<pre><code>	pid_t *restrict			pid, 
+	const char *restrict		file,
+	const posix_spawn_file_actions_t	*file_actions,
+	const posix_spawnattr_t *restrict	attrp,
+	char *const			argv[restrict],
+	char *const			envp[restrict]);
+</code></pre>
+<p><strong>Parametters</strong></p>
+<ul>
+<li><code>pid_t *restrict pid</code> 		: 생성된 자식프로세스의 pid를 저장할 변수</li>
+<li><code>const char *restrict path</code>		: 실행할 파일, 주소로 경로를 확인</li>
+<li><code>const char *restrict file</code>		: 실행할 파일, 환경변수에서 경로 탐색
+<ul>
+<li>접미사 <code>p : path enviroment</code></li>
+</ul>
+</li>
+<li><code>const posix_spawn_file_actions_t *file_actions</code> : 열거나 닫을 파일을 제어하는 구조체
+<ul>
+<li>NULL : 파일 디스크립터를 전부 넘겨준다.</li>
+</ul>
+</li>
+<li><code>const posix_spawnattr_t attrp</code>	: 프로세스 그룹, 시그널 마스크, 스케줄링 정보 속성을 제어하는 구조체</li>
+<li><code>char *const argv[restrict]</code>		: 인자를 배열로 받음 (마지막은 NULL이 들어가야함)</li>
+<li><code>char *const envp[restrict]</code>		: 환경 변수 목록 (마지막은 NULL이 들어가야함)</li>
+</ul>
+<p><strong>Return Value</strong></p>
+<ul>
+<li><code>other</code>	: 에러 코드</li>
+<li><code>127</code>	: 자식프로세스에서 셸 실행 불가</li>
+<li><code>0</code>	: 셸 사용 불가</li>
+<li><code>-1</code>	: 명령 실패 (fork 불가)</li>
+</ul>
+<p><strong>Description</strong><br>
+fork-exec 구조의 오버헤드를 방지하고 향상된 기능을 제공하는 함수<br>
+저수준 파일 처리, 세션과 프로세스 그룹, 시그널 처리, 스케줄링에 대한 처리가 포함되어있다.<br>
+file_actions, attrp 인수를 이용하여 부모프로세스의 자원을 선택적으로 복제할 수 있다.</p>
+<h2 id="posix_spawn_file_action_t-구조체">posix_spawn_file_action_t 구조체</h2>
+<p><strong>Description</strong><br>
+posix_spawn함수 호출 시 열거나 닫을 파일을 제어하는 구조체<br>
+init 함수를 통해 무조건 초기화 후 사용해야 한다.<br>
+사용을 완료한 경우 메모리를 해제해야 메모리 누수가 생기지 않는다.<br>
+EUID, 프로세스 한그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러</p>
+<p><strong>Common Parametters</strong></p>
+<ul>
+<li><code>posix_spawn_file_actions_t *file_actions</code>
+<ul>
+<li>속성을 변경할 객체의 주소</li>
+</ul>
+</li>
+<li><code>int fildes</code>	: file descriptor 번호</li>
+<li><code>int oflag</code>	: 파일 열기 옵션 비트</li>
+<li><code>mode_t mode</code>	: 파일 접근 권한 ex) 0644, 0777</li>
+</ul>
+<p><strong>Common Return Value</strong></p>
+<ul>
+<li><code>other</code>	: 에러번호</li>
+<li><code>0</code>		: 성공</li>
+</ul>
+<h3 id="int-posix_spawn_file_actions_initposix_spawn_file_actions_tfile_actions">int posix_spawn_file_actions_init(posix_spawn_file_actions_t	*file_actions)</h3>
+<p>posix_spawn_file_action_t 구조체를 초기화 한다.<br>
+</br></p>
+<h3 id="int-posix_spawn_file_actions_destroyposix_spawn_file_actions_tfile_actions">int posix_spawn_file_actions_destroy(posix_spawn_file_actions_t	*file_actions)</h3>
+<p>posix_spawn_file_action_t 구조체를 삭제한다.<br>
+</br></p>
+<h3 id="int-posix_spawn_file_actions_addopen">int posix_spawn_file_actions_addopen(</h3>
+<pre><code>	posix_spawn_file_actions_t		*file_actions,
+	int			fildes,
+	const char *restrict	path,
+	int			oflag,
+	mode_t			mode)
+</code></pre>
+<p>자식 프로세스가 생성되면서 파일을 추가로 연다.<br>
+</br></p>
+<h3 id="int-posix_spawn_file_actions_addclose">int posix_spawn_file_actions_addclose(</h3>
+<pre><code>	posix_spawn_file_actions_t		*file_actions,
+	int 			fildes)
+</code></pre>
+<p>자식 프로세스가 생성되면서 파일을 닫는다.<br>
+</br></p>
+<h3 id="int-posix_spawn_file_actions_adddup2">int posix_spawn_file_actions_adddup2(</h3>
+<pre><code>	posix_spawn_file_actions_t		*file_actions,
+	int 			fildes,
+	int 			newfildes)
+</code></pre>
+<p>자식 프로세스가 생성되면서 파일기술자를 복제한다.<br>
+</br></p>
+<h2 id="posix_spawnatter_t-구조체">posix_spawnatter_t 구조체</h2>
+<p><strong>Description</strong><br>
+posix_spawn함수 호출 시 다양 속성을 제어하는 구조체<br>
+init 함수를 통해 무조건 초기화 후 사용해야 한다.<br>
+EUID, 프로세스 그룹, 기본 시그널 작동, 시그널 블록 마스크, 스케줄링 파라미터, 스케줄러</p>
+<p><strong>Flags</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">플래그</th>
+<th style="text-align:left">설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">POSIX_SPAWN_RESETIDS</td>
+<td style="text-align:left">자식 프로세스의 EUID를 부모 프로세스의 RUID로 설정한다.</td>
+</tr>
+<tr>
+<td style="text-align:center">POSIX_SPAWN_SETPGROUP</td>
+<td style="text-align:left">프로세스 그룹 관련 속성을 활성화한다.</td>
+</tr>
+<tr>
+<td style="text-align:center">POSIX_SPAWN_SETSIGDEF</td>
+<td style="text-align:left">기본 시그널 작동 속성을 활성화한다.</td>
+</tr>
+<tr>
+<td style="text-align:center">POSIX_SPAWN_SETSIGMASK</td>
+<td style="text-align:left">시그널 블록 마스크 속성을 활성화한다.</td>
+</tr>
+<tr>
+<td style="text-align:center">POSIX_SPAWN_SETSCHEDPARAM</td>
+<td style="text-align:left">스케줄링 파라미터 속성을 활성화한다.</td>
+</tr>
+<tr>
+<td style="text-align:center">POSIX_SPAWN_SETSCHEDULER</td>
+<td style="text-align:left">스케줄러 정책 속성을 활성화한다.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Common Parameters</strong></p>
+<ul>
+<li><code>posix_spawnatter_t *attr</code>
+<ul>
+<li>속성을 변경할 객체의 주소</li>
+</ul>
+</li>
+<li><code>short flags</code>	: 해당하는 플래그 조합</li>
+</ul>
+<p><strong>Common Return Value</strong></p>
+<ul>
+<li><code>other</code>	: 에러번호</li>
+<li><code>0</code>		: 성공</li>
+</ul>
+<h3 id="int-posix_spawnattr_initposix_spawnatter_t-attr">int posix_spawnattr_init(posix_spawnatter_t *attr)</h3>
+<p>posix_spawnatter_t 구조체를 초기화 한다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_destroyposix_spawnatter_t-attr">int posix_spawnattr_destroy(posix_spawnatter_t *attr)</h3>
+<p>posix_spawnatter_t 구조체를 삭제한다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_getflags">int posix_spawnattr_getflags(</h3>
+<pre><code>	const posix_spawnatter_t *restrict 	attr,
+	short *restrict		flags)
+</code></pre>
+<p>posix_spawnatter_t 구조체에서 설정된 플래그 속성을 받는다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_setflags">int posix_spawnattr_setflags(</h3>
+<pre><code>	posix_spawnatter_t 	*attr,
+	short			flags)
+</code></pre>
+<p>posix_spawnatter_t 구조체에 플래그를 설정한다.<br>
+</br></p>
+<h2 id="프로세스-그룹-속성-조작">프로세스 그룹 속성 조작</h2>
+<h3 id="int-posix_spawnattr_getgroup">int posix_spawnattr_getgroup(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	pid_t *restrict 	pgroup)
+</code></pre>
+<p>생성될 자식프로세스의 PGID를 받는다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_setgroup">int posix_spawnattr_setgroup(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	pid_t		 	pgroup)
+</code></pre>
+<p>생성될 자식프로세스의 PGID를 변경한다.<br>
+</br></p>
+<h2 id="시그널-속성-조작">시그널 속성 조작</h2>
+<h3 id="int-posix_spawnattr_getsigdefault">int posix_spawnattr_getsigdefault(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	sigset_t *restrict 	sigdefault)
+</code></pre>
+<p>생성될 자식프로세스의 sigdefault 값을 얻는다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_setsigdefault">int posix_spawnattr_setsigdefault(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	const sigset_t *restrict 		sigdefault)
+</code></pre>
+<p>생성될 자식프로세스의 sigdefault 값을 변경한다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_getsigmask">int posix_spawnattr_getsigmask(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	sigset_t *restrict 	sigmask)
+</code></pre>
+<p>생성될 자식프로세스의 시그널 마스크 값을 얻는다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_setsigmask">int posix_spawnattr_setsigmask(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	const sigset_t *restrict 		sigmask)
+</code></pre>
+<p>생성될 자식프로세스의 시그널 마스크 값을 변경한다.<br>
+</br></p>
+<h2 id="스케줄링-속성-조작">스케줄링 속성 조작</h2>
+<h3 id="int-posix_spawnattr_getschedpolicy">int posix_spawnattr_getschedpolicy(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	int *restrict 		schedpolicy)
+</code></pre>
+<p>생성될 자식프로세스의 스케줄링 정책을 얻는다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_setschedpolicy">int posix_spawnattr_setschedpolicy(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	int 			schedpolicy)
+</code></pre>
+<p>생성될 자식프로세스의 스케줄링 정책을 변경한다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_getschedparam">int posix_spawnattr_getschedparam(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	struct sched_param *restrict 		schedparam)
+</code></pre>
+<p>생성될 자식프로세스의 스케줄 파라메터를 얻는다.<br>
+</br></p>
+<h3 id="int-posix_spawnattr_setschedparam">int posix_spawnattr_setschedparam(</h3>
+<pre><code>	const posix_spawnattr_t *restrict 	attr,
+	const struct sched_param *restrict 	schedparam)
+</code></pre>
+<p>생성될 자식프로세스의 스케줄 파라메터를 변경한다.<br>
+</br></p>
+
+        
+        
+    </body>
+    </html>

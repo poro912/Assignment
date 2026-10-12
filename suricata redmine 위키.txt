@@ -1,0 +1,527 @@
+h1. URL
+
+{{>TOC}}
+
+h2. [[Suricata-update_rule-set|suricata rule-set]]
+
+h2. 수리카타 공식 문서
+
+* https://docs.suricata.io/en/suricata-6.0.3/index.html
+* https://docs.suricata.io/en/suricata-6.0.3/rules/intro.html
+
+h2. 수리가카 업데이트 공식 문서
+
+* https://suricata-update.readthedocs.io/en/latest/index.html
+
+h2. 수리카타 정리 블로그
+
+* https://boying-blog.tistory.com/33
+* "saynot tistory":https://saynot.tistory.com/entry/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-Suricata%EC%88%98%EB%A6%AC%EC%B9%B4%ED%83%80-%EA%B3%B5%EB%B6%80
+
+h2. 정규표현식
+
+* "정규 표현식 wiki":https://en.wikipedia.org/wiki/Regular_expression
+* "Learn Regex git":https://github.com/ziishaned/learn-regex/blob/master/translations/README-ko.md
+* "Dev Docs git 정규식 페이지":https://github.com/im-d-team/Dev-Docs/blob/master/Javascript/Regular_Expressions.md
+
+h2. 기타
+
+* "Intel Hyperscan":https://www.intel.com/content/www/us/en/developer/articles/technical/introduction-to-hyperscan.html
+* "suri-stats git페이지":https://github.com/regit/suri-stats
+* "suricata-stats git페이지":https://github.com/cvandeplas/suricata_stats
+* "Suricata monitoring with Zabbix or other":http://christophe.vandeplas.com/2013/11/suricata-monitoring-with-zabbix-or-other.html
+* "기본 index.yaml URL":https://www.openinfosecfoundation.org/rules/index.yaml
+
+h1. Suricata
+
+h2. 특징
+
+* 높은 성능의 IDS, IPS 네트워크 모니터링 엔진
+* 메타, IP, TCP, UDP, ICMP, 페이로드, 변환, 필터, Flow, ByPass, HTTP, File, DNS, SSL/TLS, SSH 등 대부분을 감지, 차단 가능하다
+* Snort의 단점인 단일 스레드 처리 방식을 보완하기 위해 만들어졌다
+* Snort 룰이 호환되어 사용가능하다.
+* 로드 밸런싱, RSS, 오프로드 지원
+* 다중코어 다중 쓰레드 지원
+
+h2. 디렉터리
+
+<pre>
+📂etc
+┗ 📂suricata
+  ┣ classification.config       이벤트 분류에 관한 설정 (초기설정 시 사용)
+  ┣ reference.config            규칙에 대한 참조 및 추가정보
+  ┣ suricata.yaml               동작 및 설정을 지정
+  ┗ threshold.config            세부적인 감지 제한을 조정, 임계값 설정
+
+📂var
+┣ 📂lib
+  ┗ 📂suricata
+    ┣ 📂update
+      ┣ 📂sources                       사용중인 규칙의 상태 (활성화/비활성화)
+      ┗ 📂cache
+        ┗ index.yaml                    규칙 리스트 정보 저장
+    ┗ 📂rules
+      ┣ classification.config           이벤트 분류에 관한 설정 파일 (런타임중에 사용)
+      ┣ suricata.rules                  기본제공 룰을 저장
+      ┗ 📂.cache
+        ┗ index.yaml                    다운로드한 소스 인덱스가 캐시
+      
+┗ 📂log
+  ┗ 📂suricata 
+    ┣ eve.json                  이벤트 로그 저장
+    ┣ fast.log                  탐지로그 저장 
+    ┣ stats.log                 성능 통계 저장
+    ┣ suricata-start.log        시작시 발생한 이벤트와 초기화 관련 로그
+    ┗ suricata.log              감지한 이벤트 관련 로그 기록
+
+📂usr
+┗ 📂share
+  ┗ 📂suricata
+    ┗ 📂rules                   다운받은 룰을 저장함
+</pre>
+
+
+h2. 설치
+
+<pre><code class="shell">
+#!/bin/bash
+sudo add-apt-repository ppa:oisf/suricata-stable
+sudo apt-get update
+sudo apt-get install suricata
+
+# 그룹 생성
+sudo groupadd suricata
+
+# 디렉터리와 파일 그룹 변경
+sudo chgrp -R suricata /etc/suricata
+sudo chgrp -R suricata /var/lib/suricata/rules
+sudo chgrp -R suricata /var/lib/suricata/update
+
+#권한 설정
+sudo chmod -R g+r /etc/suricata/
+sudo chmod -R g+rw /var/lib/suricata/rules
+sudo chmod -R g+rw /var/lib/suricata/update
+
+그룹 사용자 추가
+sudo usermod -a -G suricata <username>
+</code></pre>
+
+h2. 룰 적용 테스트
+
+<pre><code># suricata 동작
+sudo suricata -i eth0 -D
+
+# 룰 파일 생성
+mkdir local.rules
+
+# 룰 추가
+vi local.rules
+alert icmp $HOME_NET any -> $EXTERNAL_NET any (msg: "ICMP 8.8.8.8 Running"; sid:1000003; rev:1;)
+
+# 룰파일 추가
+sudo vi /etc/suricata/suricata.yaml
+	rule-files:
+			- <경로>/local.rules
+
+# suricata 재시작
+sudo suricatasc -c ruleset-reload-nonblocking
+
+# 로그 확인
+tail -f /var/log/suricata/fast.log
+
+# 핑 전송
+ping 8.8.8.8
+</code></pre>
+
+---
+
+h2. 용어
+
+* PCAP (Packet Capture)
+** 네트워크 상에 떠돌아다니는 패킷의 포착
+
+* Building Blocks
+** 수리카타를 구성하는 스레드 호칭
+
+* 패킷처리 스레드
+** 패킷을 받아 분석하는 스레드
+
+* 캡쳐 스레드
+** 로드밸런싱을 수행하는 스레드
+
+h2. 기능
+
+h3. runmode
+
+* "Suricata runmodes":https://docs.suricata.io/en/suricata-6.0.3/performance/runmodes.html
+* --list-runmodes 옵션을 통해 런모드 목록을 확인할 수 있다.
+* workers
+** 하나 이상의 패킷처리 스레드를 사용한다.
+** 보통 가장 좋은 성능을 발휘한다.
+* autofp
+** 하나 이상의 캡쳐 스레드를 생성한다.
+* single
+** 패킷 처리 스레드를 하나만 사용한다.
+** 개발시점에 유리하다.
+
+
+h3. 로드 밸런싱
+
+* workers 모드에서 가장 좋은 성능을 발휘한다.
+
+h3. RSS (Recevie Side Scaling)
+
+* 트래픽을 분산 처리할 때 사용하는 기술
+* 트래픽 분산 시 서로 다른 큐에 대기하는 경우 타이밍 문제가 발생할 수 있다.
+** hand shake 시 SYN/ACK패킷이 뒤늦게 도착할 수 있다.
+** 이 경우 유효하지 않은 패킷으로 처리한다.
+
+h3. 오프로드
+
+* 기본적으로 NIC 및 드라이버에서 제공하는 오프로드 기능은 비활성화 해야함
+* LRO/GRO를 비활성화 해야함
+** LRO : 대규모 수신 오프로드
+** GRO : 일반 수신 오프로드
+
+h3. 하이퍼스캔
+
+* "Intel Hyperscan":https://www.intel.com/content/www/us/en/developer/articles/technical/introduction-to-hyperscan.html
+* 다중 정규식 매칭 라이브러리
+* C++로 정규식 컴파일러를 제공한다.
+* 사용을 위해서는 suricata.yaml 파일 편집을 통해 종속성을 설정해야한다.
+
+h3. 통계
+
+* 8초마다 고정된 간격으로 통계 레코드를 생성한다.
+* 패킷 손실 통계를 보고한다.
+* AF_PACKET 모드
+** Capture.kernel_packets
+*** 사용자 공간으로 전달된 패킷 수
+** Capture.kernel_drops
+*** 폐기처리된 패킷 수
+* PF_PING 모드
+** Capture.kernel_packets
+*** pf_ring에서 본 총 패킷 수
+** Capture.kernel_drops
+*** 폐기처리된 패킷 수
+
+h3. 그래프 그리기 도구
+
+* "suri-stats git페이지":https://github.com/regit/suri-stats
+* "suricata-stats git페이지":https://github.com/cvandeplas/suricata_stats
+* "Suricata monitoring with Zabbix or other":http://christophe.vandeplas.com/2013/11/suricata-monitoring-with-zabbix-or-other.html
+
+h3. 패킷 프로파일링
+
+* 패킷을 처리하는데 걸리는 시간을 알려줌
+* 특정 패킷이 더 빠르거나 느리게 처리되는 이유를 알고싶은 경우 사용
+
+h3. 규칙 프로파일링
+
+* 규칙번호에 대한 통계를 확인할 수 있다.
+
+h3. 문제 및 성능 분석 도우 및 메뉴얼
+
+* "Suricata analysis 페이지":https://docs.suricata.io/en/suricata-6.0.3/performance/analysis.html
+* 문제를 쉽게 찾는 방법, 고려방법에 대해 설명되어있다.
+* 시스템 부하
+** htop 도구를 사용하여 코어 사용량을 분석할 수 있다.
+* 로그 파일
+** stats.log 및 suricata.log 파일에 문제가 기록된다.
+** Capture.kernel_drops는 Capture.kernel_packets의 1% 미만이어야 한다.
+
+---
+
+h1. suricata 문법
+
+* "Suricata Rule 페이지":https://docs.suricata.io/en/suricata-6.0.3/rules/intro.html
+* 
+|=. Action|\6=. header|=. option|
+|=. Action|=. Protocol|=. SrcIP|=. srcPort|=. ->|=. DstIP|=. DDstPort|=. (Option)|
+
+h2. example
+
+> drop tcp $HOME_NET any -> $EXTERNAL_NET any 
+> (msg:”ET TROJAN Likely Bot Nick in IRC (USA +..)”; flow:established,to_server; flowbits:isset,is_proto_irc; 
+> content:”NICK “; pcre:”/NICK .*USA.*[0-9]{3,}/i”; reference:url,doc.emergingthreats.net/2008124; 
+> classtype:trojan-activity; sid:2008124; rev:2;)
+
+h2. Action
+
+* 
+| alert		| 경고 발생 및 로그 기록	|
+| pass		| 패킷 무시			|
+| drop		| 패킷 차단 및 로그 기록	|
+| reject	| 패킷 차단 및 로그 기록(인라인 구조)		|
+| rejectsrc	| 패킷 차단 및 로그 기록(인라인 구조)		|
+| rejectdst	| 일치하는 패킷의 수신자에게 RST/ICMP 오류 패킷을 보낸다.|
+| rejectboth	| 양쪽 모두에게 RST/ICMP 오류 패킷을 보낸다.	|
+
+
+h2. Protocol
+
+* 
+| tpc	| TCP		|
+| udp	| UDP		|
+| icmp	| ICMP		|
+| ip	| IP 전체	|
+| any	| 전체		|
+
+h2. SrcIP / DstIP
+
+* 
+| 192.168.100.2/32	| 특정 HOST|
+| 192.168.100.0/24	| 서브넷|
+| [192.168.100.0/24, 192.168.101.0/24]	| 서브넷 집합|
+| !192.168.100.2	| 제외한 모든 IP 주소|
+| !192.168.100.0/24	| 제외한 모든 서브넷|
+| ![192.168.100.2, 192.168.100.3]	| 서브넷 집합을 제외한 모든 주소|
+| $HOME_NET		| 내부 IP 주소 변수|
+| $EXTERNAL_NET		| 외부 IP 주소 변수|
+| $XXX_SERVERS		| 특정 서버 IP 주소 변수|
+
+h2. SrcPort / DstPort
+
+* 
+| 80		| 특정 포트 |
+| [1:500]	| 포트 범위 |
+| [80,81,82]	| 포트 집합 |
+| !80		| 특정 포트를 제외한 나머지 포트 |
+| ![1:500]	| 포트 범위를 제외한 나머지 포트 |
+| ![80,81,82]	| 포트 집합을 제외한 나머지 포트 |
+| any		| 모든 포트 |
+
+
+h2. Option
+
+* "Suricata Option 페이지":https://docs.suricata.io/en/suricata-6.0.3/rules/index.html
+
+h3. 일반 옵션
+
+* 
+| msg		| 경고 이벤트 메시지		| msg:"메시지 내용";|
+| sid		| 룰 식별자(3000000 이상 권장)	| sid:3000001;|
+| rev		| 룰 버전			| rev:1;|
+| priority	| 우선순위			| priority:1;|
+| clastype	| 스노트 룰 분류		| classtype:분류이름;|
+| reference	| 취약점 참고 배포 URL 경로	| reference:타입, reference 내용;|
+
+
+h3. 흐름 옵션
+
+* 
+| flwow		| 흐름 옵션 명령어|
+| to_server or from_client	| 클라이언트 -> 서버 패킷 룰 매칭|
+| to_client or from_server	| 서버 -> 클라이언트 패킷 룰 매칭|
+| established	| 세션이 연결된 상태의 패킷 룰 매칭|
+| statless	| 세션 연결 유무와 상관없이 룰 매칭|
+| flow:to_server,established	| 클라이언트 -> 서버 세션 연결 패킷 룰 매칭|
+
+h3. 페이로드 옵션
+
+* 
+| content	|문자/숫자 탐지			| content:"xxx";
+							content:<notextile>"|16진수|"</notextile>;|
+| nocase	|대소문자 구분 없이 탐지	| content:"xxx"; nocase;|
+| offset	|지정한 바이트번째부터 탐지	| offset:3;|
+| depth		|지정한 바이트까지 탐지		| depth:3;|
+| distance	|content 매칭 후 지정 위치 이후 다른 content 탐색	|content:"xxx"; content"yyy"; distance:5;|
+| within	|content 매칭 후 지정 위치 안에 다른 content 탐색	| content:"xxx"; content"yyy"; within:5;|
+| pcre		|정규화 표기, '/'는 시작과 끝에 표기
+				16진수는 앞에 \x 표기	| <notextile>pcre:"/(http|ftp) Traffic/"</notextile>|
+
+
+h3. HTTP 탐색 옵션
+
+* 
+| http_method		| 페이로드 앞부분 HTTP메소드 패턴 매칭|
+| http_url		| 페이로드 HTTP URL 패턴 매칭|
+| http_cookie		| 페이로드 HTTP 쿠키 패턴 매칭|
+| http_header		| HTTP 요청/응답 Header 내용 패턴 매칭|
+| http_client_body	| HTTP 요청/응답 Body 내용 패턴 매칭|
+| http_stat_code	| HTTP 응답 상태 코드 패턴 매칭|
+| http_stat_message	| HTTP 응답 상태 메세지 패턴 매칭|
+
+
+
+h2. pcre
+
+* (Perl Compatible Regular Expressions)
+* "정규 표현식 wiki":https://en.wikipedia.org/wiki/Regular_expression
+* "Learn Regex git":https://github.com/ziishaned/learn-regex/blob/master/translations/README-ko.md
+* "Dev Docs git 정규식 페이지":https://github.com/im-d-team/Dev-Docs/blob/master/Javascript/Regular_Expressions.md
+* content 정보를 세밀하게 검색할 때 사용한다
+* 메타문자, 숫자, 클래스, 서브패턴, 옵션으로 구성
+* pcre:"/정규식/옵션";
+
+
+h3. 옵션
+
+* 
+| i	| 대소문자 구분 없이 검색	|
+| s	| 줄이 넘어가도 한줄로 인식	|
+| x	| 패턴의 보든 공백 무시	|
+
+h3. HTTP 옵션
+
+* 
+| M	| HTTP 메소드 패턴 매칭			|
+| U	| 정규화된 URL 디코딩 문자열 패턴 매칭	|
+| H	| 정규화된 HTTP 요청 메세지 Header 내용 패턴 매칭	|
+| P	| HTTP 요청 메세지 Body 내용 패턴 매칭	|
+| S	| HTTP 응답 코드 패턴 매칭		|
+| Y	| HTTP 응답 상태 메세지 패턴 매칭	|
+
+---
+
+h1. suricata command
+
+* "Suricata Command Line Options":https://docs.suricata.io/en/suricata-6.0.3/command-line-options.html
+* 
+| -h			| 명령어 목록 출력|
+| -c <path>		| 사용할 설정 파일 또는 경로지정|
+| -s <file.rules>	| 지정한 파일내의 규칙과 함게 yaml 파일의 규칙 로드 |
+| -S <file.rules>	| 지정한 파일 내의 규칙만 로드 yaml에 지정되어있는 파일은 무시됨|
+| -v			| 로깅 수준 상향 조정
+	-v: INFO
+	-vv: PERF
+	-vvv: CONFIG
+	-vvvv: DEBUG|
+| -i <interface>	| 스니핑 시 사용할 인터페이스 지정, 다수 사용 가능|
+| -l <directory>	| log dir을 설정
+			옵션에 적은 경로를 log dir로 인식
+			yaml에 default로 지정되어있는 경로는 무시된다.|
+| -r <path>		| 패킷캡쳐 오프라인 모드 실행
+				미리 기록된 파일에서 패킷을 읽는다.
+				디렉터리 지정 시 디렉터리의 모든 파일간 흐름상태를 유지하며 수정된 순서대로 처리|
+| -T			| 테스트 모드 실행
+				/var/lib/suricata/rules/suricata.rules 파일을 기반으로 실행|
+| -D			| 데몬 실행, 백그라운드에서 실행된다.|
+| --pcap-file-continuous| -r 옵션과 함께 사용된다
+				모드가 중단될 때까지 활성상태를 유지함|
+| --pcap-file-recursive	| -r 옵션과 함께 사용된다
+				하위 디렉터리를 재귀적으로 이동한다.
+				--pcap-file-continuous와 함께 사용할 수 없다.|
+| --pcap-file-delete	| -r 옵션과 함께 사용된다
+				모드가 처리된 후 pcap 파일을 삭제한다.|
+| --runmode <runmode>	| Workers, autofp, Single|
+| <notextile>-k [all|none]</notextile>	| 체크섬 확인을 강제로(모두)하거나, 체크섬 확인을 비활성화 한다.|
+| --user=<user>		| 프로세스 사용자를 설정한다.|
+| --group=<group>	| 프로세스 그룹을 설정한다.|
+| --disable-detection	| ids모드 비활성화|
+| --init-errors-fatal	| signatures를 로딩하는 중 오류발생시 실패로 종료|
+
+---
+
+h1. suricata-update
+
+* 규칙 관리 프로그램
+* python 언어로 작성됨
+* usr/lib/suricata/update 디렉터리에 설치됨
+
+h2. 매커니즘
+
+* 활성 상태의 규칙을 다운로드 하여 적용시킨다.
+* 비활성 상태의 규칙은 무시된다.
+
+h2. 설치
+
+<pre><code class="shell">#!/bin/bash
+
+
+</code></pre>
+
+h2. 규칙 관리
+
+* "기본제공 index.yaml URL":https://www.openinfosecfoundation.org/rules/index.yaml
+
+<pre><code class="shell">#!/bin/bash
+# 기본규칙 다운로드 및 업데이트 
+sudo suricata-update
+sudo suricata-update update-sources
+
+# 사용 가능 규칙 출력
+suricata-update list-sources
+
+# 활성화된 규칙 리스트 출력
+suricata-update list-sources --enabled
+
+# 규칙 활성화
+suricata-update enable-source <규칙명>
+suricata-update enable-source et/pro
+
+# 규칙 비활성화
+suricata-update disable-source <규칙명>
+suricata-update disable-source et/pro
+
+# 규칙 소스 삭제
+suricata-update remove-source <규칙명>
+suricata-update remove-source et/pro
+
+# 규칙 소스 추가
+suricata-update add-source <name> <url>
+
+suricata-update add-source et https://rules.emergingthreats.net/open/suricata-6.0/emerging.rules.tar.gz
+</code></pre>
+
+
+h2. suricata rule list 적용 테스트
+
+* suricata-update를 활용한 규칙 enable/disable 테스트
+* 룰 적용 시 update와 재시작을 해야한다.
+
+<pre><code class="shell">#!/bin/bash
+# 수리카타 동작
+sudo suricata -i eth0
+
+# default룰의 용량이 커 낮은 룰을 적용 (default 회피)
+sudo suricata-update enable-source oisf/trafficid
+
+# 파일에 내용 추가
+# url은 .rule 파일의 주소
+sudo vi /var/lib/suricata/update/cache/index.yaml
+  duruan/test:
+    summary: duruan test rule
+    vendor: duruan
+    description: |
+      this rule is made by duruan for testint
+    min-version: 6.0.0
+    license: MIT
+    url: https://raw.githubusercontent.com/poro912/Assignment/main/duruan.rules
+    checksum: false
+
+# 리스트 출력
+suricata-update list-sources
+
+# 규칙 활성화
+sudo suricata-update enable-source duruan/test
+
+# 활성화된 규칙 리스트 출력
+suricata-update list-sources --enabled
+
+# suricata 변경 룰 적용
+sudo suricata-update
+sudo suricatasc -c ruleset-reload-nonblocking
+
+# 로그 확인
+tail -f /var/log/suricata/fast.log
+
+# 핑 전송
+ping 8.8.8.8
+
+# 규칙 비활성화
+sudo suricata-update disable-source duruan/test
+
+# 활성화된 규칙 리스트 출력
+suricata-update list-sources --enabled
+
+# suricata 변경 룰 적용
+sudo suricata-update
+sudo suricatasc -c ruleset-reload-nonblocking
+
+# 로그 확인
+tail -f /var/log/suricata/fast.log
+
+# 핑 전송
+ping 8.8.8.8
+</code></pre>
