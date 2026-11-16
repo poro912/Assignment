@@ -1,0 +1,124 @@
+1. 시드 1, 2 및 3을 가지고 실행하고 프로세스에 의해 생성된 각 가상 주소가 범위 내에
+있는지 계산하라. 바운드 안에 있다면 주소 변환을 수행하라.
+
+python3 relocation.py -s 1 -c && python3 relocation.py -s 2 -c && python3 relocation.py -s 3 -c 
+
+poro@DESKTOP-D3G3QU4:~/practice/ostep/ostep-homework/vm-mechanism$ python3 relocation.py -s 1 -n 5 -c && python3 relocation.py -s 2 -n 5 -c && python3 relocation.py -s 3 -n 5 -c
+
+ARG seed 1
+ARG address space size 1k
+ARG phys mem size 16k
+
+Base-and-Bounds register information:
+
+  Base   : 0x0000363c (decimal 13884)
+  Limit  : 290
+
+Virtual Address Trace
+  VA  0: 0x0000030e (decimal:  782) --> SEGMENTATION VIOLATION
+  VA  1: 0x00000105 (decimal:  261) --> VALID: 0x00003741 (decimal: 14145)
+  VA  2: 0x000001fb (decimal:  507) --> SEGMENTATION VIOLATION
+  VA  3: 0x000001cc (decimal:  460) --> SEGMENTATION VIOLATION
+  VA  4: 0x0000029b (decimal:  667) --> SEGMENTATION VIOLATION
+
+
+ARG seed 2
+ARG address space size 1k
+ARG phys mem size 16k
+
+Base-and-Bounds register information:
+
+  Base   : 0x00003ca9 (decimal 15529)
+  Limit  : 500
+
+Virtual Address Trace
+  VA  0: 0x00000039 (decimal:   57) --> VALID: 0x00003ce2 (decimal: 15586)
+  VA  1: 0x00000056 (decimal:   86) --> VALID: 0x00003cff (decimal: 15615)
+  VA  2: 0x00000357 (decimal:  855) --> SEGMENTATION VIOLATION
+  VA  3: 0x000002f1 (decimal:  753) --> SEGMENTATION VIOLATION
+  VA  4: 0x000002ad (decimal:  685) --> SEGMENTATION VIOLATION
+
+
+ARG seed 3
+ARG address space size 1k
+ARG phys mem size 16k
+
+Base-and-Bounds register information:
+
+  Base   : 0x000022d4 (decimal 8916)
+  Limit  : 316
+
+Virtual Address Trace
+  VA  0: 0x0000017a (decimal:  378) --> SEGMENTATION VIOLATION
+  VA  1: 0x0000026a (decimal:  618) --> SEGMENTATION VIOLATION
+  VA  2: 0x00000280 (decimal:  640) --> SEGMENTATION VIOLATION
+  VA  3: 0x00000043 (decimal:   67) --> VALID: 0x00002317 (decimal: 8983)
+  VA  4: 0x0000000d (decimal:   13) --> VALID: 0x000022e1 (decimal: 8929)
+
+
+
+
+2. 다음과 같은 플래그를 주고 실행하라 : -s 0 -n 10. 생성된 모든 가상 주소가 범위
+안에 있는 것을 보장하기 위해서는 -l을 어떤 값으로 설정해야 하는가?
+python3 relocation.py -s 0 -n 10 -c
+
+930
+
+
+3. 다음과 같은 플래그를 주고 실행하라 : -s 1 -n 10 -l 100. 주소 공간 전체가
+여전히 물리 메모리에 들어가려면 설정할 수 있는 바운드 레지스터의 최댓값은 얼마
+인가?
+
+python3 relocation.py -s 1 -n 10 -l 100 -c
+ARG seed 1
+ARG address space size 1k
+ARG phys mem size 16k
+
+Base-and-Bounds register information:
+
+  Base   : 0x00000899 (decimal 2201)
+  Limit  : 100
+
+Virtual Address Trace
+  VA  0: 0x00000363 (decimal:  867) --> SEGMENTATION VIOLATION
+  VA  1: 0x0000030e (decimal:  782) --> SEGMENTATION VIOLATION
+  VA  2: 0x00000105 (decimal:  261) --> SEGMENTATION VIOLATION
+  VA  3: 0x000001fb (decimal:  507) --> SEGMENTATION VIOLATION
+  VA  4: 0x000001cc (decimal:  460) --> SEGMENTATION VIOLATION
+  VA  5: 0x0000029b (decimal:  667) --> SEGMENTATION VIOLATION
+  VA  6: 0x00000327 (decimal:  807) --> SEGMENTATION VIOLATION
+  VA  7: 0x00000060 (decimal:   96) --> VALID: 0x000008f9 (decimal: 2297)
+  VA  8: 0x0000001d (decimal:   29) --> VALID: 0x000008b6 (decimal: 2230)
+  VA  9: 0x00000357 (decimal:  855) --> SEGMENTATION VIOLATION
+
+
+4. 더 큰 주소 공간 (-a) 과 물리 메모리 (-p) 를 설정하여 위 문제와 동일하게 실행시켜
+보아라.
+
+python3 relocation.py -s 1 -n 10 -l 100 -a 2k -p 32k -c
+
+ARG seed 1
+ARG address space size 2k
+ARG phys mem size 32k
+
+Base-and-Bounds register information:
+
+  Base   : 0x00001132 (decimal 4402)
+  Limit  : 100
+
+Virtual Address Trace
+  VA  0: 0x000006c7 (decimal: 1735) --> SEGMENTATION VIOLATION
+  VA  1: 0x0000061c (decimal: 1564) --> SEGMENTATION VIOLATION
+  VA  2: 0x0000020a (decimal:  522) --> SEGMENTATION VIOLATION
+  VA  3: 0x000003f6 (decimal: 1014) --> SEGMENTATION VIOLATION
+  VA  4: 0x00000398 (decimal:  920) --> SEGMENTATION VIOLATION
+  VA  5: 0x00000536 (decimal: 1334) --> SEGMENTATION VIOLATION
+  VA  6: 0x0000064f (decimal: 1615) --> SEGMENTATION VIOLATION
+  VA  7: 0x000000c0 (decimal:  192) --> SEGMENTATION VIOLATION
+  VA  8: 0x0000003a (decimal:   58) --> VALID: 0x0000116c (decimal: 4460)
+  VA  9: 0x000006af (decimal: 1711) --> SEGMENTATION VIOLATION
+
+
+5. 바운드 레지스터의 값이 변함에 따라 임의로 생성된 가상 주소 중 유효한 주소의
+비율은 얼마인가? 다른 랜덤 시드를 가지고 실행한 결과를 그래프로 나타내시오. 값의
+범위는 0부터 주소 공간의 최대 크기로 한다.

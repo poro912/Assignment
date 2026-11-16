@@ -1,0 +1,200 @@
+1. null.c라는 간단한 프로그램을 작성하라. 이 프로그램은 정수를 가리키는 포인터를
+만들고 NULL로 초기화하고 그것을 역참조하려고 한다. null이라는 실행 파일이
+생성되도록 컴파일하라. 프로그램을 실행시키면 어떤 일이 발생하는가?
+
+세그멘테이션 오류가 발생합니다.
+
+2. 다음에 이 프로그램을 심볼 정보가 포함되도록 컴파일하라 (-g 플래그 사용). 실행
+파일에 더 많은 정보를 추가하여 디버거가 변수 이름 등의 유용한 정보를 접근할 수
+있게 한다. 디버거에서 프로그램을 실행하라 (gdb null). gdb가 실행되면, run
+명령어를 입력하라. gdb는 무ᨨ을 보여주는가?
+
+Program terminated with signal SIGSEGV, Segmentation fault.
+The program no longer exists.
+segmentation fault 에러를 보여준다.
+
+3. 마지막으로, 이 프로그램에 valgrind 도구를 사용하라. 우리는 valgrind의 일부
+인 memcheck 도구를 사용하여 어떤 일이 일어나는지 분석할 것이다. 다음과 같은
+명령어를 실행시켜라 : valgrind - -leak-check=yes null. 이를 실행하면
+어떻게 되는가? 출력을 해석할 수 있는가?
+
+==5373== Memcheck, a memory error detector
+==5373== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==5373== Using Valgrind-3.26.0 and LibVEX; rerun with -h for copyright info
+==5373== Command: ./null
+==5373==
+==5373== Invalid write of size 4		// 맞지 않는 쓰기
+==5373==    at 0x4001161: main (null.c:6)	// null.c 파일 6번째 줄
+==5373==  Address 0x0 is not stack'd, malloc'd or (recently) free'd	// 주소 0x0은 스택 영역이 아니다 
+==5373==
+==5373==
+==5373== Process terminating with default action of signal 11 (SIGSEGV)	// 시그널 11로 정지됨
+==5373==  Access not within mapped region at address 0x0		// 접근이 매핑 이내의 주소지가 아니다.
+==5373==    at 0x4001161: main (null.c:6)
+==5373==  If you believe this happened as a result of a stack
+==5373==  overflow in your program's main thread (unlikely but		// overflow 발생했을 가능성이 있음
+==5373==  possible), you can try to increase the size of the
+==5373==  main thread stack using the --main-stacksize= flag.
+==5373==  The main thread stack size used in this run was 8388608.
+==5373==
+==5373== HEAP SUMMARY:						통계
+==5373==     in use at exit: 0 bytes in 0 blocks
+==5373==   total heap usage: 0 allocs, 0 frees, 0 bytes allocated
+==5373==
+==5373== All heap blocks were freed -- no leaks are possible
+==5373==
+==5373== For lists of detected and suppressed errors, rerun with: -s
+==5373== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+세그멘테이션 오류  valgrind --leak-check=yes ./null
+
+
+4. malloc()을 사용하여 메모리를 할당하지만 종료 전에 해제하는 것을 잊어버리는
+간단한 프로그램을 작성하라. 이 프로그램을 실행시키면 무슨 일이 일어나는가? 이
+프로그램의 문제를 gdb를 사용하여 발견할 수 있는가? valgrind는 어떤가 (다시
+- -leak-check=yes 플래그를 주고 실행)?
+
+valgrind -\-leak-check=yes ./no_free
+
+==5763== Memcheck, a memory error detector
+==5763== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==5763== Using Valgrind-3.26.0 and LibVEX; rerun with -h for copyright info
+==5763== Command: ./no_free
+==5763==
+==5763==
+==5763== HEAP SUMMARY:
+==5763==     in use at exit: 4 bytes in 1 blocks
+==5763==   total heap usage: 1 allocs, 0 frees, 4 bytes allocated
+==5763==
+==5763== 4 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==5763==    at 0x4850858: malloc (vg_replace_malloc.c:447)
+==5763==    by 0x4001166: main (no_free.c:7)
+==5763==
+==5763== LEAK SUMMARY:
+==5763==    definitely lost: 4 bytes in 1 blocks
+==5763==    indirectly lost: 0 bytes in 0 blocks
+==5763==      possibly lost: 0 bytes in 0 blocks
+==5763==    still reachable: 0 bytes in 0 blocks
+==5763==         suppressed: 0 bytes in 0 blocks
+==5763==
+==5763== For lists of detected and suppressed errors, rerun with: -s
+==5763== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+5. 크기가 100인 data라는 이름의 정수 배열을 만드는 프로그램을 작성하라. 그런 후
+data[I00]을 0으로 클리어 하라. 이 프로그램을 실행하면 어떤 일이 벌어지는가?
+valgrind를 사용하여 프로그램을 실행하면 어떤 일이 일어나는가? 프로그램은
+정확한가?
+
+valgrind -\-leak-check=yes ./outofrange
+
+==5842== Memcheck, a memory error detector
+==5842== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==5842== Using Valgrind-3.26.0 and LibVEX; rerun with -h for copyright info
+==5842== Command: ./outofrange
+==5842==
+==5842== Invalid write of size 4
+==5842==    at 0x400116D: main (outofrange.c:8)
+==5842==  Address 0x4a941d0 is 0 bytes after a block of size 400 alloc'd
+==5842==    at 0x4850858: malloc (vg_replace_malloc.c:447)
+==5842==    by 0x400115E: main (outofrange.c:6)
+==5842==
+==5842==
+==5842== HEAP SUMMARY:
+==5842==     in use at exit: 400 bytes in 1 blocks
+==5842==   total heap usage: 1 allocs, 0 frees, 400 bytes allocated
+==5842==
+==5842== 400 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==5842==    at 0x4850858: malloc (vg_replace_malloc.c:447)
+==5842==    by 0x400115E: main (outofrange.c:6)
+==5842==
+==5842== LEAK SUMMARY:
+==5842==    definitely lost: 400 bytes in 1 blocks
+==5842==    indirectly lost: 0 bytes in 0 blocks
+==5842==      possibly lost: 0 bytes in 0 blocks
+==5842==    still reachable: 0 bytes in 0 blocks
+==5842==         suppressed: 0 bytes in 0 blocks
+==5842==
+==5842== For lists of detected and suppressed errors, rerun with: -s
+==5842== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
+
+6. 정수 배열을 할당하고 (위와 동일), 다시 해제하고, 배열의 원소 하나의 값을 출력하려
+고 시도하는 프로그램을 작성하라. 프로그램이 실행되는가? Valgrind를 사용하여
+실행하면 어떤 일이 발생하는가?
+
+poro@DESKTOP-D3G3QU4:~/practice/chapter14$ valgrind -\-leak-check=yes ./free_after_access
+==5981== Memcheck, a memory error detector
+==5981== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==5981== Using Valgrind-3.26.0 and LibVEX; rerun with -h for copyright info
+==5981== Command: ./free_after_access
+==5981==
+==5981== Invalid write of size 4
+==5981==    at 0x4001199: main (free_after_access.c:9)
+==5981==  Address 0x4a94108 is 200 bytes inside a block of size 400 free'd
+==5981==    at 0x48538BF: free (vg_replace_malloc.c:990)
+==5981==    by 0x400118E: main (free_after_access.c:8)
+==5981==  Block was alloc'd at
+==5981==    at 0x4850858: malloc (vg_replace_malloc.c:447)
+==5981==    by 0x400117E: main (free_after_access.c:6)
+==5981==
+==5981==
+==5981== HEAP SUMMARY:
+==5981==     in use at exit: 0 bytes in 0 blocks
+==5981==   total heap usage: 1 allocs, 1 frees, 400 bytes allocated
+==5981==
+==5981== All heap blocks were freed -- no leaks are possible
+==5981==
+==5981== For lists of detected and suppressed errors, rerun with: -s
+==5981== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+
+7. free에 위에서 할당한 배열의 중간을 가리키는 포인터와 같은 황당한 값을 전달하라.
+어떤 일이 벌어지는가? 이런 종류의 문제를 발견하기 위해 도구가 필요한가?
+
+poro@DESKTOP-D3G3QU4:~/practice/chapter14$ valgrind -\-leak-check=yes ./middle_free
+==6184== Memcheck, a memory error detector
+==6184== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==6184== Using Valgrind-3.26.0 and LibVEX; rerun with -h for copyright info
+==6184== Command: ./middle_free
+==6184==
+==6184== Invalid free() / delete / delete[] / realloc()
+==6184==    at 0x48538BF: free (vg_replace_malloc.c:990)
+==6184==    by 0x4001194: main (middle_free.c:8)
+==6184==  Address 0x4a94108 is 200 bytes inside a block of size 400 alloc'd
+==6184==    at 0x4850858: malloc (vg_replace_malloc.c:447)
+==6184==    by 0x400117E: main (middle_free.c:6)
+==6184==
+==6184==
+==6184== HEAP SUMMARY:
+==6184==     in use at exit: 400 bytes in 1 blocks
+==6184==   total heap usage: 1 allocs, 1 frees, 400 bytes allocated
+==6184==
+==6184== 400 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==6184==    at 0x4850858: malloc (vg_replace_malloc.c:447)
+==6184==    by 0x400117E: main (middle_free.c:6)
+==6184==
+==6184== LEAK SUMMARY:
+==6184==    definitely lost: 400 bytes in 1 blocks
+==6184==    indirectly lost: 0 bytes in 0 blocks
+==6184==      possibly lost: 0 bytes in 0 blocks
+==6184==    still reachable: 0 bytes in 0 blocks
+==6184==         suppressed: 0 bytes in 0 blocks
+==6184==
+==6184== For lists of detected and suppressed errors, rerun with: -s
+==6184== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
+
+
+8. 메모리를 할당할 때 다른 인터페이스를 사용해 보라. 예를 들어, 간단한 벡터-비슷한
+자료 구조를 만들고 벡터를 관리하기 위하여 realloc()을 사용하는 루틴을 만들어
+라. 벡터 원소를 저장하기 위하여 배열을 사용하라. 사용자가 벡터에 항목을 추가할
+때, realloc()을 사용하여 필요 공간을 확보하라. 이 벡터 프로그램은 얼마나 잘
+동작하는가? 연결 리스트와 비교하면 어떠한가? 버그를 발견하기 위하여 valgrind를
+사용하라.
+
+
+
+
+
+9. gdb와 valgrind 사용법을 배우기 위하여 시간과 노력을 투자하라. 도구를 잘 아는
+것은 매우 중요하다. Unix와 C 환경에서 디버거 전문가가 되기 위해 시간과 노력을
+투자하라.
+
+넹
