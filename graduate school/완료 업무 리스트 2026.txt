@@ -10,6 +10,71 @@ MM/DD ~ MM/DD
 금
 	
 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+11/16 ~ 11/20
+월
+	뉴스와 연구 동향에 관한 코멘트
+		AI를 사용하지 않는 것 에서 AI의 결과에 책임지는 능력에 대해 대두됨
+		NOMAD (Non eclusive Memory Tiering via Transctional Page Migration)
+			메모리 migration 비동기화
+			cold로 판단된 메모리를 지우지 않고 shadow page로 변경
+			copy, remove 비용 최소화 reclaim 시 shadow page에서 진행
+		P2CACHE
+			파일 시스템의 read write 경로 재구성
+	OSTEP 23 VAX/VMS 가상 메모리 시스템 
+		OSTEP 12 ~ 24 1회 읽기 완료 정리하며 읽기 시작
+	텝스 영어 공부
+		4문제
+	밑바닥부터 시작하는 딥러닝 1
+		1장 파이썬, 2장 퍼셉트론 62페이지
+	xv6
+		using gdb 과제 완료
+	영어 공부
+		1문제 해결 및 모르는 단어 단어장 등록
+화
+	OSTEP 13 정리 완료
+	텝스 영어 공부
+		3문제
+	밑바닥부터 시작하는 딥러닝 1
+		3장 73페이지
+	뉴스와 연구 동향에 관한 코멘트
+		 Overfcoming the Memory Wall with CXL-Enabled SSDs
+			CXL을 대용량 메모리로 사용
+	조퇴
+수
+	뉴스와 연구 동향에 관한 코멘트
+		MEMTIS Efficient MEmory Tiering with Dynamic Hotness Tracking and Page Granularity Control
+			임계값이 상수이면 변화에 적응하지 못함
+			용량에 맞춰 동작으로 임계값을 정한다.
+	OSTEP 14 Memory API 정리 완료
+	텝스 영어공부
+		2문제
+	밑바닥부터 시작하는 딥러닝 1
+		3장 
+	vx6
+		using gdb 완료
+		Sandbox a command 완료
+		Sandbox with allowed pathnames 완료
+목
+	뉴스와 연구 동향에 관한 코멘트
+		최근 취약점에 대한 빠른 대처가 오히려 시스템 장애의 원인이 되고 있음
+			-> 무중단 프로그램 업데이트 혹은 커널 업데이트를 진행할 수 있으면 충분히 해결 할 수 있는 문제
+ 			무중단 프로그램 업데이트 까지 가지 않더라도 프로그램 일부 업데이트 기능 등 긴급 패칭 기능이 활성화 되면 막을 수 있을 것으로 예상됨
+	연구 주제에 관한 정리를 시작함
+		Reserch 레퍼지터리 생성
+	단어 시험
+	텝스 영어공부
+		set2 4문제
+	VX6 
+금
+	뉴스와 연구 동향에 관한 코멘트
+		장치의 포트 종류에 대한 고민을 하게 됨
+		포트 종류에 따른 메모리 간섭과 길이 위치등을 고려해야 함
+		뇌 구조를 모방하여 AI 학습 시 계층을 나눠 진행하는 방법이 있지 않을까? 하는 고민
+	OSTEP
+		깃 꼬임으로 14Cahpter 부터 다시 시작
+	텝스 문제풀이
+		9문제
+
 11/09 ~ 11/13
 월
 	OSTEP 20 페이징 : 더 작은 테이블, 21 물리 메모리 크기의 극복 : 메커니즘

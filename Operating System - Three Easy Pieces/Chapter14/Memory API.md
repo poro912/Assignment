@@ -1,4 +1,4 @@
-<h1> ChapterName </h1>
+<h1> 메모리 API (Memory API) </h1>
 
 <h2> Index </h2>
 
